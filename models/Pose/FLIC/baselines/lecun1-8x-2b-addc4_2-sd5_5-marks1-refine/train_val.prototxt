@@ -992,7 +992,7 @@ layer {
     # phase_name: "test_predicted/"
     # phase_name: "test_ground_truths/"
     phase_name: "test_fusion/"
-    threshold: 0.3
+    threshold: 0.273
   }
 }
 

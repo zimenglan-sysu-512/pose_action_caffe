@@ -1,0 +1,14 @@
+1 git clone --recursive liangdp@172.18.181.186:/home/liangdp/dongdk/pose-rgb.git
+  or
+  git clone --recursive ~/home/../pathTo/pose-rgb.git
+
+2 git checkout -b ddk origin/master (create a branch named ddk, based on origin/master)
+
+
+ssh
+  ssh lawrence@172.18.18/2.27
+  627116
+
+watch -n nvidia-smi
+
+

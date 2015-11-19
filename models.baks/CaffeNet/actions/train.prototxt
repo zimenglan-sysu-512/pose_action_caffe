@@ -1,0 +1,15 @@
+name: "ActionCaffeNet"
+layer {
+  name: 'data'
+  type: 'Python'
+  top: 'data'
+  top: 'rois'
+  top: 'labels'
+  # top: 'bbox_targets'
+  # top: 'bbox_loss_weights'
+  python_param {
+    module: 'action_roi_data_layer.layer'
+    layer: 'RoIDataLayer'
+    param_str: "'num_classes': 11"
+  }
+}

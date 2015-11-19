@@ -1,0 +1,53 @@
+input: "in_data"
+input_dim: 2
+input_dim: 3
+input_dim: 9
+input_dim: 6
+
+input: "in_data1"
+input_dim: 2
+input_dim: 2
+input_dim: 9
+input_dim: 6
+
+input: "in_data2"
+input_dim: 2
+input_dim: 2
+input_dim: 9
+input_dim: 6
+
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "in_data"
+  top: "conv1"
+
+  convolution_param {
+    num_output: 2
+    kernel_size: 5
+  }
+}
+
+layer {
+  name: "crop_patch_max_fea_pos"
+  type: "CropPatchFromMaxFeaturePosition"
+  bottom: "in_data"
+  bottom: "conv1"
+
+  bottom: "in_data"
+  top: "out_data"
+
+  bottom: "in_data1"
+  top: "out_data1"
+
+  bottom: "in_data2"
+  top: "out_data2"
+
+  crop_patch_from_max_feature_position_param {
+    crop_factor: 0.5
+
+    match_channel: false
+    match_channel: true
+    match_channel: true
+  }
+}

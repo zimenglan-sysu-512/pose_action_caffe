@@ -1,0 +1,29 @@
+input: "in_data"
+input_dim: 2
+input_dim: 2
+input_dim: 4
+input_dim: 4
+
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "in_data"
+  top: "conv1"
+
+  convolution_param {
+    num_output: 3
+    kernel_size: 5
+    pad: 2
+  }
+}
+
+layer {
+  name: "crop_patch_max_fea_pos"
+  type: "CropPatchFromMaxFeaturePosition"
+
+  bottom: "in_data"
+  bottom: "conv1"
+
+  bottom: "in_data"
+  top: "out_data"
+}

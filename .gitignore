@@ -1,0 +1,11 @@
+*.pyc
+.ipynb_checkpoints
+utils/*.c
+utils/*.so
+action_output/
+data/Actions/
+*.tar.gz
+*.tar
+.project
+.pydevproject
+face-detection/

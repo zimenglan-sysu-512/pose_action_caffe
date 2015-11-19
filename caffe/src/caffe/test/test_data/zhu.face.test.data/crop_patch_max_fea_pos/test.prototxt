@@ -1,0 +1,53 @@
+input: "in_data"
+input_dim: 2
+input_dim: 2
+input_dim: 9
+input_dim: 9
+
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "in_data"
+  top: "conv1"
+
+  convolution_param {
+    num_output: 2
+    kernel_size: 5
+    pad: 2
+  }
+}
+
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+layer {
+  name: "resize"
+  type: "Resize"
+  bottom: "pool1"
+  top: "resize1"
+
+  resize_param {
+    height: 2
+    width: 2
+  }
+}
+
+layer {
+  name: "crop_patch_max_fea_pos"
+  type: "CropPatchFromMaxFeaturePosition"
+  bottom: "conv1"
+  bottom: "resize1"
+
+  bottom: "conv1"
+  top: "out_conv1"
+}

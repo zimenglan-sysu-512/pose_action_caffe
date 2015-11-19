@@ -1,0 +1,28 @@
+input: "data"
+input_dim: 2
+input_dim: 2
+input_dim: 4
+input_dim: 4
+
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+
+  convolution_param {
+    num_output: 128
+    kernel_size: 5
+    pad: 2
+  }
+}
+
+layer {
+  name: "resize_with_map"
+  type: "ResizeWithMap"
+  bottom: "data"
+  bottom: "conv1"
+
+  bottom: "data"
+  top: "data1"
+}

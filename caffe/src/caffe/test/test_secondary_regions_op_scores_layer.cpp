@@ -91,7 +91,7 @@ class SecondaryRegionsOpScoresLayerTest : public MultiDeviceTest<TypeParam> {
     blob_bottom_->Reshape(num, channels, height, width);
 
     // 
-    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/secondary_regions/max/";
     std::string bottom_data_input_filename = "bottom_data_input.log";
     std::string bottom_data_input_filepath = 
@@ -238,7 +238,7 @@ class SecondaryRegionsOpScoresLayerTest : public MultiDeviceTest<TypeParam> {
     blob_bottom_->Reshape(num, channels, height, width);
 
     // 
-    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/secondary_regions/max/";
     std::string bottom_data_input_filename = "bottom_data_input.log";
     std::string bottom_data_input_filepath = 
@@ -385,7 +385,7 @@ class SecondaryRegionsOpScoresLayerTest : public MultiDeviceTest<TypeParam> {
     blob_bottom_->Reshape(num, channels, height, width);
 
     // 
-    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/secondary_regions/max/";
     std::string bottom_data_input_filename = "bottom_data_input.log";
     std::string bottom_data_input_filepath = 
@@ -536,7 +536,7 @@ class SecondaryRegionsOpScoresLayerTest : public MultiDeviceTest<TypeParam> {
     blob_bottom_->Reshape(num, channels, height, width);
 
     // 
-    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/secondary_regions/sum/";
     std::string bottom_data_input_filename = "bottom_data_input.log";
     std::string bottom_data_input_filepath = 
@@ -632,7 +632,7 @@ class SecondaryRegionsOpScoresLayerTest : public MultiDeviceTest<TypeParam> {
     blob_bottom_->Reshape(num, channels, height, width);
 
     // 
-    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/secondary_regions/sum/";
     std::string bottom_data_input_filename = "bottom_data_input.log";
     std::string bottom_data_input_filepath = 

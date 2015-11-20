@@ -91,7 +91,7 @@ class CrossBlobsSumLayerTest2 : public MultiDeviceTest<TypeParam> {
     // ###############################################################
     // init data values
     std::string test_file_dir = 
-        "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+        "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/cross_blobs_sum/";
 
     // primary

@@ -271,7 +271,7 @@ message LayerParameter {
   // so, the model defined in `*train*.prototxt` has `primary_fc6` layer
   // in result, `primary_fc6` will be initialized by `fc6`
   // for more details, please refer to the code:
-  //    caffe-fast-rcnn/src/caffe/net.cpp `CopyTrainedLayersFrom` function
+  //    caffe/src/caffe/net.cpp `CopyTrainedLayersFrom` function
   optional string copy_postfix_name = 400;
 
   // 

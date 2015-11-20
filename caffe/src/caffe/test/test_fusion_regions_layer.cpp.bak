@@ -96,7 +96,7 @@ class FusionRegionsLayerTest : public MultiDeviceTest<TypeParam> {
     secondary_regions_->Reshape(batch_size, n_regions, 1, 1);
 
     // 
-    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+    std::string test_file_dir = "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/fusion_regions/";
     // 
     std::string cls_sr_inds_filename = "cls_sr_inds.log";

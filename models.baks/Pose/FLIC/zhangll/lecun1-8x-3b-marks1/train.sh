@@ -5,7 +5,7 @@ ProjectDir="../../../../../"
 cd $ProjectDir
 # export LD_LIBRARY_PATH=../asserts/cuddn/v2/lib/:$LD_LIBRARY_PATH
 
-CaffeRootDir="caffe-fast-rcnn/"
+CaffeRootDir="caffe/"
 # build/tools/
 Tools="build/tools/"
 Tools=$CaffeRootDir$Tools

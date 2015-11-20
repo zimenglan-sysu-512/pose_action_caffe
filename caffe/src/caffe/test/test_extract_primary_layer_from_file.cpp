@@ -108,7 +108,7 @@ class ExtractPrimaryLayerTest2 : public MultiDeviceTest<TypeParam> {
     // ###############################################################
     // init data values
     std::string test_file_dir = 
-        "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+        "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/extract_primary/";
     std::string bottom_data_input_filename = "bottom_data_input.log";
     std::string bottom_data_input_filepath = 
@@ -243,7 +243,7 @@ class ExtractPrimaryLayerTest2 : public MultiDeviceTest<TypeParam> {
     // ###############################################################
     // init data values
     std::string test_file_dir = 
-        "/home/black/caffe/fast-rcnn-action/caffe-fast-rcnn/src/caffe/test/";
+        "/home/black/caffe/fast-rcnn-action/caffe/src/caffe/test/";
     std::string test_file_sub_dir = "test_data/extract_primary/";
     std::string bottom_data_input_filename = "bottom_data_input.log";
     std::string bottom_data_input_filepath = 

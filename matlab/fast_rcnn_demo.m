@@ -10,7 +10,7 @@ function fast_rcnn_demo()
 
 [folder, name, ext] = fileparts(mfilename('fullpath'));
 
-caffe_path = fullfile(folder, '..', 'caffe-fast-rcnn', 'matlab', 'caffe');
+caffe_path = fullfile(folder, '..', 'caffe', 'matlab', 'caffe');
 addpath(caffe_path);
 
 use_gpu = true;

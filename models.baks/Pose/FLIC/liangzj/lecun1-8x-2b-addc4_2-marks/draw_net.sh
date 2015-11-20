@@ -1,4 +1,4 @@
-python_dir="../../../../../caffe-fast-rcnn/python/"
+npython_dir="../../../../../caffe/python/"
 cd $python_dir
 
 rankdir="TB"

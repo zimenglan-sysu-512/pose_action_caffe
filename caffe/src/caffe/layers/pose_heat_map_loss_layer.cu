@@ -40,6 +40,7 @@ Dtype PoseHeatMapLossLayer<Dtype>::PrintLoss_gpu()
   LOG(INFO) << "euclidean loss (joint): " << per_heat_map_loss;
   LOG(INFO) << "heat_map_loss_emphase_type: " << loss_emphase_type_;
   LOG(INFO) << "heat_score_thres: " << heat_score_thres_;
+  LOG(INFO) << "prob_num: " << this->prob_num_;
   LOG(INFO);
 
   return batch_loss;

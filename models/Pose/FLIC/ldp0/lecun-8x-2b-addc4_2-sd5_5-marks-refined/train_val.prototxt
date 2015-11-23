@@ -982,7 +982,7 @@ layer {
   }
   visual_pose_coords_param {
     coords_path: "../asserts/models/Pose/FLIC/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks-refined/poses_coords/"
-    skel_path: "../asserts/dataset/Pose/FLIC/labels/skel_path.txt"
+    skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
     # if bottom.size() == 1, only one of them, either `train/test` or `train, test, fusion` 

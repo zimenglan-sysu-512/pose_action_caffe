@@ -1058,6 +1058,7 @@ layer {
     acc_factor: 0.05
     acc_factor_num: 10
     images_num: 1016
+    zero_iter_test: true
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
     acc_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/test_acc/"

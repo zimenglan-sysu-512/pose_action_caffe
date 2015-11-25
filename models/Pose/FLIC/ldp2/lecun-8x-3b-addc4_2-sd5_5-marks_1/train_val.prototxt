@@ -20,7 +20,7 @@ layer {
     # opencv: B, G, R
   }
   random_image_data2_param {
-    batch_size: 24
+    batch_size: 12
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"

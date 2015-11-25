@@ -46,23 +46,27 @@ echo "  sh train_val_.sh [re_iter]"
 echo
 echo "######################################"
 echo
-sleep_time=1
+sleep_time=3
 sleep $sleep_time
 # resume model file
 if [ ! -n "$1" ] ;then
 	re_iter=0
-	# run & log command
-	$caffe_bin train --solver=$solver_proto 2>&1 | tee -a $log_filename
+	mkdir -p $model_path
+	resume_model_file="flic_iter_"$re_iter".caffemodel"
 else
 	re_iter=$1
 	resume_model_file="flic_iter_"$re_iter".solverstate"
-	resume_model_file=$model_path$resume_model_file
-	echo
-	echo "re_iter:" $re_iter
-	echo "snapshot path:" $resume_model_file
-	echo
-	# run & log command
+fi
+resume_model_file=$model_path$resume_model_file
+echo
+echo "re_iter:" $re_iter
+echo "snapshot path:" $resume_model_file
+echo
+
+# run & log command
+if [ ! -n "$1" ] ;then
+	$caffe_bin train --solver=$solver_proto --weights=$resume_model_file 2>&1 | tee -a $log_filename
+else
 	$caffe_bin train --solver=$solver_proto --snapshot=$resume_model_file 2>&1 | tee -a $log_filename
 fi
-
 echo "Done!"

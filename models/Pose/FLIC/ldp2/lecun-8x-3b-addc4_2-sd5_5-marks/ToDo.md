@@ -9,6 +9,10 @@ batch size increases, the iteration for devergence decreases, and accuracy
 18 -> 88.92
 24 -> ?
 
+Notice:
+	crop ratio: 0.4 is better than 0.3
+	heat map loss: 0.05 is better than 0.005
+
 step1: 
  set large prob_num in heat map loss layer
  and lr_rate is 0.001

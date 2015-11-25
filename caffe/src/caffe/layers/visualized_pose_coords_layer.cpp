@@ -68,6 +68,11 @@ void VisualizedPoseCoordsLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bo
   get_skeleton_idxs(this->skel_path_, this->start_skel_idxs_, this->end_skel_idxs_);
   CHECK(this->start_skel_idxs_.size() > 0);
   CHECK_EQ(this->start_skel_idxs_.size(), this->end_skel_idxs_.size());
+  LOG(INFO);
+  LOG(INFO) << "coords_path:" << this->coords_path_;
+  LOG(INFO) << "coords_files_path:" << this->coords_files_path_;
+  LOG(INFO) << "coords_images_path:" << this->coords_files_path_;
+  LOG(INFO);
 }
 
 template <typename Dtype>

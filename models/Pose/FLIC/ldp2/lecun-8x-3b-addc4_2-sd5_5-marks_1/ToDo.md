@@ -1,8 +1,8 @@
 Note:
 	1 hard negatives, use top k
-	2 two banks, use conv4_1 and conv4_2
+	2 three banks, use conv4_1 and conv4_2
 	3 torso masks
-	4 refined model - one bank
+	4 initial by the trained two-banks model
 
 batch size increases, the iteration for devergence decreases, and accuracy 
 (PDJ@0.1) increases

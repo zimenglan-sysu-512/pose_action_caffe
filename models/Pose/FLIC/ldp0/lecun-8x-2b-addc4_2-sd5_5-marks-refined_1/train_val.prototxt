@@ -20,7 +20,7 @@ layer {
     # opencv: B, G, R
   }
   random_image_data2_param {
-    batch_size: 24
+    batch_size: 6
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
@@ -34,7 +34,7 @@ layer {
     img_ext: ".jpg"
     # receptive_field_size: 100
     # visual_images_path: "m_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks/visual_data/train/"
+    # visual_path: "../asserts/models/Pose/FLIC/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks-refined_1/visual_data/train/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
@@ -67,7 +67,7 @@ layer {
     img_ext: ".jpg"
     # receptive_field_size: 100
     # visual_images_path: "nm_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks/visual_data/test/"
+    # visual_path: "../asserts/models/Pose/FLIC/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks-refined_1/visual_data/test/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
@@ -86,7 +86,7 @@ layer {
     top_id2: 6
     bottom_id2: 10
     value: 255
-    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks/data_masks/"
+    # visual_path: "../asserts/models/Pose/FLIC/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks-refined_1/data_masks/"
     # img_ext: ".jpg"
   }
 }
@@ -107,16 +107,6 @@ layer {
   bottom: "data_bank1"
   top: "data_bank2"
   resize_param {
-    height_fac: 0.707
-    width_fac: 0.707
-  }
-}
-layer {
-  name: "data_bank3"
-  type: "Resize"
-  bottom: "data_bank1"
-  top: "data_bank3"
-  resize_param {
     height_fac: 0.5
     width_fac: 0.5
   }
@@ -133,9 +123,7 @@ layer {
   heat_maps_from_coords_origin_param {
     is_binary: true
     # 决定了heat map的pixels不为0的区域(菱形)的边长
-    # radius: 10
-    # radius_str: "2,2,2,6,6,4,6,6,4,6,6,6,6,6"
-    radius_str: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
+    radius_str: "2,2,2,2,2,2,2,2,2,2,2,2,2,2"
     gau_mean: 0
     gau_stds: 1.5
   }
@@ -150,11 +138,11 @@ layer {
   bottom: "data_bank1"
   top: "conv1_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -197,11 +185,11 @@ layer {
   bottom: "pool1_bank1"
   top: "conv2_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -244,11 +232,11 @@ layer {
   bottom: "pool2_bank1"
   top: "conv3_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -291,11 +279,11 @@ layer {
   bottom: "pool3_bank1"
   top: "conv4_1_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -325,11 +313,11 @@ layer {
   bottom: "conv4_1_bank1"
   top: "conv4_2_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -362,11 +350,11 @@ layer {
   bottom: "data_bank2"
   top: "conv1_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -409,11 +397,11 @@ layer {
   bottom: "pool1_bank2"
   top: "conv2_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -456,11 +444,11 @@ layer {
   bottom: "pool2_bank2"
   top: "conv3_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -503,11 +491,11 @@ layer {
   bottom: "pool3_bank2"
   top: "conv4_1_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -537,11 +525,11 @@ layer {
   bottom: "conv4_1_bank2"
   top: "conv4_2_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -572,225 +560,6 @@ layer {
   top: "re_conv4_2_bank2"
 }
 
-# ##########################
-# conv & relu & lrn & pool
-# brand 3
-layer {
-  name: "conv1_bank3"
-  type: "Convolution"
-  bottom: "data_bank3"
-  top: "conv1_bank3"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 128
-    pad: 2
-    kernel_size: 5
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "relu1_bank3"
-  type: "ReLU"
-  bottom: "conv1_bank3"
-  top: "conv1_bank3"
-}
-layer {
-  name: "pool1_bank3"
-  type: "Pooling"
-  bottom: "conv1_bank3"
-  top: "pool1_bank3"
-  pooling_param {
-    pool: MAX
-    stride: 2
-    kernel_size: 2
-  }
-}
-
-# #######################
-
-layer {
-  name: "conv2_bank3"
-  type: "Convolution"
-  bottom: "pool1_bank3"
-  top: "conv2_bank3"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 128
-    pad: 2
-    kernel_size: 5
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.
-    }
-  }
-}
-layer {
-  name: "relu2_bank3"
-  type: "ReLU"
-  bottom: "conv2_bank3"
-  top: "conv2_bank3"
-}
-layer {
-  name: "pool2_bank3"
-  type: "Pooling"
-  bottom: "conv2_bank3"
-  top: "pool2_bank3"
-  pooling_param {
-    pool: MAX
-    stride: 2
-    kernel_size: 2
-  }
-}
-
-# #######################
-
-layer {
-  name: "conv3_bank3"
-  type: "Convolution"
-  bottom: "pool2_bank3"
-  top: "conv3_bank3"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 128
-    pad: 2
-    kernel_size: 5
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  name: "relu3_bank3"
-  type: "ReLU"
-  bottom: "conv3_bank3"
-  top: "conv3_bank3"
-}
-layer {
-  name: "pool3_bank3"
-  type: "Pooling"
-  bottom: "conv3_bank3"
-  top: "pool3_bank3"
-  pooling_param {
-    pool: MAX
-    stride: 2
-    kernel_size: 2
-  }
-}
-
-# ####################
-
-layer {
-  name: "conv4_1_bank3"
-  type: "Convolution"
-  bottom: "pool3_bank3"
-  top: "conv4_1_bank3"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 512
-    pad: 2
-    kernel_size: 5
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.
-    }
-  }
-}
-layer {
-  name: "relu4_1_bank3"
-  type: "ReLU"
-  bottom: "conv4_1_bank3"
-  top: "conv4_1_bank3"
-}
-
-layer {
-  name: "conv4_2_bank3"
-  type: "Convolution"
-  bottom: "conv4_1_bank3"
-  top: "conv4_2_bank3"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 512
-    pad: 4
-    kernel_size: 9
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.
-    }
-  }
-}
-layer {
-  name: "relu4_2_bank3"
-  type: "ReLU"
-  bottom: "conv4_2_bank3"
-  top: "conv4_2_bank3"
-}
-layer {
-  name: "re_conv4_2_bank3"
-  type: "Resize"
-  bottom: "conv4_2_bank3"
-  bottom: "conv4_2_bank1"
-  top: "re_conv4_2_bank3"
-}
-
 # ############
 # merge banks
 layer {
@@ -798,7 +567,6 @@ layer {
   type: "Eltwise"
   bottom: "conv4_2_bank1"
   bottom: "re_conv4_2_bank2"
-  bottom: "re_conv4_2_bank3"
   top: "conv4"
   eltwise_param {
     operation: SUM
@@ -823,11 +591,11 @@ layer {
   bottom: "conv4"
   top: "conv5"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -858,11 +626,11 @@ layer {
   bottom: "conv5"
   top: "conv6"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -893,11 +661,11 @@ layer {
   bottom: "conv6"
   top: "conv7"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -914,12 +682,177 @@ layer {
     }
   }
 }
+
 layer {
-  name: "re_heat_maps"
+  name: "re_conv7"
   type: "Resize"
-  bottom: "heat_maps"
   bottom: "conv7"
-  top: "re_heat_maps"
+  bottom: "heat_maps"
+  top: "re_conv7"
+}
+
+# #####################################
+# refined models -- only conv && relu
+layer {
+  name: "crop-data"
+  type: "CropPatchFromMaxFeaturePosition"
+
+  ## this is for getting mapping relationship
+  bottom: "conv1_bank1"
+  bottom: "re_conv7"
+
+  bottom: "conv1_bank1"
+  top: "crop_conv1_bank1"
+
+  bottom: "heat_maps"
+  top: "crop_heat_maps"
+
+  crop_patch_from_max_feature_position_param {
+    crop_factor: 0.4
+    match_channel: false
+    match_channel: true
+  }
+}
+
+# #######################
+
+layer {
+  name: "crop_conv2_bank1"
+  type: "Convolution"
+  bottom: "crop_conv1_bank1"
+  top: "crop_conv2_bank1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 224
+    pad: 2
+    group: 14
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "crop_relu2_bank1"
+  type: "ReLU"
+  bottom: "crop_conv2_bank1"
+  top: "crop_conv2_bank1"
+}
+
+# #######################
+
+layer {
+  name: "crop_conv3_bank1"
+  type: "Convolution"
+  bottom: "crop_conv2_bank1"
+  top: "crop_conv3_bank1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 224
+    pad: 3
+    group: 14
+    kernel_size: 7
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "crop_relu3_bank1"
+  type: "ReLU"
+  bottom: "crop_conv3_bank1"
+  top: "crop_conv3_bank1"
+}
+
+# ####################
+
+layer {
+  name: "crop_conv4_bank1"
+  type: "Convolution"
+  bottom: "crop_conv3_bank1"
+  top: "crop_conv4_bank1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 448
+    pad: 4
+    kernel_size: 9
+    group: 14
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "crop_relu4_bank1"
+  type: "ReLU"
+  bottom: "crop_conv4_bank1"
+  top: "crop_conv4_bank1"
+}
+
+# ####################
+
+layer {
+  name: "crop_conv5_bank1"
+  type: "Convolution" 
+  bottom: "crop_conv4_bank1"
+  top: "crop_conv5_bank1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 14
+    kernel_size: 1
+    group: 14
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
 }
 
 # ###########
@@ -927,8 +860,8 @@ layer {
 layer {
   name: "pose_heap_map_loss"
   type: "PoseHeatMapLoss"
-  bottom: "conv7"
-  bottom: "re_heat_maps"
+  bottom: "crop_conv5_bank1"
+  bottom: "crop_heat_maps"
   bottom: "heat_maps_masks"
   top: "pose_heap_map_loss"
   include {
@@ -944,7 +877,7 @@ layer {
     fg_eof: 3
     bg_eof: 1
     # bg_num: 5
-    ratio: 0.01
+    ratio: 0.005
     # when loss continues to decrease, but accuracy does not keep increasing,
     # modify the prob_num to be smaller, e.g. 11 to 7
     prob_num: 11
@@ -959,19 +892,35 @@ layer {
 # ########################
 # visual & accuracy layer
 layer {
-  name: "re_conv7"
-  type: "Resize"
-  bottom: "conv7"
-  bottom: "heat_maps"
-  top: "re_conv7"
+  name: "resize_crop_heat_map"
+  type: "ResizeWithMap"
+  bottom: "crop_conv5_bank1"
+  bottom: "data_bank1"
+
+  bottom: "crop_conv5_bank1"
+  top: "re_crop_conv5_bank1"
+
   include {
     phase: TEST
   }
 }
 layer {
+  name: "mix_heat_map"
+  type: "Eltwise"
+  bottom: "re_conv7"
+  bottom: "re_crop_conv5_bank1"
+  top: "mix_heat_map"
+  include {
+    phase: TEST
+  }
+  eltwise_param {
+    operation: SUM
+  }
+}
+layer {
   name: "pred_coords_from_maps"
   type: "CoordsFromHeatMaps"
-  bottom: "re_conv7"
+  bottom: "mix_heat_map"
   top: "pred_pose_coords"
   include {
     phase: TEST
@@ -997,10 +946,11 @@ layer {
     phase: TEST
   }
 }
+
 layer {
-  name: "visual_heat_maps2_2"
+  name: "visual_heat_maps2"
   type: "VisualizedHeatMaps2"
-  bottom: "re_conv7"
+  bottom: "mix_heat_map"
   bottom: "heat_maps"
   bottom: "aux_info"
   include {
@@ -1009,7 +959,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks-refined_1/test_heat_maps2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -1021,7 +971,6 @@ layer {
     threshold: 0.273
   }
 }
-
 layer {
   name: "visual_coords"
   type: "VisualizedPoseCoords"
@@ -1032,7 +981,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks-refined_1/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -1055,12 +1004,13 @@ layer {
     phase: TEST
   }
   pose_pdj_accuracy_param {
-    acc_factor: 0.005
+    acc_factor: 0.05
     acc_factor_num: 10
     images_num: 1016
+    zero_iter_test: true
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks-refined_1/test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

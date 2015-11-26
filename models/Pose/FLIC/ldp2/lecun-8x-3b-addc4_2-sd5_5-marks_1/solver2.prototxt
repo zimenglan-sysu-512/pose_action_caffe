@@ -10,10 +10,10 @@ snapshot_prefix: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-mar
 # Test images num(where is 1016) = test_iter(127) * test_batch(where is 8)
 test_iter: 127
 # Test when reaching the test_interval
-test_interval: 1000
+test_interval: 500
 
 # 0.001 fast convergence
-base_lr: 0.001
+base_lr: 0.0001
 # Learning rate
 lr_policy: "step"
 

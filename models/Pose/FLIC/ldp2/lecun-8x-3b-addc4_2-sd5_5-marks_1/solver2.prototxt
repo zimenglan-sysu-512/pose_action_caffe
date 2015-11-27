@@ -1,7 +1,7 @@
 # Solver prototxt
 net: "models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/train_val2.prototxt"
 # Snapshot
-snapshot: 1000
+snapshot: 500
 # Snapshot prefix
 snapshot_prefix: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/models/flic"
 
@@ -13,7 +13,7 @@ test_iter: 127
 test_interval: 500
 
 # 0.001 fast convergence
-base_lr: 0.0001
+base_lr: 0.00001
 # Learning rate
 lr_policy: "step"
 

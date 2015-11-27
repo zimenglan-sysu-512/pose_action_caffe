@@ -3,6 +3,7 @@ Note:
 	2 three banks, use conv4_1 and conv4_2
 	3 torso masks
 	4 initial by the trained two-banks model
+	5 add refine model
 
 batch size increases, the iteration for devergence decreases, and accuracy 
 (PDJ@0.1) increases

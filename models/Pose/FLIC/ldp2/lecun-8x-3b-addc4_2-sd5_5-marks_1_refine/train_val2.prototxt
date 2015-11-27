@@ -20,7 +20,7 @@ layer {
     # opencv: B, G, R
   }
   random_image_data2_param {
-    batch_size: 24
+    batch_size: 6
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
@@ -34,7 +34,7 @@ layer {
     img_ext: ".jpg"
     # receptive_field_size: 100
     # visual_images_path: "m_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/visual_data/train/"
+    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/visual_data/train/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
@@ -67,7 +67,7 @@ layer {
     img_ext: ".jpg"
     # receptive_field_size: 100
     # visual_images_path: "nm_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/visual_data/test/"
+    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/visual_data/test/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
@@ -86,7 +86,7 @@ layer {
     top_id2: 6
     bottom_id2: 10
     value: 255
-    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/data_masks/"
+    # visual_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/data_masks/"
     # img_ext: ".jpg"
   }
 }
@@ -150,11 +150,11 @@ layer {
   bottom: "data_bank1"
   top: "conv1_bank1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -197,11 +197,11 @@ layer {
   bottom: "pool1_bank1"
   top: "conv2_bank1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -244,11 +244,11 @@ layer {
   bottom: "pool2_bank1"
   top: "conv3_bank1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -291,11 +291,11 @@ layer {
   bottom: "pool3_bank1"
   top: "conv4_1_bank1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -325,11 +325,11 @@ layer {
   bottom: "conv4_1_bank1"
   top: "conv4_2_bank1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -362,11 +362,11 @@ layer {
   bottom: "data_bank2"
   top: "conv1_bank2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -409,11 +409,11 @@ layer {
   bottom: "pool1_bank2"
   top: "conv2_bank2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -456,11 +456,11 @@ layer {
   bottom: "pool2_bank2"
   top: "conv3_bank2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -503,11 +503,11 @@ layer {
   bottom: "pool3_bank2"
   top: "conv4_1_bank2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -537,11 +537,11 @@ layer {
   bottom: "conv4_1_bank2"
   top: "conv4_2_bank2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -1009,7 +1009,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -1032,7 +1032,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -1061,7 +1061,7 @@ layer {
     zero_iter_test: true
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/test_acc2/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

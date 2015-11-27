@@ -8,26 +8,26 @@ CaffeRootDir="caffe/"
 # build/tools/
 Tools="build/tools/"
 Tools=$CaffeRootDir$Tools
-# models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/
+# models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/
 ProtosDir="models/Pose/"
 SubProtosDir="FLIC/ldp2/"
-ExperName="lecun-8x-3b-addc4_2-sd5_5-marks_1/"
+ExperName="lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/"
 ExperPath=$ProtosDir$SubProtosDir$ExperName
 mkdir -p $ExperPath
-# models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/solver.prototxt
+# models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/solver.prototxt
 solver_proto="solver2.prototxt"
 solver_proto=$ExperPath$solver_proto
 echo $solver_proto
-# ../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/
+# ../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/
 ModelsDir="../asserts/"
 ModelsDir=$ModelsDir$ExperPath
 mkdir -p $ModelsDir
-# ../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/models/
+# ../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/models/
 model_path="models/"
 model_path=$ModelsDir$model_path
 mkdir -p $model_path
 echo $model_path
-# ../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1/log/
+# ../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/log/
 log_path="log/"
 log_path=$ModelsDir$log_path
 mkdir -p $log_path

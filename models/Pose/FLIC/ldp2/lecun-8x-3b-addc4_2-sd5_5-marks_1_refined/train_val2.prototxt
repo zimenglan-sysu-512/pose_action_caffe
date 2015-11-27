@@ -1348,7 +1348,7 @@ layer {
   bottom: "crop_conv4_bank1"
   bottom: "re_crop_conv4_bank2"
   bottom: "re_crop_conv4_bank3"
-  top: "conv4"
+  top: "crop_conv4"
   eltwise_param {
     operation: SUM
   }
@@ -1359,7 +1359,7 @@ layer {
 layer {
   name: "crop_conv5"
   type: "Convolution" 
-  bottom: "crop_conv4_bank1"
+  bottom: "crop_conv4"
   top: "crop_conv5"
   param {
     lr_mult: 1

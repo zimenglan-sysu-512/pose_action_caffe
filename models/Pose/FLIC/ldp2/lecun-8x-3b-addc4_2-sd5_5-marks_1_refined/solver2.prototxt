@@ -13,7 +13,7 @@ test_iter: 127
 test_interval: 500
 
 # 0.001 fast convergence
-base_lr: 0.0001
+base_lr: 0.00001
 # Learning rate
 lr_policy: "step"
 

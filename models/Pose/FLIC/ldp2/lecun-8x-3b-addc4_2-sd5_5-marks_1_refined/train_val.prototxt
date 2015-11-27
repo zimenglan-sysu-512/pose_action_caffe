@@ -967,7 +967,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896
+    num_output: 224
     pad: 2
     group: 14
     kernel_size: 5
@@ -1004,7 +1004,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896
+    num_output: 224
     pad: 3
     group: 14
     kernel_size: 7
@@ -1041,7 +1041,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 1792
+    num_output: 448
     pad: 4
     kernel_size: 9
     group: 14
@@ -1098,7 +1098,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896
+    num_output: 224
     pad: 2
     group: 14
     kernel_size: 5
@@ -1135,7 +1135,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896
+    num_output: 224
     pad: 3
     group: 14
     kernel_size: 7
@@ -1172,7 +1172,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 1792
+    num_output: 448
     pad: 4
     kernel_size: 9
     group: 14
@@ -1237,7 +1237,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896
+    num_output: 224
     pad: 2
     group: 14
     kernel_size: 5
@@ -1274,7 +1274,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896
+    num_output: 224
     pad: 3
     group: 14
     kernel_size: 7
@@ -1311,7 +1311,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 1792
+    num_output: 448
     pad: 4
     kernel_size: 9
     group: 14

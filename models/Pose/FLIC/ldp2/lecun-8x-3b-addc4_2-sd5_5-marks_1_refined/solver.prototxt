@@ -1,9 +1,9 @@
 # Solver prototxt
-net: "models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/train_val.prototxt"
+net: "models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refined/train_val.prototxt"
 # Snapshot
 snapshot: 500
 # Snapshot prefix
-snapshot_prefix: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refine/models/flic"
+snapshot_prefix: "../asserts/models/Pose/FLIC/ldp2/lecun-8x-3b-addc4_2-sd5_5-marks_1_refined/models/flic"
 
 # # Train images num(where is 3987) = test_iter(443) * test_batch(where is 9)
 # test_iter: 443

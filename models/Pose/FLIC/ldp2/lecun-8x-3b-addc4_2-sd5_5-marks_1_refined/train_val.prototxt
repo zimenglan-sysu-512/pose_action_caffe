@@ -1074,10 +1074,7 @@ layer {
 
   bottom: "conv1_bank2"
   top: "crop_conv1_bank2"
-
-  bottom: "heat_maps"
-  top: "crop_heat_maps"
-
+  
   crop_patch_from_max_feature_position_param {
     crop_factor: 0.3
     match_channel: false
@@ -1216,9 +1213,6 @@ layer {
 
   bottom: "conv1_bank3"
   top: "crop_conv1_bank3"
-
-  bottom: "heat_maps"
-  top: "crop_heat_maps"
 
   crop_patch_from_max_feature_position_param {
     crop_factor: 0.3

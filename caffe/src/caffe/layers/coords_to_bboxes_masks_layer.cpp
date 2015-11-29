@@ -55,10 +55,14 @@ void CoordsToBboxesMasksLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bot
   this->top_idx2_ = this->top_id2_ * 2;
   this->bottom_idx_ = this->bottom_id_ * 2;
   this->bottom_idx2_ = this->bottom_id2_ * 2;
-  LOG(INFO) << "top_id: " << this->top_id_ << ", top_idx: " << this->top_idx_;
-  LOG(INFO) << "top_id2: " << this->top_id2_ << ", top_idx2: " << this->top_idx2_;
-  LOG(INFO) << "bottom_id: " << this->bottom_id_ << ", bottom_idx: " << this->bottom_idx_;
-  LOG(INFO) << "bottom_id2: " << this->bottom_id2_ << ", bottom_idx2: " << this->bottom_idx2_;
+  LOG(INFO) << "top_id: " << this->top_id_ 
+      << ", top_idx: " << this->top_idx_;
+  LOG(INFO) << "top_id2: " << this->top_id2_ 
+      << ", top_idx2: " << this->top_idx2_;
+  LOG(INFO) << "bottom_id: " << this->bottom_id_ 
+      << ", bottom_idx: " << this->bottom_idx_;
+  LOG(INFO) << "bottom_id2: " << this->bottom_id2_ 
+      << ", bottom_idx2: " << this->bottom_idx2_;
   LOG(INFO) << "value: " << this->value_;
   LOG(INFO) << "whole or not: " << this->whole_;
   if(this->has_visual_path_) {
@@ -82,7 +86,8 @@ void CoordsToBboxesMasksLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
   CHECK_LT(this->bottom_id_, bottom[0]->channels());
   CHECK_LT(this->bottom_id2_, bottom[0]->channels());
   CHECK_EQ(bottom[0]->num(), bottom[1]->num());
-  CHECK_EQ(bottom[0]->channels(), bottom[0]->count() / bottom[0]->num());
+  CHECK_EQ(bottom[0]->channels(), 
+      bottom[0]->count() / bottom[0]->num());
 
   this->num_ = bottom[0]->num();
   this->channels_ = bottom[0]->channels();
@@ -107,7 +112,10 @@ void CoordsToBboxesMasksLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
   this->width_ = int(max_width);
   this->height_ = int(max_height);
   // Reshape  
-  top[0]->Reshape(this->num_, this->new_channels_, this->height_, this->width_);
+  top[0]->Reshape(this->num_, 
+      this->new_channels_, 
+      this->height_, 
+      this->width_);
   // 
   this->InitRand();
 }
@@ -128,8 +136,8 @@ int CoordsToBboxesMasksLayer<Dtype>::Rand(int n) {
 }
 
 template <typename Dtype>
-void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   int mo = 0;
   int pco = 0;
@@ -168,6 +176,12 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bo
         y2 = part_coords[pco + this->bottom_idx2_ + 1];
       }
     }
+    // sometime we need to inorge some images
+    if(x1 <= 0 && y1 <= 0 && x2 <= 0 && y2 <= 0) continue;
+    if(x1 >= this->width_ && y1 >= this->height_
+        && x2 >= this->width_ && y2 >= this->height_) {
+      continue;
+    }
     // check bound
     if(x1 > x2) std::swap(x1, x2);
     if(y1 > y2) std::swap(y1, y2);
@@ -177,10 +191,6 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bo
     if(x2 < Zero || x2 >= this->width_) continue;
     if(y1 < Zero || y1 >= this->height_) continue;
     if(y2 < Zero || y2 >= this->height_) continue;
-    // x1 = std::max(x1, Zero);
-    // y1 = std::max(y1, Zero);
-    // x2 = std::min(x2, Dtype(this->width_ - 1));
-    // y2 = std::min(y2, Dtype(this->height_ - 1));
     // set the corresponding bbox/area to non-zero value
     for(int h = y1; h <= y2; h++) {
       for(int w = x1; w <= x2; w++) {
@@ -192,14 +202,17 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bo
 
   // visualization
   if(this->has_visual_path_) {
-    const std::vector<std::string>& objidxs = GlobalVars::objidxs();
-    const std::vector<std::string>& imgidxs = GlobalVars::imgidxs();
+    const std::vector<std::string>& objidxs = 
+        GlobalVars::objidxs();
+    const std::vector<std::string>& imgidxs = 
+        GlobalVars::imgidxs();
     CHECK_EQ(objidxs.size(), imgidxs.size());
     CHECK_EQ(objidxs.size(), this->num_);
     
     const Dtype* bbox_masks = top[0]->cpu_data();
     for(int n = 0; n < this->num_; n++) {
-      cv::Mat img = cv::Mat::zeros(this->height_, this->width_, CV_8UC1);
+      cv::Mat img = cv::Mat::zeros(this->height_, 
+          this->width_, CV_8UC1);
       // get offset
       for(int h = 0; h < this->height_; h++) {
         for(int w = 0; w < this->width_; w++) {
@@ -209,16 +222,18 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bo
         }
       }
       // 
-      const std::string img_path = this->visual_path_ + imgidxs[n] + "_" 
-          + objidxs[n] + this->img_ext_;
+      const std::string img_path = this->visual_path_ 
+          + imgidxs[n] + "_" + objidxs[n] + this->img_ext_;
       cv::imwrite(img_path, img);
     }
   }
 }
 
 template <typename Dtype>
-void CoordsToBboxesMasksLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) 
+void CoordsToBboxesMasksLayer<Dtype>::Backward_cpu(
+    const vector<Blob<Dtype>*>& top,
+    const vector<bool>& propagate_down, 
+    const vector<Blob<Dtype>*>& bottom) 
 {
   const Dtype Zero = Dtype(0);
   CHECK_EQ(propagate_down.size(), bottom.size());
@@ -226,7 +241,8 @@ void CoordsToBboxesMasksLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& t
   for (int i = 0; i < propagate_down.size(); ++i) {
     if (propagate_down[i]) { 
       // NOT_IMPLEMENTED; 
-      caffe_set(bottom[i]->count(), Zero, bottom[i]->mutable_cpu_diff());
+      caffe_set(bottom[i]->count(), Zero, 
+          bottom[i]->mutable_cpu_diff());
     }
   }
 }

@@ -40,9 +40,9 @@ const int _D_Img_Min_Len = 240;
 const int _D_Img_Max_Len = 256;
 int _img_min_len = _D_Img_Min_Len;
 int _img_max_len = _D_Img_Max_Len;
-// torso
-const int _D_Torso_Width = 40;
-const int _D_Torso_Height = 40;
+// torso - half size
+const int _D_Torso_Width = 30;
+const int _D_Torso_Height = 30;
 // fps
 int _fps = 30;
 // mutex
@@ -239,7 +239,7 @@ void _init() {
 // save results from pose estimation
 int _show_results(){
   cv::VideoWriter s_v_fd;
-  cv::Size s = cv::Size(_f_width,_f_height);
+  cv::Size s = cv::Size(_f_width, _f_height);
   // open
   s_v_fd.open(_video_name,CV_FOURCC('M','J','P','G'), _fps, s);
   // save the results to video
@@ -253,7 +253,7 @@ int _show_results(){
     if (!_frames.empty()) {
       cv::Mat frame = _frames.front();
       _frames.pop();
-      cv::resize(frame, frame, cv::Size(_f_width, _f_height));
+      cv::resize(frame, frame, s);
       s_v_fd << frame;
       cv::imshow("pose demo", frame);
     }
@@ -278,34 +278,25 @@ int _pose_estimate() {
   vector<Blob<float>* > bottom_vec;
   // input image
   Blob<float> *data_blob = new Blob<float>();
-  data_blob -> Reshape(_batch_size, 3, _f_height, _f_width);
   // aux info
   Blob<float> *aux_info_blob = new Blob<float>();
-  aux_info_blob -> Reshape(_batch_size, 5, 1, 1);
-  // set aux info
-  float *aux_data = aux_info_blob -> mutable_cpu_data();
-  for(int i =0; i < _batch_size; ++i) {
-    int offset = aux_info_blob->offset(i);
-    aux_data[offset + 0] = i;
-    aux_data[offset + 1] = _f_width;
-    aux_data[offset + 2] = _f_height;
-    aux_data[offset + 3] = 1.;
-    aux_data[offset + 4] = 0;
-  }
   // set torso info
   Blob<float> *torso_info_blob = NULL;
-  if(_has_torso) {
-    torso_info_blob = new Blob<float>();
-    torso_info_blob -> Reshape(_batch_size, _part_num * 2, 1, 1);
-  }
 
   // capture images from video
   int imgidx = 0;
-  string objindx = "0";
+  string objidx = "0";
   vector<string> imgidxs;
+  vector<string> objidxs;
   vector<string> images_paths;
-  string root_folder_ = "/home/lawrence/dongdk/img/";
-  vector<string> objidxs = vector<string>(_batch_size,"0");
+
+  int t_x = -1;
+  int t_y = -1;
+  if(_has_torso) {
+    t_x = _f_width / 2;
+    t_y = _f_height / 2;
+  }
+  // Start
   while(true){
     // clear
     imgidxs.clear();
@@ -329,14 +320,45 @@ int _pose_estimate() {
         stringstream ss;
         ss << imgidx;
         imgidxs.push_back(ss.str());
-        std::string img_path = root_folder_ + ss.str() + ".jpg";
+        objidxs.push_back(objidx);
+        std::string img_path = _output_directory + ss.str() + ".jpg";
         images_paths.push_back(img_path);
         ++imgidx;
       }
     }
     CHECK_EQ(img_vec.size(), _batch_size) 
         << "_batch_size does not match the size of img_vec...";
-    
+
+    // reshape
+    data_blob->Reshape(_batch_size, 3, _f_height, _f_width);
+    aux_info_blob->Reshape(_batch_size, 5, 1, 1);
+    // set aux info
+    float *aux_data = aux_info_blob->mutable_cpu_data();
+    for(int i =0; i < _batch_size; ++i) {
+      int offset = aux_info_blob->offset(i);
+      aux_data[offset + 0] = i;
+      aux_data[offset + 1] = _f_width;
+      aux_data[offset + 2] = _f_height;
+      aux_data[offset + 3] = 1.;
+      aux_data[offset + 4] = 0;
+    }
+    // set torso
+    if(_has_torso) {
+      torso_info_blob = new Blob<float>();
+      torso_info_blob->Reshape(_batch_size, _part_num * 2, 1, 1);
+      float *torso_info = torso_info_blob->mutable_cpu_data();
+      // use `whole` mode
+      for(int i =0; i < _batch_size; ++i) {
+        int offset = aux_info_blob->offset(i);
+        torso_info[offset + 0] = std::min(1, t_x - _D_Torso_Width);
+        torso_info[offset + 1] = std::min(1, t_y - _D_Torso_Height);
+        torso_info[offset + 2] = std::min(_f_width  - 2, 
+            t_x + _D_Torso_Width);
+        torso_info[offset + 3] = std::max(_f_height - 2, 
+            t_y + _D_Torso_Height);
+      }
+    }
+
     // set global info
     caffe::GlobalVars::set_objidxs(objidxs);
     caffe::GlobalVars::set_imgidxs(imgidxs);
@@ -350,18 +372,21 @@ int _pose_estimate() {
       bottom_vec.push_back(torso_info_blob);
     }
     caffe_net.Forward(bottom_vec, &loss);
+
     // get final result from the last layer
     const vector<vector<Blob<float>*> > &top_vecs = 
         caffe_net.top_vecs();
     const int t_id = top_vecs.size() - 1; 
     const Blob<float> *coord_blob = top_vecs[t_id][0];
-    
+    // get number of coord of all joints/parts
+    int channels = coord_blob->channels();
+    CHECK_EQ(channels, _part_num * 2)
+        << "Does not match the channels: " << channels;  
     // visualize the pose
-    int channels = coord_blob -> channels();    
-    const float *coord = coord_blob -> cpu_data();
+    const float *coord = coord_blob->cpu_data();
     for(int i = 0; i < _batch_size; ++i) {
       // get offset
-      int offset = coord_blob -> offset(i);
+      int offset = coord_blob->offset(i);
       // one person
       for(int c = 0; c < channels; c += 2){
         float x = coord[offset + c + 0];        

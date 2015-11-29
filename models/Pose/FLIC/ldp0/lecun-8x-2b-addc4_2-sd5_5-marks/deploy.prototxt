@@ -37,10 +37,10 @@ layer {
   bottom: "aux_info"
   top: "data_masks"
   coord_to_bbox_masks_param {
-    top_id: 6
-    bottom_id: 10
-    top_id2: 6
-    bottom_id2: 10
+    top_id: 0
+    bottom_id: 0
+    top_id2: 0
+    bottom_id2: 0
     value: 255
   }
 }

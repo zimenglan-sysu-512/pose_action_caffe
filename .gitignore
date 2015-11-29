@@ -9,3 +9,4 @@ data/Actions/
 .project
 .pydevproject
 face-detection/
+*.avi

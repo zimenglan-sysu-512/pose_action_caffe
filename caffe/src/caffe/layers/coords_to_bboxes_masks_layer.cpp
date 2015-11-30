@@ -112,10 +112,23 @@ void CoordsToBboxesMasksLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
   this->width_ = int(max_width);
   this->height_ = int(max_height);
   // Reshape  
-  top[0]->Reshape(this->num_, 
-      this->new_channels_, 
-      this->height_, 
-      this->width_);
+  if(this->height_ <= 0 || this->width_ <= 0) {
+    // You must know where to set `g_width` and `g_height`
+    // Just for the initialization, like the deploy.prototxt
+    //    in tools/camera_pose.cpp
+    // The shape must keep the same as input layer
+    const int g_width = GlobalVars::g_width();
+    const int g_height = GlobalVars::g_height();
+    top[0]->Reshape(this->num_, 
+        this->new_channels_, 
+        g_width, 
+        g_height);
+  } else {
+    top[0]->Reshape(this->num_, 
+        this->new_channels_, 
+        this->height_, 
+        this->width_);
+  }
   // 
   this->InitRand();
 }

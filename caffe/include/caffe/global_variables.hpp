@@ -42,6 +42,18 @@ class GlobalVars {
   }  
   inline static int caffe_iter() { return Get().caffe_iter_; }
 
+  // g_width
+  inline static void set_g_width(const int g_width) {
+    Get().g_width_ = g_width;
+  } 
+  inline static int g_width() { return Get().g_width_; }
+
+  // imgidxs
+  inline static void set_g_height(const int g_height) {
+    Get().g_height_ = g_height;
+  } 
+  inline static int g_height() { return Get().g_height_; }
+
   // learn_lr
   inline static void set_learn_lr(const float learn_lr) { 
     Get().learn_lr_ = learn_lr; 
@@ -93,6 +105,8 @@ class GlobalVars {
   static shared_ptr<GlobalVars> singleton_;
 
   Phase phase_;
+  int g_width_;
+  int g_height_;
   int caffe_iter_;
   float learn_lr_;
   std::string stellate_;

@@ -30,7 +30,8 @@ void ResizeLayer<Dtype>::Reshape(
 		bool wh = resize_param.has_width() && resize_param.has_height();
 		bool wh_fac = resize_param.has_width_fac() && resize_param.has_height_fac();
 		CHECK((wh && !wh_fac) || (!wh && wh_fac)) 
-				<<"output height&width or height_fac&&width_fac must be required, but can't not both exist...";
+				<< "output height&width or height_fac&&width_fac"
+				<< " must be required, but can't not both exist...";
 		if(wh) {
 			this->out_height_ = resize_param.height();
 			this->out_width_ = resize_param.width();		
@@ -45,8 +46,10 @@ void ResizeLayer<Dtype>::Reshape(
 	if(this->has_bottom_param_) {
 		bool is_bottom_info = bottom[1]->count() == 4;
 		if(is_bottom_info) {
-			CHECK(is_bottom_info) <<"output width and height is required by bottom blob";	
-			// (width, height, heat_map_a, heat_map_b), see the layer produces the bottom[1] blob for more details
+			CHECK(is_bottom_info) 
+					<< "output width and height is required by bottom blob";	
+			// (width, height, heat_map_a, heat_map_b), 
+			// see the layer produces the bottom[1] blob for more details
 			this->out_width_ = bottom[1]->cpu_data()[0];
 			this->out_height_ = bottom[1]->cpu_data()[1];
 		} else {

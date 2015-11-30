@@ -518,7 +518,7 @@ int _pose_estimate() {
   return 0;
 }
 
-int camera_pose() {
+int static_pose() {
   // init thread
   boost::thread process_thread(_pose_estimate);
   sleep(2);
@@ -529,7 +529,7 @@ int camera_pose() {
 
   return 0;
 } 
-RegisterBrewFunction(camera_pose);
+RegisterBrewFunction(static_pose);
 
 // ####################################################################
 // #####                            Main                          #####
@@ -546,7 +546,7 @@ int main(int argc, char** argv) {
   gflags::SetUsageMessage("command line brew\n"
       "usage: caffe <command> <args>\n\n"
       "commands:\n"
-      "  camera_pose    show result timely from camera");
+      "  static_pose    show result timely from camera");
   
   // Run tool or show usage.
   caffe::GlobalInit(&argc, &argv);
@@ -562,7 +562,7 @@ int main(int argc, char** argv) {
   }
 #endif
   } else {
-    gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/camera_pose");
+    gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/static_pose");
   }
   // exit cleanly on interrupt
   if (quit_signal) exit(0); 

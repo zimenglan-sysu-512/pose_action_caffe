@@ -10,8 +10,11 @@ input: "data"
 input_shape {
   dim: 5
   dim: 3
-  dim: 256
-  dim: 256
+  # see src/caffe/layers/coords_to_bboxes_masks_layer.cpp
+  # must keep the same shape of the initialization of the top blobs 
+  # in coords_to_bboxes_masks_layer
+  dim: 100
+  dim: 100
 }
 
 input: "aux_info"
@@ -626,7 +629,7 @@ layer {
   name: "re_conv7"
   type: "Resize"
   bottom: "conv7"
-  bottom: "heat_maps"
+  bottom: "data_bank1"
   top: "re_conv7"
   include {
     phase: TEST

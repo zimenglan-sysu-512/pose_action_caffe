@@ -6,9 +6,10 @@ namespace bp = boost::python;
 #include <glog/logging.h>
 #include "caffe/blob.hpp"
 #include "caffe/caffe.hpp"
+#include "caffe/util/util_img.hpp"
 #include "caffe/global_variables.hpp"
-#include "caffe/util/math_functions.hpp"
 #include "boost/algorithm/string.hpp"
+#include "caffe/util/math_functions.hpp"
 
 #include <map>
 #include <queue>
@@ -16,6 +17,7 @@ namespace bp = boost::python;
 #include <vector>
 #include <cstring>
 #include <sstream>
+#include <iostream>
 #include <boost/thread.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
@@ -33,47 +35,23 @@ using std::ostringstream;
 using std::stringstream;
 
 // video
-const int _D_F_Width = 640;
-const int _D_F_Height = 480;
-int _f_width = _D_F_Width;
-int _f_height = _D_F_Height;
-// pose 
-const int _D_Img_Min_Len = 240;
-const int _D_Img_Max_Len = 256;
-int _img_min_len = _D_Img_Min_Len;
-int _img_max_len = _D_Img_Max_Len;
-// torso - half size
-const int _D_Torso_Width = 40;
-const int _D_Torso_Height = 60;
-int _d_t_width = _D_Torso_Width;
-int _d_t_height = _D_Torso_Height;
-// 
 int _g_width;
 int _g_height;
-// fps
-int _fps = 30;
-// mutex
-boost::mutex _mutex; 
-// frame pool
-std::queue<cv::Mat> _frames;
-// video name
-std::string _video_name = "demo_pose.avi";
-// 
-const int _radius = 2;
-const int _thickness = 2;
-const cv::Scalar _blue = cv::Scalar(216, 16, 216);
-const cv::Scalar _red = cv::Scalar(255, 0, 0);
-const cv::Scalar _yellow = cv::Scalar(255, 255, 0);
-// default or use FLAGS
+int _min_size;
+int _max_size;
 int _part_num = 14;
 int _has_torso = 0;
 int _batch_size = 1;
-int _iterations = 50;
-std::string _input_directory = "";
-std::string _input_label_file = "";
-std::string _output_directory = "";
-// 
+std::string _tp_file;
 const float zero = 0;
+const int _radius = 2;
+const int _thickness = 2;
+std::string _in_directory;
+std::string _out_directory;
+const cv::Scalar _blue = cv::Scalar(216, 16, 216);
+const cv::Scalar _red = cv::Scalar(255, 0, 0);
+const cv::Scalar _yellow = cv::Scalar(255, 255, 0);
+
 
 DEFINE_string(gpu, "",
     "Optional; run in GPU mode on given device IDs separated by ','."
@@ -84,38 +62,26 @@ DEFINE_string(deployprototxt, "",
 DEFINE_string(trainedmodel, "",
     "Optional; the pretrained weights to initialize finetuning. "
     "Cannot be set simultaneously with snapshot.");
-DEFINE_int32(iterations, 50,
-    "The number of iterations to run.");
 DEFINE_int32(batchsize, 1,
     "The number of images to be process per iteration.");
 DEFINE_int32(hastorso, 0,
     "The number of images to be process per iteration.");
 DEFINE_int32(partnum, 14,
     "The number of images to be process per iteration.");
-DEFINE_int32(fps, 30,
-    "The number of images captu_red by video per second.");
-DEFINE_int32(fwidth, 640,
+DEFINE_int32(maxsize, 256,
     "The width of frame from video .");
-DEFINE_int32(fheight, 480,
+DEFINE_int32(minsize, 240,
     "The height of frame from video .");
-DEFINE_int32(imgminlen, 240,
-    "The width of frame from video .");
-DEFINE_int32(imgmaxlen, 256,
-    "The height of frame from video .");
-DEFINE_int32(dtwidth, 40,
-    "The width of torso .");
-DEFINE_int32(dtheight, 60,
-    "The height of torso .");
 DEFINE_int32(gwidth, 0,
     "The width of frame from video .");
 DEFINE_int32(gheight, 0,
     "The height of frame from video .");
-DEFINE_string(inputdirectory, "",
+DEFINE_string(indirectory, "",
     "Optional; the input of the images.");
-DEFINE_string(inputlabelfile, "",
+DEFINE_string(tpfile, "",
     "Optional; the input of label file specifying the input image and its "
     "corresponding label information, like torso/person bbox");
-DEFINE_string(outputdirectory, "",
+DEFINE_string(outdirectory, "",
     "Optional; the output of the results, like files or visualized images.");
 
 // A simple registry for caffe commands.
@@ -181,12 +147,6 @@ static void get_gpus(vector<int>* gpus) {
   }
 }
 
-// caffe commands to call by
-//     caffe <command> <args>
-//
-// To add a command, define a function "int command()" and register it with
-// RegisterBrewFunction(action);
-
 // Device Query: show diagnostic information for a GPU device.
 int device_query() {
   LOG(INFO) << "Querying GPUs" << FLAGS_gpu;
@@ -201,8 +161,7 @@ int device_query() {
 }
 RegisterBrewFunction(device_query);
 
-// Load the weights from the specified caffemodel(s) into the train and
-// test nets.
+// Load the weights from the specified caffemodel(s) into the train and test nets.
 void CopyLayers(caffe::Solver<float>* solver, const std::string& model_list) {
   std::vector<std::string> model_names;
   boost::split(model_names, model_list, boost::is_any_of(",") );
@@ -218,6 +177,23 @@ void CopyLayers(caffe::Solver<float>* solver, const std::string& model_list) {
 // ####################################################################
 // #####              Pose Estimation From Camera                 #####
 // ####################################################################
+
+struct BBox {
+  int tx1, ty1;  
+  int tx2, ty2;  
+  int px1, py1;  
+  int px2, py2;  
+  float scale;
+  float tscore;
+  float pscore;
+};
+
+struct TP_Info {
+  std::string im_dir;
+  std::string im_name;
+  std::string im_path;
+  std::vector<BBox> bboxes;
+};
 
 void _init() {
   // check
@@ -239,24 +215,17 @@ void _init() {
   }
 
   // FLAGS args
-  _fps = FLAGS_fps;
-  _f_width = FLAGS_fwidth;
-  _f_height = FLAGS_fheight;
+  _tp_file = FLAGS_tpfile;
   _part_num = FLAGS_partnum;
-  _d_t_width = FLAGS_dtwidth;
+  _min_size = FLAGS_minsize;
+  _max_size = FLAGS_maxsize;
   _has_torso = FLAGS_hastorso;
-  _d_t_height = FLAGS_dtheight;
   _batch_size = FLAGS_batchsize;
-  _iterations = FLAGS_iterations;
-  _img_min_len = FLAGS_imgminlen;
-  _img_max_len = FLAGS_imgmaxlen;
-  _input_directory = FLAGS_inputdirectory;
-  _input_label_file = FLAGS_inputlabelfile;
-  _output_directory = FLAGS_outputdirectory;
+  _in_directory = FLAGS_indirectory;
+  _out_directory = FLAGS_outdirectory;
 
-  // Must be the same as in the data layer of deploy.prototxt
-  // For example
   /*
+    Must be the same as in the data layer of deploy.prototxt. e.g.
     input_shape {
       dim: 5
       dim: 3
@@ -274,76 +243,65 @@ void _init() {
   caffe::GlobalVars::set_g_height(_g_height);
 }
 
+void read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file,
+    const int n = 9 /*the number of labels of the one instance in image*/) 
+{
+  LOG(INFO) << "Opening file " << tp_file;
+  std::ifstream filer(tp_file.c_str());
+  CHECK(filer);
 
-template <typename Dtype>
-void CVImageVec2Blob(const vector<cv::Mat> &img_vec, Blob<Dtype> *dst_blob){
-  CHECK_EQ(img_vec.size(), dst_blob->num());
-  int num = dst_blob -> num();
-  int height = dst_blob->height();
-  int width = dst_blob->width();
-  int img_channels = dst_blob->channels();
-  bool do_mirror = false;
- 
-  // bool has_mean_file = false;
-  // bool has_mean_values = false;
-  
-  Dtype *transformed_data = dst_blob->mutable_cpu_data();
-  float scale = 1.0;
-  for(int i =0; i < num; ++i){
-    cv::Mat cv_cropped_img = img_vec[i];
-    for (int h = 0; h < height; ++h) {
-      const uchar* ptr = cv_cropped_img.ptr<uchar>(h);
-      int img_index = 0;
-      for (int w = 0; w < width; ++w) {
-        for (int c = 0; c < img_channels; ++c) {
-          int top_index = 0;
-          if (do_mirror) {
-            top_index = (c * height + h) * width + (width - 1 - w);
-          } else {
-            top_index = (c * height + h) * width + w;
-          }
-          // int top_index = (c * height + h) * width + w;
-          Dtype pixel = static_cast<Dtype>(ptr[img_index++]);
-          transformed_data[top_index] = pixel * scale;
-        }
-      }
-    }
-    transformed_data += dst_blob->offset(1); 
-  }
+  // format:
+  //  im_dir im_name ts1 tbbox1 pbbox1 ts2 tbbox2 pbbox2 ...
+  // see `~/dongdk/faster-rcnn/tools/demo_torso.py` for more details
+  std::string line;
+  while (getline(filer, line)) {
+    TP_Info tp_info;
+    boost::trim(line);
+    std::vector<std::string> info;
+    boost::split(info, line, boost::is_any_of(" "));
+
+    int l1 = info.size();
+    int l2 = l1 - 2;
+    CHECK_GE(l1, 2);
+    CHECK_EQ(l2 % n, 0);
+    tp_info.im_dir = info[0];
+    tp_info.im_name = info[1];
+    boost::trim(tp_info.im_dir);
+    boost::trim(tp_info.im_name);
+    tp_info.im_path = tp_info.im_dir + tp_info.im_name;
+
+    int n2 = l2 / n;
+    int i = 0;
+    while(i < n2) {
+      int i2 = 2 + i * n;
+      BBox bbox;
+      bbox.tscore = std::atof(info[i2 + 0].c_str());
+      bbox.pscore = bbox.tscore; // here use torso's score for person's score
+      bbox.scale = 1.0;
+      // bounding boxes for torso and person
+      bbox.tx1 = std::atoi(info[i2 + 1].c_str());
+      bbox.ty1 = std::atoi(info[i2 + 2].c_str());
+      bbox.tx2 = std::atoi(info[i2 + 3].c_str());
+      bbox.ty2 = std::atoi(info[i2 + 4].c_str());
+      bbox.px1 = std::atoi(info[i2 + 5].c_str());
+      bbox.py1 = std::atoi(info[i2 + 6].c_str());
+      bbox.px2 = std::atoi(info[i2 + 7].c_str());
+      bbox.py2 = std::atoi(info[i2 + 8].c_str());
+      // push
+      tp_info.bboxes.push_back(bbox);
+    } // end inner while
+
+    tp_infos.push_back(tp_info);
+  } // end outer while
 }
 
-// save results from pose estimation
-int _show_results(){
-  cv::VideoWriter s_v_fd;
-  cv::Size s = cv::Size(_f_width, _f_height);
-  // open
-  s_v_fd.open(_video_name,CV_FOURCC('M','J','P','G'), _fps, s);
-  // save the results to video
-  if (!s_v_fd.isOpened()) {
-      LOG(INFO)  << "Could not open the output video for write: " 
-          << _video_name ;
-      return -1;
-  }
-  while(true) {
-    _mutex.lock();
-    if (!_frames.empty()) {
-      cv::Mat frame = _frames.front();
-      _frames.pop();
-      cv::resize(frame, frame, s);
-      s_v_fd << frame;
-      cv::imshow("pose demo", frame);
-    }
-    _mutex.unlock();
-    boost::this_thread::sleep(boost::posix_time::seconds(0.03));
-  }
-
-  return 0;
-}
-
-// show result from camera.
 int _pose_estimate() {
   // init for preparation
   _init();
+
+  // get labels
+  std::vector<TP_Info> tp_infos;
+  read_tp_info(tp_infos, _tp_file);
 
   // instantiate the caffe net.
   Net<float> caffe_net(FLAGS_deployprototxt, caffe::TEST);
@@ -360,125 +318,157 @@ int _pose_estimate() {
   Blob<float> *torso_info_blob = NULL;
 
   // capture images from video
-  int imgidx = 0;
-  string objidx = "0";
-  vector<string> imgidxs;
-  vector<string> objidxs;
-  vector<string> images_paths;
+  std::vector<string> imgidxs;
+  std::vector<string> objidxs;
+  std::vector<string> im_names;
+  std::vector<cv::Mat> ims_vec;
+  std::vector<string> images_paths;
+  std::vector<std::pair<int, int> > ids;
 
-  int t_x = -1;
-  int t_y = -1;
   if(_has_torso) {
-    t_x = _f_width / 2;
-    t_y = _f_height / 2;
     torso_info_blob = new Blob<float>();
   }
-  // Start
-  while(true){
-    // clear
-    imgidxs.clear();
-    images_paths.clear();
-    bottom_vec.clear();
-    // open camera
-    cv::VideoCapture cap(0);
-    if (!cap.isOpened()) {
-      LOG(INFO) << "No camera found.";
-      return -1;
-    }
-    LOG(INFO) << "Starting capturing the images from camera";
-    // receive data from camera
-    cv::Mat frame;
-    std::vector<cv::Mat> img_vec;
-    while(img_vec.size() < _batch_size){
-      cap >> frame;
-      if (!frame.empty()) {
-        cv::resize(frame, frame, cv::Size(_f_width, _f_height));
-        img_vec.push_back(frame);
-        cv::waitKey(10);
-        stringstream ss;
-        ss << imgidx;
-        imgidxs.push_back(ss.str());
-        objidxs.push_back(objidx);
-        std::string img_path = _output_directory + ss.str() + ".jpg";
-        images_paths.push_back(img_path);
-        ++imgidx;
-      }
-    }
-    CHECK_EQ(img_vec.size(), _batch_size) 
-        << "_batch_size does not match the size of img_vec...";
 
-    // Reshape
-    data_blob->Reshape(_batch_size, 3, _f_height, _f_width);
+  int s = 0;
+  const int l_tp_infos = tp_infos.size();
+  while(s < l_tp_infos) {
+    // clear
+    ids.clear();
+    ims_vec.clear();
+    imgidxs.clear();
+    objidxs.clear();
+    im_names.clear();
+    bottom_vec.clear();
+    images_paths.clear();
+    
+    int bs = 0;
+    int is = 0;
+    int max_width = -1;
+    int max_height = -1;
+    while(bs < _batch_size && s < l_tp_infos){
+      TP_Info& tp_info = tp_infos[s];
+      const std::string im_path = tp_info.im_path;
+      cv::Mat im = cv::imread(im_path);
+      ims_vec.push_back(im);
+      im_names.push_back(tp_info.im_name);
+
+      std::vector<BBox>& bboxes = tp_info.bboxes;
+      for(int j = 0; j < bboxes.size(); j++) {
+        int pw = bboxes[j].px2 - bboxes[j].px1 + 1;
+        int ph = bboxes[j].py2 - bboxes[j].py1 + 1;
+        int min_size = std::min(pw, ph);
+        int max_size = std::min(pw, ph);
+        float scale = float(std::max(min_size, _min_size)) 
+            / float(std::min(min_size, _min_size));
+        if(scale * max_size > _max_size) {
+          scale = float(_max_size) / float(max_size);
+        }
+        bboxes[j].scale = scale;  // reset
+        max_width = std::max(max_width, int(pw * scale));
+        max_height = std::max(max_height, int(ph * scale));
+
+        // here just for convinience (with img_ext)
+        imgidxs.push_back(tp_info.im_name); 
+        objidxs.push_back(boost::to_string(j));
+        images_paths.push_back(im_path);
+
+        ids.push_back(std::make_pair(bs, j)); // <imgidx, objidx>
+        is++;
+      }
+  
+      s++;
+      bs++;
+    } // end inner while
+
+    const int n_batch_size = is;
+    data_blob->Reshape(n_batch_size, 3, max_height, max_width);
     float* data = data_blob->mutable_cpu_data();
     caffe::caffe_set(data_blob->count(), zero, data);
-    // 
-    aux_info_blob->Reshape(_batch_size, 5, 1, 1);
-    // set aux info
+    for(int j = 0; j < n_batch_size; j++) {
+      const int imgidx = ids[j].first;
+      const int objidx = ids[j].second;
+      const BBox bbox = tp_infos[imgidx].bboxes[objidx];
+
+      vector<float> coords;
+      coords.push_back(bbox.px1);
+      coords.push_back(bbox.py1);
+      coords.push_back(bbox.px2);
+      coords.push_back(bbox.py2);
+
+      int w = bbox.px2 - bbox.px1 + 1;
+      int h = bbox.py2 - bbox.py1 + 1;
+      w = int(w * bbox.scale);
+      h = int(h * bbox.scale);
+      cv::Size S(h, w);
+      cv::Mat im_crop;
+      caffe::CropAndResizePatch(ims_vec[imgidx], im_crop, coords, S, true, zero);
+      caffe::ImageDataToBlob(data_blob, j, im_crop);
+    } // end for
+
+    aux_info_blob->Reshape(n_batch_size, 5, 1, 1);
     float *aux_data = aux_info_blob->mutable_cpu_data();
     caffe::caffe_set(aux_info_blob->count(), zero, aux_data);
+    for(int j = 0; j < n_batch_size; j++) {
+      const int imgidx = ids[j].first;
+      const int objidx = ids[j].second;
+      const BBox bbox = tp_infos[imgidx].bboxes[objidx];
 
-    for(int i =0; i < _batch_size; ++i) {
-      int offset = aux_info_blob->offset(i);
-      aux_data[offset + 0] = i;
-      aux_data[offset + 1] = _f_width;
-      aux_data[offset + 2] = _f_height;
-      aux_data[offset + 3] = 1.;
-      aux_data[offset + 4] = 0;
-    }
-    // set torso
+      int o = aux_info_blob->offset(j);
+      aux_data[o + 0] = j;
+      // origin height & width
+      aux_data[o + 2] = bbox.px2 - bbox.px1 + 1;
+      aux_data[o + 1] = bbox.py2 - bbox.py1 + 1;
+      aux_data[o + 3] = bbox.scale;
+      aux_data[o + 4] = 0;
+    } // end for
+
+    // set torso -- crop and scale
     if(_has_torso) {
-      LOG(INFO) << "Has torso info..."; 
-      torso_info_blob->Reshape(_batch_size, _part_num * 2, 1, 1);
-
+      torso_info_blob->Reshape(n_batch_size, _part_num * 2, 1, 1);
       float *torso_info = torso_info_blob->mutable_cpu_data();
       caffe::caffe_set(torso_info_blob->count(), zero, torso_info);
       // use `whole` mode
-      for(int i =0; i < _batch_size; ++i) {
-        int offset = aux_info_blob->offset(i);
-        torso_info[offset + 0] = std::min(1, t_x - _D_Torso_Width);
-        torso_info[offset + 1] = std::min(1, t_y - _D_Torso_Height);
-        torso_info[offset + 2] = std::min(_f_width  - 2, 
-            t_x + _d_t_width);
-        torso_info[offset + 3] = std::max(_f_height - 2, 
-            t_y + _d_t_height);
-      }
-    }
-    // get final result from the last layer
-    // const vector<vector<Blob<float>*> > &bottom_vec2 = 
-    //     caffe_net.bottom_vecs();
-    // LOG(INFO) << bottom_vec2.size();
-    // LOG(INFO) << bottom_vec2[0].size();
-    const shared_ptr<Blob<float> > data_in = caffe_net.blob_by_name("data");
-    const shared_ptr<Blob<float> > aux_info_in = caffe_net.blob_by_name("aux_info");
+      // see src/caffe/layers/coords_to)bboxes_masks_layer.cpp for more details
+      for(int j = 0; j < n_batch_size; j++) {
+        const int imgidx = ids[j].first;
+        const int objidx = ids[j].second;
+        const BBox bbox = tp_infos[imgidx].bboxes[objidx];
+
+        int o = aux_info_blob->offset(j);
+        int tx1 = std::max(1, bbox.tx1 - bbox.px1);
+        int ty1 = std::max(1, bbox.ty1 - bbox.py1);
+        int tx2 = std::max(1, bbox.tx2 - bbox.px2);
+        int ty2 = std::max(1, bbox.ty2 - bbox.py2);
+        torso_info[o + 0] = tx1 * bbox.scale;
+        torso_info[o + 1] = ty1 * bbox.scale;
+        torso_info[o + 2] = tx2 * bbox.scale;
+        torso_info[o + 3] = ty2 * bbox.scale;
+      } // end for
+    } // end if
+    
+    // Reshape
+    const shared_ptr<Blob<float> > data_in = 
+        caffe_net.blob_by_name("data");
+    const shared_ptr<Blob<float> > aux_info_in = 
+        caffe_net.blob_by_name("aux_info");
     const shared_ptr<Blob<float> > gt_pose_coords_in = 
         caffe_net.blob_by_name("gt_pose_coords");
     data_in->ReshapeLike(*data_blob);
     aux_info_in->ReshapeLike(*aux_info_blob);
     gt_pose_coords_in->ReshapeLike(*torso_info_blob);
 
-    // LOG(INFO) << data_in->shape_string();
-    // LOG(INFO) << aux_info_in->shape_string();
-    // LOG(INFO) << gt_pose_coords_in->shape_string();
-    // bottom_vec2[0][0]->ReshapeLike(data_blob);
-    // bottom_vec2[0][1]->ReshapeLike(aux_info_blob);
-    // bottom_vec2[0][2]->ReshapeLike(torso_info_blob);
-
-    // set global info
+    // Set global info
     caffe::GlobalVars::set_objidxs(objidxs);
     caffe::GlobalVars::set_imgidxs(imgidxs);
     caffe::GlobalVars::set_images_paths(images_paths);
 
-    LOG(INFO) << "Starting forward.";
-    // forward data
-    float loss;
-    CVImageVec2Blob(img_vec, data_blob);
+    LOG(INFO) << "Forward.";
     bottom_vec.push_back(data_blob);
     bottom_vec.push_back(aux_info_blob);
     if(_has_torso) {
       bottom_vec.push_back(torso_info_blob);
-      LOG(INFO) << "Using torso info.";
     }
-    LOG(INFO) << "Forward.";
+    float loss;
     caffe_net.Forward(bottom_vec, &loss);
 
     // get final result from the last layer
@@ -486,47 +476,43 @@ int _pose_estimate() {
         caffe_net.top_vecs();
     const int t_id = top_vecs.size() - 1; 
     const Blob<float> *coord_blob = top_vecs[t_id][0];
-    
-    // get number of coord of all joints/parts
-    int channels = coord_blob->channels();
-    CHECK_EQ(channels, _part_num * 2)
-        << "Does not match the channels: " << channels;  
-    // visualize the pose
     const float *coord = coord_blob->cpu_data();
-    for(int i = 0; i < _batch_size; ++i) {
+    
+    // Visualize
+    int channels = _part_num * 2;
+    CHECK_EQ(channels, coord_blob->channels())
+        << "Does not match the channels: " << channels;  
+    for(int j = 0; j < n_batch_size; j++) {
       // get offset
-      int offset = coord_blob->offset(i);
+      int o = coord_blob->offset(j);
       // one person
-      for(int c = 0; c < channels; c += 2){
-        float x = coord[offset + c + 0];        
-        float y = coord[offset + c + 1];
+      const int imgidx = ids[j].first;
+      for(int c = 0; c < channels; c += 2) {
+        float x = coord[o + c + 0];        
+        float y = coord[o + c + 1];
         cv::Point p(x, y);
         if(c/2 == 4 || c/2 == 5 ){
-          cv::circle(img_vec[i], p, _radius, _red, _thickness);
+          cv::circle(ims_vec[imgidx], p, _radius, _red, _thickness);
         }else if (c/2 == 7 || c/2 == 8 ) {
-          cv::circle(img_vec[i], p, _radius, _yellow, _thickness);
+          cv::circle(ims_vec[imgidx], p, _radius, _yellow, _thickness);
         } else {
-          cv::circle(img_vec[i], p, _radius, _blue, _thickness);
+          cv::circle(ims_vec[imgidx], p, _radius, _blue, _thickness);
         }
-      }
-      _mutex.lock();
-      _frames.push(img_vec[i]);
-      _mutex.unlock();
+      } // end inner for
+    } // end outer for
+
+    // Write
+    for(int j = 0; j < ims_vec.size(); j++) {
+      const std::string out_path = _out_directory + im_names[j];
+      cv::imwrite(out_path, ims_vec[j]);
     }
-  } 
+  } // end outer while
 
   return 0;
 }
 
 int static_pose() {
-  // init thread
-  boost::thread process_thread(_pose_estimate);
-  sleep(2);
-  boost::thread show_thread(_show_results);
-  // start thread
-  process_thread.join();
-  show_thread.join();
-
+  _pose_estimate();
   return 0;
 } 
 RegisterBrewFunction(static_pose);

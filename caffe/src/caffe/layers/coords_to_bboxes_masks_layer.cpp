@@ -71,8 +71,8 @@ void CoordsToBboxesMasksLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bot
 }
 
 
-// bottom[0]: coords
-// bottom[1]: aux_info
+// bottom[0]: coords -- have been scaled
+// bottom[1]: aux_info -- origin height & width
 template <typename Dtype>
 void CoordsToBboxesMasksLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) 

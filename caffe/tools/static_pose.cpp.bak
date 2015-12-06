@@ -581,8 +581,8 @@ int _pose_estimate() {
         // cv::circle(c_ims_vec[j], cv::Point(x / bbox.scale, 
         //   y / bbox.scale), _radius, _red, _thickness);   // error
         
-        x = int(x / bbox.scale);
-        y = int(y / bbox.scale);
+        // x = int(x / bbox.scale);
+        // y = int(y / bbox.scale);
         x += bbox.px1;
         y += bbox.py1;
 

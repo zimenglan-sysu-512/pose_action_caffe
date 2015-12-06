@@ -51,9 +51,14 @@ const int _radius = 2;
 const int _thickness = 2;
 std::string _in_directory;
 std::string _out_directory;
-const cv::Scalar _red = cv::Scalar(255, 0, 0);
-const cv::Scalar _blue = cv::Scalar(216, 16, 216);
-const cv::Scalar _yellow = cv::Scalar(255, 255, 0);
+const cv::Scalar _color1 = cv::Scalar(249,  0,    0);
+const cv::Scalar _color2 = cv::Scalar(14,  219,  64);
+const cv::Scalar _color3 = cv::Scalar(0,    0,  249);
+const cv::Scalar _color4 = cv::Scalar(136,  232, 36);
+const cv::Scalar _color5 = cv::Scalar(216, 26,   118);
+const cv::Scalar _color6 = cv::Scalar(15,  12,  210);
+const cv::Scalar _color7 = cv::Scalar(55,  155, 119);
+const cv::Scalar _color8 = cv::Scalar(255, 205,  25);
 
 DEFINE_string(gpu, "",
     "Optional; run in GPU mode on given device IDs separated by ','."
@@ -268,7 +273,9 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file,
     int l1 = info.size();
     int l2 = l1 - 2;
     CHECK_GE(l1, 2);
-    CHECK_EQ(l2 % n, 0);
+    CHECK_EQ(l2 % n, 0) << "error: " 
+        << n << " " << l1 << " " << l2
+        << "\n" << line;
     tp_info.im_dir = info[0];
     tp_info.im_name = info[1];
     boost::trim(tp_info.im_dir);
@@ -337,8 +344,7 @@ int _pose_estimate() {
   LOG(INFO);
 
   int s = 0;
-  const int l_tp_infos = tp_infos.size();
-  while(s < l_tp_infos) {
+  while(s < tp_infos.size()) {
     // clear
     ids.clear();
     ims_vec.clear();
@@ -352,15 +358,16 @@ int _pose_estimate() {
     int is = 0;
     int max_width = -1;
     int max_height = -1;
-    while(bs < _batch_size && s < l_tp_infos){
+    while(bs < _batch_size && s < tp_infos.size()){
       // Pointer Reference
       TP_Info& tp_info = tp_infos[s];
-      const std::string im_path = tp_info.im_path;
+      std::vector<BBox>& bboxes = tp_info.bboxes;
+
+      std::string im_path = tp_info.im_path;
       cv::Mat im = cv::imread(im_path);
       ims_vec.push_back(im);
       im_names.push_back(tp_info.im_name);
-      // Pointer Reference
-      std::vector<BBox>& bboxes = tp_info.bboxes;
+      
       for(int j = 0; j < bboxes.size(); j++) {
         int pw = bboxes[j].px2 - bboxes[j].px1 + 1;
         int ph = bboxes[j].py2 - bboxes[j].py1 + 1;
@@ -395,6 +402,12 @@ int _pose_estimate() {
       bs++;
     } // end inner while
 
+    CHECK_EQ(is, ids.size());
+    CHECK_EQ(is, imgidxs.size());
+    CHECK_EQ(is, objidxs.size());
+    CHECK_EQ(is, images_paths.size());
+    CHECK_EQ(bs, ims_vec.size());
+
     const int n_batch_size = is;
     data_blob->Reshape(n_batch_size, 3, max_height, max_width);
     float* data = data_blob->mutable_cpu_data();
@@ -428,7 +441,7 @@ int _pose_estimate() {
     for(int j = 0; j < n_batch_size; j++) {
       const int imgidx = ids[j].imgidx;
       const int objidx = ids[j].objidx;
-      const BBox bbox = tp_infos[imgidx].bboxes[objidx];
+      const BBox& bbox = tp_infos[imgidx].bboxes[objidx];
 
       // origin width & height
       int o = aux_info_blob->offset(j);
@@ -502,6 +515,7 @@ int _pose_estimate() {
     const int t_id = top_vecs.size() - 1; 
     const Blob<float> *coord_blob = top_vecs[t_id][0];
     const float *coord = coord_blob->cpu_data();
+    CHECK_EQ(coord_blob->num(), n_batch_size);
 
     // Visualize
     int channels = _part_num * 2;
@@ -516,22 +530,45 @@ int _pose_estimate() {
       const int objidx = ids[j].objidx;
       const BBox& bbox = tp_infos[imgidx].bboxes[objidx];
 
+      cv::Point p1(bbox.tx1, bbox.ty1);
+      cv::Point p2(bbox.tx2, bbox.ty2);
+      cv::rectangle(ims_vec[bchidx], p1, p2, 
+          cv::Scalar(2, 33, 245), 1);
+      // cv::Point p3(bbox.px1, bbox.py1);
+      // cv::Point p4(bbox.px2, bbox.py2);
+      // cv::rectangle(ims_vec[bchidx], p3, p4, 
+      //     cv::Scalar(152, 33, 45), 1);
+
       // one person
       for(int c = 0; c < channels; c += 2) {
-        int x = int(coord[o + c + 0] / bbox.scale);
-        int y = int(coord[o + c + 1] / bbox.scale);
+        // int x = int(coord[o + c + 0] / bbox.scale);
+        // int y = int(coord[o + c + 1] / bbox.scale);
+        int x = int(coord[o + c + 0]);
+        int y = int(coord[o + c + 1]);
         x += bbox.px1;
         y += bbox.py1;
 
         cv::Point p(x, y);
-        if(c/2 == 4 || c/2 == 5 ){
-          cv::circle(ims_vec[bchidx], p, _radius, _red, _thickness);
-        }else if (c/2 == 7 || c/2 == 8 ) {
-          cv::circle(ims_vec[bchidx], p, _radius, _yellow, _thickness);
+        // if(c / 2 == 4 || c / 2 == 5 ){
+        //   cv::circle(ims_vec[bchidx], p, _radius, _color1, _thickness);
+        // }else if (c / 2 == 7 || c / 2 == 8 ) {
+        //   cv::circle(ims_vec[bchidx], p, _radius, _color2, _thickness);
+        // } else {
+        //   cv::circle(ims_vec[bchidx], p, _radius, _color3, _thickness);
+        // }
+        int idx = c / 2;
+        if(idx < 3) {
+          cv::circle(ims_vec[bchidx], p, _radius, _color1, _thickness);
+        } else if(idx < 6) {
+          cv::circle(ims_vec[bchidx], p, _radius, _color2, _thickness);
+        } else if(idx < 9) {
+          cv::circle(ims_vec[bchidx], p, _radius, _color3, _thickness);
+        } else if(idx == 11 or idx == 10) {
+          cv::circle(ims_vec[bchidx], p, _radius, _color4, _thickness);
         } else {
-          cv::circle(ims_vec[bchidx], p, _radius, _blue, _thickness);
+          cv::circle(ims_vec[bchidx], p, _radius, _color5, _thickness);
         }
-      } // end inner for
+      } // end inner fori
     } // end outer for
 
     // Write

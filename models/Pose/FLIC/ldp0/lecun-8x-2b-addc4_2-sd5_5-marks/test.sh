@@ -32,10 +32,18 @@ minsize=240
 maxsize=256
 partnum=14
 hastorso=1
-batchsize=10
-indirectory="/home/ddk/dongdk/tools/demo/images/double/"
-outdirectory="/home/ddk/dongdk/tools/demo/images/v.double/images/"
-tpfile="/home/ddk/dongdk/tools/demo/images/v.double/tp_file.log"
+batchsize=1
+# indirectory="/home/ddk/dongdk/tools/demo/images/double/"
+# outdirectory="/home/ddk/dongdk/tools/demo/images/v.double/images/"
+# tpfile="/home/ddk/dongdk/tools/demo/images/v.double/tp_file.log"
+
+# indirectory=""
+# outdirectory="/home/ddk/dongdk/tools/demo/FLIC/vision/test.images/"
+# tpfile="/home/ddk/dongdk/tools/demo/FLIC/vision/tp_file.log"
+
+indirectory=""
+outdirectory="/home/ddk/dongdk/tools/demo/images/torso_person_2_pose/p.vision/"
+tpfile="/home/ddk/dongdk/tools/demo/images/torso_person_2_pose/tp_file.log"
 mkdir -p $outdirectory
 
 caffe_bin="static_pose"

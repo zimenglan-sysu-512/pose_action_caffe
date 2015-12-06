@@ -34,6 +34,7 @@ using caffe::shared_ptr;
 using std::ostringstream;
 using std::stringstream;
 
+// video
 int _sho_id;
 int _hip_id;
 int _sho_id2;
@@ -51,8 +52,8 @@ const int _radius = 2;
 const int _thickness = 2;
 std::string _in_directory;
 std::string _out_directory;
-const cv::Scalar _red = cv::Scalar(255, 0, 0);
 const cv::Scalar _blue = cv::Scalar(216, 16, 216);
+const cv::Scalar _red = cv::Scalar(255, 0, 0);
 const cv::Scalar _yellow = cv::Scalar(255, 255, 0);
 
 DEFINE_string(gpu, "",
@@ -243,6 +244,20 @@ void _init() {
   _batch_size = FLAGS_batchsize;
   _in_directory = FLAGS_indirectory;
   _out_directory = FLAGS_outdirectory;
+
+  /*
+    Must be the same as in the data layer of deploy.prototxt. e.g.
+    input_shape {
+      dim: 5
+      dim: 3
+      # see src/caffe/layers/coords_to_bboxes_masks_layer.cpp
+      # must keep the same shape of the initialization of the top blobs 
+      # in coords_to_bboxes_masks_layer
+      dim: 100
+      dim: 100
+    }
+    so g_height = 100 and g_width = 100
+  */
   _g_width  = FLAGS_gwidth;
   _g_height  = FLAGS_gheight;
   caffe::GlobalVars::set_g_width(_g_width);
@@ -274,7 +289,7 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file,
     boost::trim(tp_info.im_dir);
     boost::trim(tp_info.im_name);
     tp_info.im_path = tp_info.im_dir + tp_info.im_name;
-
+    LOG(INFO) << tp_info.im_path;
     int n2 = l2 / n;
     for(int j = 0; j < n2; j++) {
       int j2 = 2 + j * n;
@@ -291,6 +306,7 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file,
       bbox.py1 = std::atoi(info[j2 + 6].c_str());
       bbox.px2 = std::atoi(info[j2 + 7].c_str());
       bbox.py2 = std::atoi(info[j2 + 8].c_str());
+      // push
       tp_info.bboxes.push_back(bbox);
     } // end for
 
@@ -301,14 +317,15 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file,
 int _pose_estimate() {
   // init for preparation
   _init();
+  LOG(INFO) << "_init done.";
 
   // get labels
   std::vector<TP_Info> tp_infos;
   _read_tp_info(tp_infos, _tp_file);
+  LOG(INFO) << "_read_tp_info done.";
 
   // instantiate the caffe net.
   Net<float> caffe_net(FLAGS_deployprototxt, caffe::TEST);
-
   // copy the trained model
   caffe_net.CopyTrainedLayersFrom(FLAGS_trainedmodel);
 
@@ -321,20 +338,19 @@ int _pose_estimate() {
   // set torso info
   Blob<float> *torso_info_blob = NULL;
 
+  // capture images from video
   std::vector<Ind> ids;
   std::vector<string> imgidxs;
   std::vector<string> objidxs;
   std::vector<string> im_names;
   std::vector<cv::Mat> ims_vec;
+  std::vector<cv::Mat> c_ims_vec;
   std::vector<string> images_paths;
 
   if(_has_torso) {
     torso_info_blob = new Blob<float>();
   }
-
-  LOG(INFO);
-  LOG(INFO) << "Start...";
-  LOG(INFO);
+  LOG(INFO) << "Init network done.";
 
   int s = 0;
   const int l_tp_infos = tp_infos.size();
@@ -345,6 +361,7 @@ int _pose_estimate() {
     imgidxs.clear();
     objidxs.clear();
     im_names.clear();
+    c_ims_vec.clear();
     bottom_vec.clear();
     images_paths.clear();
     
@@ -353,13 +370,16 @@ int _pose_estimate() {
     int max_width = -1;
     int max_height = -1;
     while(bs < _batch_size && s < l_tp_infos){
-      // Pointer Reference
+      //
       TP_Info& tp_info = tp_infos[s];
       const std::string im_path = tp_info.im_path;
       cv::Mat im = cv::imread(im_path);
       ims_vec.push_back(im);
+      // cv::imshow(tp_info.im_name, im);
+      // cv::waitKey(0);
+      // cv::destroyAllWindows();
       im_names.push_back(tp_info.im_name);
-      // Pointer Reference
+      //
       std::vector<BBox>& bboxes = tp_info.bboxes;
       for(int j = 0; j < bboxes.size(); j++) {
         int pw = bboxes[j].px2 - bboxes[j].px1 + 1;
@@ -419,7 +439,33 @@ int _pose_estimate() {
       cv::Mat im_crop;
       cv::Size S(w, h);
       caffe::CropAndResizePatch(ims_vec[bchidx], im_crop, coords, S);
+      c_ims_vec.push_back(im_crop);
       caffe::ImageDataToBlob(data_blob, j, im_crop);
+      // LOG(INFO) << "px1: " << bbox.px1 << " py1: " << bbox.py1;
+      // LOG(INFO) << "tx1: " << bbox.tx1 << " ty1: " << bbox.ty1;
+      // LOG(INFO) << "scale: " << bbox.scale;
+      // cv::Point p1((bbox.tx1 - bbox.px1) * bbox.scale, 
+      //     (bbox.ty1 - bbox.py1) * bbox.scale);
+      // cv::Point p2((bbox.tx2 - bbox.px1) * bbox.scale, 
+      //     (bbox.ty2 - bbox.py1) * bbox.scale);
+      // LOG(INFO) << "cw: " << im_crop.cols;
+      // LOG(INFO) << "ch: " << im_crop.rows;
+      // LOG(INFO) << "p1: " << p1;
+      // LOG(INFO) << "p2: " << p2;
+      // cv::rectangle(im_crop, p1, p2, cv::Scalar(2, 33, 245), 2);
+      // cv::imshow(tp_infos[imgidx].im_name, im_crop);
+      // cv::waitKey(0);
+      // cv::destroyAllWindows();
+
+      // cv::Mat im_crop2 = BlobToColorImage(data_blob, j);
+      // cv::Point p1((bbox.tx1 - bbox.px1) * bbox.scale, 
+      //     (bbox.ty1 - bbox.py1) * bbox.scale);
+      // cv::Point p2((bbox.tx2 - bbox.px1) * bbox.scale, 
+      //     (bbox.ty2 - bbox.py1) * bbox.scale);
+      // cv::rectangle(im_crop2, p1, p2, cv::Scalar(2, 33, 245), 2);
+      // cv::imshow(tp_infos[imgidx].im_name, im_crop2);
+      // cv::waitKey(0);
+      // cv::destroyAllWindows();
     } // end for
 
     aux_info_blob->Reshape(n_batch_size, 5, 1, 1);
@@ -449,7 +495,7 @@ int _pose_estimate() {
       for(int j = 0; j < n_batch_size; j++) {
         const int imgidx = ids[j].imgidx;
         const int objidx = ids[j].objidx;
-        const BBox& bbox = tp_infos[imgidx].bboxes[objidx];
+        const BBox bbox = tp_infos[imgidx].bboxes[objidx];
 
         int o = torso_info_blob->offset(j);
         // substract the left-top cornor of the person bounding box
@@ -469,6 +515,13 @@ int _pose_estimate() {
         torso_info[o + s_idx2 + 1] = ty1 * bbox.scale;
         torso_info[o + h_idx2 + 0] = tx2 * bbox.scale;
         torso_info[o + h_idx2 + 1] = ty2 * bbox.scale;
+
+        // cv::Point p1(tx1 * bbox.scale, ty1 * bbox.scale);
+        // cv::Point p2(tx2 * bbox.scale, ty2 * bbox.scale);
+        // cv::rectangle(c_ims_vec[j], p1, p2, cv::Scalar(2, 33, 245), 2);
+        // cv::imshow(tp_infos[imgidx].im_name, c_ims_vec[j]);
+        // cv::waitKey(0);
+        // cv::destroyAllWindows();
       } // end for
     } // end if
     
@@ -488,13 +541,15 @@ int _pose_estimate() {
     caffe::GlobalVars::set_imgidxs(imgidxs);
     caffe::GlobalVars::set_images_paths(images_paths);
 
-    float loss;
+    LOG(INFO) << "Forward.";
     bottom_vec.push_back(data_blob);
     bottom_vec.push_back(aux_info_blob);
     if(_has_torso) {
       bottom_vec.push_back(torso_info_blob);
     }
+    float loss;
     caffe_net.Forward(bottom_vec, &loss);
+    LOG(INFO) << "Forward done.";
 
     // get final result from the last layer
     const vector<vector<Blob<float>*> > &top_vecs = 
@@ -502,6 +557,7 @@ int _pose_estimate() {
     const int t_id = top_vecs.size() - 1; 
     const Blob<float> *coord_blob = top_vecs[t_id][0];
     const float *coord = coord_blob->cpu_data();
+    LOG(INFO) << "Gain predicted coords done.";
 
     // Visualize
     int channels = _part_num * 2;
@@ -518,8 +574,15 @@ int _pose_estimate() {
 
       // one person
       for(int c = 0; c < channels; c += 2) {
-        int x = int(coord[o + c + 0] / bbox.scale);
-        int y = int(coord[o + c + 1] / bbox.scale);
+        int x = int(coord[o + c + 0]);
+        int y = int(coord[o + c + 1]);
+        // cv::circle(c_ims_vec[j], cv::Point(x, y), 
+        //     _radius, _red, _thickness);
+        // cv::circle(c_ims_vec[j], cv::Point(x / bbox.scale, 
+        //   y / bbox.scale), _radius, _red, _thickness);   // error
+        
+        x = int(x / bbox.scale);
+        y = int(y / bbox.scale);
         x += bbox.px1;
         y += bbox.py1;
 
@@ -532,20 +595,25 @@ int _pose_estimate() {
           cv::circle(ims_vec[bchidx], p, _radius, _blue, _thickness);
         }
       } // end inner for
+
+      // cv::imshow(im_names[bchidx], c_ims_vec[j]);
+      // cv::waitKey(0);
+      // cv::destroyAllWindows();
     } // end outer for
 
     // Write
+    LOG(INFO) << "Write visualized images.";
     std::string out_path;
     for(int j = 0; j < ims_vec.size(); j++) {
+      // LOG(INFO) << "out_path: " << out_path;
+      // cv::imshow(im_names[j], ims_vec[j]);
+      // cv::waitKey(0);
+      // cv::destroyAllWindows();
       out_path = _out_directory + im_names[j];
       cv::imwrite(out_path, ims_vec[j]);
     }
   } // end outer while
 
-  LOG(INFO);
-  LOG(INFO) << "End...";
-  LOG(INFO)
-  ;
   return 0;
 }
 

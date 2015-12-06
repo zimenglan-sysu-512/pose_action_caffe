@@ -14,49 +14,55 @@ model="models/flic_iter_14000.caffemodel"
 trainedmodel=$project_dir$asserts$exper$model
 echo $trainedmodel
 
-log_path="log/deploy.log"
-log_path=$project_dir$exper$log_path
+log_path="log/"
+log_path=$project_dir$asserts$exper$log_path
 echo $log_path
 mkdir -p $log_path
+log_name="deploy.log"
+log_path=$log_path$log_name
 
 gpu=0
-fps=30
+shoid=6
+hipid=10
+shoid2=6
+hipid2=10
 gwidth=100
 gheight=100
-fwidth=640
-fheight=480
+minsize=240
+maxsize=256
 partnum=14
 hastorso=1
-batchsize=5
-imgminlen=240
-imgmaxlen=256
-inputdirectory="~/dongdk/tools/demo/images/double/"
-inputlabelfile="~/dongdk/tools/demo/images/v.double/tp_file.log"
-outputdirectory="~/dongdk/tools/demo/images/v.double/images/"
+batchsize=10
+indirectory="/home/ddk/dongdk/tools/demo/images/double/"
+outdirectory="/home/ddk/dongdk/tools/demo/images/v.double/images/"
+tpfile="/home/ddk/dongdk/tools/demo/images/v.double/tp_file.log"
+mkdir -p $outdirectory
 
-caffe_bin="camera_pose"
+caffe_bin="static_pose"
 caffe_bin=$tools$caffe_bin
 echo $caffe_bin
 
 sleep_time=3
 sleep $sleep_time
 
-$caffe_bin camera_pose \
+$caffe_bin static_pose \
 		--gpu=$gpu \
-		--fps=$fps \
-		--fwidth=$fwidth \
-		--fheight=$fheight \
-		--partnum=$partnum \
-		--hastorso=$hastorso \
-		--imgminlen=$imgminlen \
-		--imgmaxlen=$imgmaxlen \
-		--inputdirectory=$inputdirectory \
-		--inputlabelfile=$inputlabelfile \
-		--outputdirectory=$outputdirectory \
-		--deployprototxt=$deployprototxt \
-		--trainedmodel=$trainedmodel \
+		--shoid=$shoid \
+		--hipid=$hipid \
+		--shoid2=$shoid2 \
+		--hipid2=$hipid2 \
 		--gwidth=$gwidth \
 		--gheight=$gheight \
+		--minsize=$minsize \
+		--maxsize=$maxsize \
+		--partnum=$partnum \
+		--hastorso=$hastorso \
+		--batchsize=$batchsize \
+		--tpfile=$tpfile \
+		--indirectory=$indirectory \
+		--outdirectory=$outdirectory \
+		--trainedmodel=$trainedmodel \
+		--deployprototxt=$deployprototxt \
 		2>&1 | tee -a $log_path
 
 echo ""

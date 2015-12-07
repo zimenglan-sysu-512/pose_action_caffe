@@ -35,7 +35,8 @@
 
 //
 // torso detection
-#include "caffe/wanglan_face_shoulders_layers.hpp"
 #include "caffe/solver2.hpp"
+#include "caffe/person_torso_layers.hpp"
+#include "caffe/wanglan_face_shoulders_layers.hpp"
 
 #endif  // CAFFE_CAFFE_HPP_

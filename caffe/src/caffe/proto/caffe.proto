@@ -380,6 +380,8 @@ message LayerParameter {
   /// Wanglan.Face.Torso.Detection.Model
   optional WindowMultiScaleDataParameter window_multi_scale_data_param = 401;
   optional CenterFromConnectedParameter center_from_connected_param = 402;
+  //
+  optional ELUParameter elu_param = 403;
 }
 
 // #################################################################################
@@ -903,6 +905,27 @@ message WindowMultiScaleDataParameter {
   optional bool with_bbox = 22 [default = false];
   //
   optional string visual_bbox_path = 25;
+}
+
+// ####################################################################
+// New layers
+
+// Message that stores parameters used by ReLULayer
+message ELUParameter {
+  // Allow non-zero slope for negative inputs to speed up optimization
+  // Described in:
+  // Maas, A. L., Hannun, A. Y., & Ng, A. Y. (2013). Rectifier nonlinearities
+  // improve neural network acoustic models. In ICML Workshop on Deep Learning
+  // for Audio, Speech, and Language Processing.
+  optional float negative_slope = 1 [default = 0];
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 2 [default = DEFAULT];
+  optional float beta = 4 [default = 1];
+  optional float alpha = 3 [default = 1];
 }
 
 // ####################################################################

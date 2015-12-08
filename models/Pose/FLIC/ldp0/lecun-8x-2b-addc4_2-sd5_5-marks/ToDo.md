@@ -18,3 +18,7 @@ step2:
 step3
  when loss continues to decrease, but accuracy does not keep increasing,
  modify the lr_rate, e.g. lr_rate /= 10
+
+
+test:
+	cd ../../../../../caffe/ && make -j8 && cd - && sh test.sh

@@ -741,7 +741,8 @@ message VisualPoseCoordsParameter {
   repeated string phase_name = 5;
   optional string img_ext = 6 [default = ".jpg"];
   optional string file_ext = 7 [default = ".log"];
-  optional bool is_draw_text = 8 [default = false];
+  optional bool is_draw_skel = 8 [default = false];
+  optional bool is_draw_text = 9 [default = false];
 }
 
 // message that stores parameters used by

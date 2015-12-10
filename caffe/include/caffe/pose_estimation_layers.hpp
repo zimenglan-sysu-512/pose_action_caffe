@@ -1084,6 +1084,7 @@ class VisualizedPoseCoordsLayer : public Layer<Dtype>{
   void WriteImages(
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
  protected:
+  bool is_draw_skel_;
   bool is_draw_text_;
   int num_;
   int channels_;
@@ -1137,6 +1138,7 @@ class VisualizedPoseCoords2Layer : public Layer<Dtype>{
   void WriteImages(
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
  protected:
+  bool is_draw_skel_;
   bool is_draw_text_;
   int num_;
   int channels_;

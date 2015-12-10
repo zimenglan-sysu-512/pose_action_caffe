@@ -20,8 +20,8 @@ namespace caffe {
 //  bottom[1]: ground truth
 //  bottom[2]: aux info blob
 template <typename Dtype>
-void VisualizedPoseCoords2Layer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void VisualizedPoseCoords2Layer<Dtype>::LayerSetUp(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   CHECK(this->layer_param_.has_visual_pose_coords_param());
   const VisualPoseCoordsParameter visual_pose_coords_param =
@@ -34,20 +34,30 @@ void VisualizedPoseCoords2Layer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& b
   CHECK(visual_pose_coords_param.has_skel_path());
   CHECK(visual_pose_coords_param.has_is_draw_text());
   
-  this->coords_path_ = visual_pose_coords_param.coords_path();
-  this->coords_files_name_ = visual_pose_coords_param.coords_files_name();
-  this->coords_images_name_ = visual_pose_coords_param.coords_images_name();
-  for(int pn = 0; pn < visual_pose_coords_param.phase_name_size(); pn++) {
-    this->phase_name_.push_back(visual_pose_coords_param.phase_name(pn));
+  this->coords_path_ = 
+      visual_pose_coords_param.coords_path();
+  this->coords_files_name_ = 
+      visual_pose_coords_param.coords_files_name();
+  this->coords_images_name_ = 
+      visual_pose_coords_param.coords_images_name();
+  int pns = visual_pose_coords_param.phase_name_size();
+  for(int pn = 0; pn < pns; pn++) {
+    std::string phase_name = visual_pose_coords_param.phase_name(pn);
+    this->phase_name_.push_back(phase_name);
   }
+  this->is_draw_skel_ = visual_pose_coords_param.has_is_draw_skel() ? 
+      visual_pose_coords_param.is_draw_skel() :
+      false;
   this->skel_path_ = visual_pose_coords_param.skel_path();
   this->is_draw_text_ = visual_pose_coords_param.is_draw_text();
   // use default values
   this->img_ext_ = visual_pose_coords_param.img_ext();
   this->file_ext_ = visual_pose_coords_param.file_ext();
 
-  this->coords_files_path_ = this->coords_path_ + this->coords_files_name_;
-  this->coords_images_path_ = this->coords_path_ + this->coords_images_name_;
+  this->coords_files_path_ = 
+      this->coords_path_ + this->coords_files_name_;
+  this->coords_images_path_ = 
+      this->coords_path_ + this->coords_images_name_;
   
   CreateDir(this->coords_path_);
   CreateDir(this->coords_files_path_);
@@ -56,8 +66,10 @@ void VisualizedPoseCoords2Layer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& b
   // (maybe you use use other name instead train/test/fusion)
   // must end with "/"
   for(int pn = 0; pn < this->phase_name_.size(); pn++) {
-    const std::string file_phase_path = this->coords_files_path_ + this->phase_name_[pn];
-    const std::string image_phase_path = this->coords_images_path_ + this->phase_name_[pn];
+    const std::string file_phase_path = 
+        this->coords_files_path_ + this->phase_name_[pn];
+    const std::string image_phase_path = 
+        this->coords_images_path_ + this->phase_name_[pn];
     CreateDir(file_phase_path);
     CreateDir(image_phase_path);
   }
@@ -65,14 +77,15 @@ void VisualizedPoseCoords2Layer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& b
   if(this->start_skel_idxs_.size() > 0) this->start_skel_idxs_.clear();
   if(this->end_skel_idxs_.size() > 0) this->end_skel_idxs_.clear();
   // index starts from zero
-  get_skeleton_idxs(this->skel_path_, this->start_skel_idxs_, this->end_skel_idxs_);
+  get_skeleton_idxs(this->skel_path_, 
+      this->start_skel_idxs_, this->end_skel_idxs_);
   CHECK(this->start_skel_idxs_.size() > 0);
   CHECK_EQ(this->start_skel_idxs_.size(), this->end_skel_idxs_.size());
 }
 
 template <typename Dtype>
-void VisualizedPoseCoords2Layer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void VisualizedPoseCoords2Layer<Dtype>::Reshape(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   this->num_ = bottom[0]->num();
   this->channels_ = bottom[0]->channels();
@@ -98,8 +111,8 @@ void VisualizedPoseCoords2Layer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bott
 // if bottom.size() == 3, then use this order for bottom blobs: 
 //    predicted, ground truth, aux info
 template <typename Dtype>
-void VisualizedPoseCoords2Layer<Dtype>::WriteFiles(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void VisualizedPoseCoords2Layer<Dtype>::WriteFiles(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   const int b_size = bottom.size();
   const Dtype* aux_info = bottom[b_size - 1]->cpu_data();
@@ -130,9 +143,11 @@ void VisualizedPoseCoords2Layer<Dtype>::WriteFiles(const vector<Blob<Dtype>*>& b
   }
 }
 
+// if bottom.size() == 3, then use this order for bottom blobs: 
+//    predicted, ground truth, aux info
 template <typename Dtype>
-void VisualizedPoseCoords2Layer<Dtype>::WriteImages(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void VisualizedPoseCoords2Layer<Dtype>::WriteImages(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   const int b_size = bottom.size();
   const Dtype* aux_info = bottom[b_size - 1]->cpu_data();
@@ -198,36 +213,43 @@ void VisualizedPoseCoords2Layer<Dtype>::WriteImages(const vector<Blob<Dtype>*>& 
     } // end bs
 
     // draw skeleton -- only 
-    for(int s_idx = 0; s_idx < this->start_skel_idxs_.size(); s_idx++) {
-      const int start_idx = this->start_skel_idxs_[s_idx];
-      const int end_idx = this->end_skel_idxs_[s_idx];
-      // get point
-      const Dtype sx = bottom[b_size - 2]->data_at(item_id, start_idx * 2, 0, 0) / im_scale;
-      const Dtype sy = bottom[b_size - 2]->data_at(item_id, start_idx * 2 + 1, 0, 0) / im_scale;
-      const cv::Point sp(sx, sy);
-      const Dtype ex = bottom[b_size - 2]->data_at(item_id, end_idx * 2, 0, 0) / im_scale;
-      const Dtype ey = bottom[b_size - 2]->data_at(item_id, end_idx * 2 + 1, 0, 0) / im_scale;
-      const cv::Point ep(ex, ey);
-      // 
-      cv::line(img, sp, ep, skel_color, thickness);
-    } // end s_idx
-
+    if(this->is_draw_skel_) {
+      const int idx3 = b_size - 2;
+      for(int s_idx = 0; s_idx < this->start_skel_idxs_.size(); s_idx++) {
+        const int start_idx = this->start_skel_idxs_[s_idx];
+        const int end_idx = this->end_skel_idxs_[s_idx];
+        const int si = start_idx * 2;
+        const int ei = end_idx * 2;
+        // get point
+        const Dtype sx = bottom[idx3]->data_at(item_id, si, 0, 0) / im_scale;
+        const Dtype sy = bottom[idx3]->data_at(item_id, si + 1, 0, 0) / im_scale;
+        const cv::Point sp(sx, sy);
+        const Dtype ex = bottom[idx3]->data_at(item_id, ei, 0, 0) / im_scale;
+        const Dtype ey = bottom[idx3]->data_at(item_id, ei + 1, 0, 0) / im_scale;
+        const cv::Point ep(ex, ey);
+        // 
+        cv::line(img, sp, ep, skel_color, thickness);
+      } // end s_idx
+    }
+    
     // save visual image
     std::string visual_image_path;
     if(b_size == 2) {
       visual_image_path = this->coords_images_path_ + 
-          this->phase_name_[0] + imgidx + "_" + objidx + this->img_ext_;
+          this->phase_name_[0] + imgidx + 
+            "_" + objidx + this->img_ext_;
     } else {
       visual_image_path = this->coords_images_path_ + 
-          this->phase_name_[b_size - 1] + imgidx + "_" + objidx + this->img_ext_;
+          this->phase_name_[b_size - 1] + imgidx + 
+            "_" + objidx + this->img_ext_;
     }
     cv::imwrite(visual_image_path, img);
   } // end item_id
 }
 
 template <typename Dtype>
-void VisualizedPoseCoords2Layer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void VisualizedPoseCoords2Layer<Dtype>::Forward_cpu(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   this->objidxs_ = GlobalVars::objidxs();
   this->imgidxs_ = GlobalVars::imgidxs();
@@ -242,8 +264,10 @@ void VisualizedPoseCoords2Layer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& 
 }
 
 template <typename Dtype>
-void VisualizedPoseCoords2Layer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) 
+void VisualizedPoseCoords2Layer<Dtype>::Backward_cpu(
+    const vector<Blob<Dtype>*>& top,
+    const vector<bool>& propagate_down, 
+    const vector<Blob<Dtype>*>& bottom) 
 {
   const Dtype Zero = Dtype(0);
   CHECK_EQ(propagate_down.size(), bottom.size());

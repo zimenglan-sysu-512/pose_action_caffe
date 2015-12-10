@@ -29,7 +29,8 @@ void ELULayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   const Dtype* bottom_data = bottom[0]->gpu_data();
   
   const Dtype Zero = Dtype(0);
-  Dtype beta = this->layer_param_.elu_param().beta();
+  Dtype beta = Dtype(1);
+  // Dtype beta = this->layer_param_.elu_param().beta();
   Dtype alpha = this->layer_param_.elu_param().alpha();
   CHECK_GE(beta, Zero);
   CHECK_GT(alpha, Zero);
@@ -63,7 +64,8 @@ void ELULayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const Dtype* bottom_data = bottom[0]->gpu_data();
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
     
-    Dtype beta = this->layer_param_.elu_param().beta();
+    Dtype beta = Dtype(1);
+    // Dtype beta = this->layer_param_.elu_param().beta();
     Dtype alpha = this->layer_param_.elu_param().alpha();
 
     // NOLINT_NEXT_LINE(whitespace/operators)

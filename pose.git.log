@@ -1,0 +1,310 @@
+@purpose:
+	remind the git commit history
+
+#################################
+before xx.xx.xx
+
+
+#################################
+before 15.12.12
+	commit a409dfd10dc98a4c4f1fd66f88aa12c654259102
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Sat Dec 12 14:59:46 2015 +0800
+
+	    something wrong with cuddn when input < kernel size
+
+	commit 1168f2cf901d94f6bdaef7818c7d5fc533c8bff3
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 20:24:04 2015 +0800
+
+	    run kinect2 dataset
+
+	commit d3aacb0dcd8f29f5bddcb7ebe1d872e8d7384640
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 20:11:27 2015 +0800
+
+	    torso and person pts
+
+	commit 3e3793a0f1703cb6da005585724353dc236adf8a
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 20:09:02 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 2e778bd757ca5693ad06286731d92d9d859d9f72
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 19:54:59 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 8c1f0b355655f1a931616031b00bd37f4c83c0bb
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 19:26:47 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 87ee624c09c709c538edd2624852e74f9dd27d34
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 19:05:21 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 469eb95dda928fa8716b158a2a525a62e28f19ce
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 17:59:53 2015 +0800
+
+	    run kinect2 dataset
+
+	commit e141a838f7da222fa0834c4d6834e77dfb883991
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Dec 11 17:10:08 2015 +0800
+
+	    add elu layer
+
+	commit f0e3adfd9ed2cdd0fd968440c3a9ebec478afaca
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Dec 10 15:49:34 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 7be747349faa3aebf0725a137d507836d095c414
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Dec 10 12:57:32 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 80c8c4600b46c4c4ecec60540547f62f091eeb16
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Dec 10 12:55:41 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 2e4d1cd26e5e83f297b6b8fcac94003a01baafeb
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Dec 10 12:40:18 2015 +0800
+
+	    run kinect2 dataset
+
+	commit 128c6036ac5ef4ae47e8de16a273c50a4bd6f2df
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Dec 10 12:35:05 2015 +0800
+
+	    add elu layer
+
+	commit 506ec86ef79c9258f6cbecd05c827179ef4fea71
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Dec 10 12:32:43 2015 +0800
+
+	    run kinect2 dataset
+
+	commit a00b8ae76f5ee5c7a5f7de7987536e8e94db1f7e
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Dec 10 10:15:48 2015 +0800
+
+	    add ELULayer
+
+	commit f2726150352bb36e8d57adcea9a342d3f15a9878
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Tue Dec 8 11:49:48 2015 +0800
+
+	    add ELULayer
+
+	commit 041bfc21d112de8c5d61edd1fbe254b916779d96
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Mon Dec 7 11:09:34 2015 +0800
+
+	    add ELULayer
+
+	commit 6ef919ac2984f25e48ce5bfe122dc4aa27545916
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Sun Dec 6 20:29:39 2015 +0800
+
+	    add pose demo
+
+	commit 839a89009a89f94095466060b3c3e351947e64de
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Sun Dec 6 16:05:32 2015 +0800
+
+	    add pose demo
+
+	commit 8e16ea5f247c19e5890cc678a1620116263b3283
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Sat Dec 5 20:57:29 2015 +0800
+
+	    add pose demo
+
+	commit 9450be605112b19af472dd79f289c7a6b0413f2b
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Mon Nov 30 19:31:29 2015 +0800
+
+	    add pose demo
+
+	commit a58cfdd87df4e9e0e3f6099cab6260e811a97cc2
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Sun Nov 29 22:06:35 2015 +0800
+
+	    add pose demo
+
+	commit 8acd5d4a9f2a64e5edae45868f9abe639e888d15
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Sun Nov 29 12:43:05 2015 +0800
+
+	    add pose demo
+
+	commit 36aede95e19a03f44d3c635fd14f970e8e1d1aaf
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 18:12:23 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit 8abb1c4362fbbae0ae3123b2d82fbfd472874b21
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 18:00:48 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit 2f9212047e0212b4aff413bc9071f43261b0dd7c
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 17:58:17 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit bd750061cc0d484b3ab22e3a11e59e144d2e7872
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 17:56:30 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit 3bb19a8c0c7e6eeb297533c13cc7e2246d0b560d
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 17:51:49 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit 6d02e00f84153b66df2877d21a3dfbcd6e3096a5
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 17:46:23 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit 1b00ec80b29fea42c2d76e4033c235a3bc6ba70d
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 17:37:51 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit c7d51a969520ce8f7785dc85b759ab97a5929066
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 17:23:55 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit 2bcccc158565dcbaee0bfc6d9bb8113975d5262a
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 17:17:53 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks -- add refined model: 3 banks only conv1
+
+	commit a689ef05ee71c57c8d871638c4a482fcc9a160b7
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 14:51:01 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks
+
+	commit ef9b8274a63bb2731c9575394f53873acdc41509
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 27 00:02:01 2015 +0800
+
+	    finetune 3rd bank and then finetube all banks
+
+	commit 7216f9ef411c3e56c01b5c55f579e4acd24219c9
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Nov 26 20:00:15 2015 +0800
+
+	    add exper for 3 banks of coarse model
+
+	commit 80c81b5efb003131818bc32fea59047cc843e3db
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Wed Nov 25 15:32:40 2015 +0800
+
+	    add exper for 3 banks of coarse model
+
+	commit e27b38212a9d8b4cdc7af24fac292a03e83dfadc
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Wed Nov 25 12:06:25 2015 +0800
+
+	    first add refined model experiments
+
+	commit f7209d02b4a5c981c8eeb35ff78e1a3ff54819f0
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Wed Nov 25 12:01:58 2015 +0800
+
+	    first add refined model experiments
+
+	commit 4c87ff72f4af9eb450c8002248e0a0a14201e331
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Wed Nov 25 11:51:08 2015 +0800
+
+	    add exper for 3 banks of coarse model
+
+	commit 7672dcc367c6fc57280fd44ffdac3969e1e4ab87
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Wed Nov 25 11:27:34 2015 +0800
+
+	    add exper for 3 banks of coarse model
+
+	commit fb2c4413f49ddc2b957bce855b59cc65a0080d5a
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Wed Nov 25 11:21:24 2015 +0800
+
+	    first add refined model experiments
+
+	commit ae672ff8fec1f089f5290f530ef450accc44f8b0
+	Merge: dca4022 9b2f45e
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Tue Nov 24 20:02:05 2015 +0800
+
+	    Merge branch 'ddk' of /home/ddk/git-server/pose-caffe into ddk
+
+	commit dca4022bb0d753fbcfaba2146d51e58aef20d1fd
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Tue Nov 24 19:52:29 2015 +0800
+
+	    add exper for 3 banks of coarse model
+
+	commit 9b2f45e35979b101b14edb7e0a8363c337fd005b
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Mon Nov 23 11:52:12 2015 +0800
+
+	    first add refined model experiments
+
+	commit a478a4e97f2aeadeded5063efec6aeb8510c11a0
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Mon Nov 23 11:38:09 2015 +0800
+
+	    first add refined model experiments
+
+	commit e3c7231efa760afd45cf8cc7e9b51d53862c70c5
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Sat Nov 21 08:17:56 2015 +0800
+
+	    reproduce the 90.2%
+
+	commit 111293e284d204b4c9cd96896cd45ce3847b3ae9
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Fri Nov 20 10:14:14 2015 +0800
+
+	    rename caffe-fast-rnn to caffe
+
+	commit 42d14a46a443652accd5ae514e8fc9cb187a858f
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Nov 19 16:39:52 2015 +0800
+
+	    modify prototxt&sh -- the path
+
+	commit 8f29342e54b0a181934c0faefaefb6408a58ce17
+	Author: dongdk <dongdk.sysu@foxmail.com>
+	Date:   Thu Nov 19 15:32:51 2015 +0800
+
+	    first time to build - add window multi-scale data layer
+

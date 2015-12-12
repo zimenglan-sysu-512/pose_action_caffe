@@ -9,12 +9,12 @@ namespace caffe {
 
 template <typename Dtype>
 __global__ void ELUForward(const int n, const Dtype* in, Dtype* out,
-    Dtype alpha, Dtype beta, const Dtype Zero) {
+    Dtype alpha, const Dtype Zero, const Dtype One) {
   CUDA_KERNEL_LOOP(index, n) {
     if(in[index] > Zero) {
       out[index] = in[index];
     } else {
-      Dtype elu_val = alpha * (exp(in[index]) - beta);
+      Dtype elu_val = alpha * (exp(in[index]) - One);
       out[index] = elu_val <= Zero ? elu_val : Zero;
     }
   }
@@ -28,27 +28,25 @@ void ELULayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   Dtype* top_data = top[0]->mutable_gpu_data();
   const Dtype* bottom_data = bottom[0]->gpu_data();
   
+  const Dtype One = Dtype(1);
   const Dtype Zero = Dtype(0);
-  Dtype beta = Dtype(1);
-  // Dtype beta = this->layer_param_.elu_param().beta();
   Dtype alpha = this->layer_param_.elu_param().alpha();
-  CHECK_GE(beta, Zero);
   CHECK_GT(alpha, Zero);
 
   // NOLINT_NEXT_LINE(whitespace/operators)
   ELUForward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
-      count, bottom_data, top_data, alpha, beta, Zero);
+      count, bottom_data, top_data, alpha, Zero, One);
   CUDA_POST_KERNEL_CHECK;
 }
 
 template <typename Dtype>
 __global__ void ELUBackward(const int n, const Dtype* in_diff,
     const Dtype* in_data, const Dtype* out_data, 
-    Dtype* out_diff, Dtype alpha, Dtype beta) 
+    Dtype* out_diff, Dtype alpha) 
 {
   CUDA_KERNEL_LOOP(index, n) {
     Dtype diff_val = (in_data[index] > 0) + 
-        (in_data[index] <= 0) * (out_data[index] + alpha * beta);
+        (in_data[index] <= 0) * (out_data[index] + alpha);
     out_diff[index] = in_diff[index] * diff_val;
   }
 }
@@ -64,13 +62,13 @@ void ELULayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const Dtype* bottom_data = bottom[0]->gpu_data();
     Dtype* bottom_diff = bottom[0]->mutable_gpu_diff();
     
-    Dtype beta = Dtype(1);
-    // Dtype beta = this->layer_param_.elu_param().beta();
+    const Dtype Zero = Dtype(0);
     Dtype alpha = this->layer_param_.elu_param().alpha();
+    CHECK_GT(alpha, Zero);
 
     // NOLINT_NEXT_LINE(whitespace/operators)
     ELUBackward<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
-        count, top_diff, bottom_data, top_data, bottom_diff, alpha, beta);
+        count, top_diff, bottom_data, top_data, bottom_diff, alpha);
     CUDA_POST_KERNEL_CHECK;
   }
 }

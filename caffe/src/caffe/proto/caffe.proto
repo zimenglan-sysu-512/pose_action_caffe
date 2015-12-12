@@ -273,6 +273,7 @@ message LayerParameter {
   // for more details, please refer to the code:
   //    caffe/src/caffe/net.cpp `CopyTrainedLayersFrom` function
   optional string copy_postfix_name = 400;
+  optional bool is_disp_info = 404 [default = false];
 
   // 
   optional string name = 1; // the layer name
@@ -743,6 +744,8 @@ message VisualPoseCoordsParameter {
   optional string file_ext = 7 [default = ".log"];
   optional bool is_draw_skel = 8 [default = false];
   optional bool is_draw_text = 9 [default = false];
+  optional bool is_write_file = 10 [default = false];
+  optional bool is_write_image = 11 [default = true];
 }
 
 // message that stores parameters used by
@@ -925,7 +928,6 @@ message ELUParameter {
     CUDNN = 2;
   }
   optional Engine engine = 2 [default = DEFAULT];
-  optional float beta = 4 [default = 1];
   optional float alpha = 3 [default = 1];
 }
 

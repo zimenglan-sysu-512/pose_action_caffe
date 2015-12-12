@@ -69,6 +69,13 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Init(
 			is_match_channel[i] = 0;
 		}
 	}
+
+	// use default value
+  if(this->layer_param_.is_disp_info()) {
+  	LOG(INFO) << "layer name: " << this->layer_param_.name()
+  			<< " crop width: " << crop_w_
+  			<< " crop height: " << crop_h_;
+  }
 }
 
 template <typename Dtype>

@@ -8,10 +8,9 @@
 namespace caffe {
 
 template <typename Dtype>
-inline Dtype elu_func(const Dtype x, const Dtype alpha, 
-    const Dtype beta = Dtype(1)) 
+inline Dtype elu_func(const Dtype x, const Dtype alpha) 
 {
-  return alpha * (exp(x) - beta);
+  return alpha * (exp(x) - 1);
 }
 
 template <typename Dtype>
@@ -23,16 +22,13 @@ void ELULayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   const Dtype* bottom_data = bottom[0]->cpu_data();
 
   const Dtype Zero = Dtype(0);
-  Dtype beta = Dtype(1);
-  // Dtype beta = this->layer_param_.elu_param().beta();
   Dtype alpha = this->layer_param_.elu_param().alpha();
-  CHECK_GE(beta, Zero);
   CHECK_GT(alpha, Zero);
 
   for (int i = 0; i < count; ++i) {
     top_data[i] = bottom_data[i] > Zero ?
         bottom_data[i] : 
-        std::min(elu_func(bottom_data[i], alpha, beta), Zero);
+        std::min(elu_func(bottom_data[i], alpha), Zero);
   }
 }
 
@@ -47,13 +43,13 @@ void ELULayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const Dtype* bottom_data = bottom[0]->cpu_data();
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
 
-    Dtype beta = Dtype(1);
-    // Dtype beta = this->layer_param_.elu_param().beta();
+    const Dtype Zero = Dtype(0);
     Dtype alpha = this->layer_param_.elu_param().alpha();
-
+    CHECK_GT(alpha, Zero);
+    
     for (int i = 0; i < count; ++i) {
       Dtype diff_val = (bottom_data[i] > 0) + 
-          (bottom_data[i] <= 0) * (top_data[i] + alpha * beta);
+          (bottom_data[i] <= 0) * (top_data[i] + alpha);
       bottom_diff[i] = top_diff[i] * diff_val;
     }
   }

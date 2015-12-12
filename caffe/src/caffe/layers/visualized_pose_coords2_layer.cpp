@@ -259,8 +259,13 @@ void VisualizedPoseCoords2Layer<Dtype>::Forward_cpu(
   CHECK_EQ(this->imgidxs_.size(), this->objidxs_.size());
   CHECK_EQ(this->imgidxs_.size(), this->images_paths_.size());
   
-  this->WriteFiles(bottom, top);
-  this->WriteImages(bottom, top);
+  // use default value
+  if(this->layer_param_.visual_pose_coords_param().is_write_file()) {
+    this->WriteFiles(bottom, top);
+  } 
+  if(this->layer_param_.visual_pose_coords_param().is_write_image()) {
+    this->WriteImages(bottom, top);
+  }
 }
 
 template <typename Dtype>

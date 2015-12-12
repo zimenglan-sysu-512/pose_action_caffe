@@ -171,6 +171,8 @@ void VisualizedHeatMaps2Layer<Dtype>::WriteImages(const vector<Blob<Dtype>*>& bo
     const int width  = (img_width  * im_scale) * rsw;
     const int height = (img_height * im_scale) * rsh;
     cv::Mat img = cv::imread(origin_image_path);
+    CHECK(img.data) << " Loading " << origin_image_path << " failed.";
+
     cv::resize(img, img, cv::Size(width, height));
     if(flippable) {
       // >0: horizontal; <0: horizontal&vertical; =0: vertical
@@ -255,7 +257,8 @@ void VisualizedHeatMaps2Layer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bo
     this->WriteFiles(bottom, top);
     this->WriteImages(bottom, top);
   } else {
-    NOT_IMPLEMENTED;
+    // NOT_IMPLEMENTED;
+    LOG(INFO) << "Do nothing...";
   }
 }
 

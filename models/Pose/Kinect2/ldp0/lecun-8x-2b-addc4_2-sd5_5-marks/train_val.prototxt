@@ -754,49 +754,49 @@ layer {
   }
 }
 
-# layer {
-#   name: "visual_heat_maps2_2"
-#   type: "VisualizedHeatMaps2"
-#   bottom: "re_conv7"
-#   bottom: "heat_maps"
-#   bottom: "aux_info"
-#   include {
-#     phase: TEST
-#   }
-#   visual_heat_maps_param {
-#     # 0: files; 1: images, 2: both
-#     visual_type: 1
-#     heat_map_path: "../asserts/models/Pose/Kinect2/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks/test_heat_maps2_2/"
-#     heat_map_files_name: "files/"
-#     heat_map_images_name: "images/"
-#     phase_name: "test_fusion/"
-#     threshold: 0.273
-#   }
-# }
+layer {
+  name: "visual_heat_maps2_2"
+  type: "VisualizedHeatMaps2"
+  bottom: "re_conv7"
+  bottom: "heat_maps"
+  bottom: "aux_info"
+  include {
+    phase: TEST
+  }
+  visual_heat_maps_param {
+    # 0: files; 1: images, 2: both
+    visual_type: 1
+    heat_map_path: "../asserts/models/Pose/Kinect2/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks/test_heat_maps2_2/"
+    heat_map_files_name: "files/"
+    heat_map_images_name: "images/"
+    phase_name: "test_fusion/"
+    threshold: 0.273
+  }
+}
 
-# layer {
-#   name: "visual_coords"
-#   type: "VisualizedPoseCoords"
-#   bottom: "pred_pose_coords"
-#   # bottom: "gt_origin_pose_coords"
-#   bottom: "aux_info"
-#   include {
-#     phase: TEST
-#   }
-#   visual_pose_coords_param {
-#     coords_path: "../asserts/models/Pose/Kinect2/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks/poses_coords/"
-#     skel_path: "../dataset/Kinect2/labels/skel_path.log"
-#     coords_files_name: "files/"
-#     coords_images_name: "images/"
-#     phase_name: "test_prediction/"
-#     # phase_name: "test_ground_truths/"
-#     # phase_name: "test_fusion/"
-#     is_draw_skel: false
-#     is_draw_text: true
-#     is_write_file: false
-#     is_write_image: true
-#   }
-# }
+layer {
+  name: "visual_coords"
+  type: "VisualizedPoseCoords"
+  bottom: "pred_pose_coords"
+  # bottom: "gt_origin_pose_coords"
+  bottom: "aux_info"
+  include {
+    phase: TEST
+  }
+  visual_pose_coords_param {
+    coords_path: "../asserts/models/Pose/Kinect2/ldp0/lecun-8x-2b-addc4_2-sd5_5-marks/poses_coords/"
+    skel_path: "../dataset/Kinect2/labels/skel_path.log"
+    coords_files_name: "files/"
+    coords_images_name: "images/"
+    phase_name: "test_prediction/"
+    # phase_name: "test_ground_truths/"
+    # phase_name: "test_fusion/"
+    is_draw_skel: false
+    is_draw_text: true
+    is_write_file: false
+    is_write_image: true
+  }
+}
 
 layer {
   name: "accuracy"

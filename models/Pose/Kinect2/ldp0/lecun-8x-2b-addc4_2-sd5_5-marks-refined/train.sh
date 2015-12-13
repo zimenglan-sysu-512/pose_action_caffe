@@ -1,8 +1,8 @@
 #!/usr/bin/env sh
+# export LD_LIBRARY_PATH=/home/liangdp/dongdk/cudnn/v2/lib:$LD_LIBRARY_PATH
 
 ProjectDir="../../../../../"
 cd $ProjectDir
-export LD_LIBRARY_PATH=/home/liangdp/dongdk/cudnn/v3/lib64:$LD_LIBRARY_PATH
 
 RootDir="caffe/"
 Tools="build/tools/"

@@ -413,7 +413,7 @@ int _pose_estimate() {
           int tw = bboxes[j].tx2 - bboxes[j].tx1 + 1;
           // int th = bboxes[j].ty2 - bboxes[j].ty1 + 1;
           bboxes[j].tx1 += int(tw * _ratio);
-          // bboxes[j].tx2 -= int(tw * _ratio);
+          bboxes[j].tx2 -= int(tw * _ratio);
         }
 
         // reset
@@ -607,7 +607,7 @@ int _pose_estimate() {
     // Write
     std::string out_path;
     for(int j = 0; j < ims_vec.size(); j++) {
-      out_path = _out_directory + im_names[j] + _img_ext;
+      out_path = _out_directory + im_names[j];
       cv::imwrite(out_path, ims_vec[j]);
     }
   } // end outer while

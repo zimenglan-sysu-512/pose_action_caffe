@@ -28,8 +28,8 @@ layer {
     parts_orders_path: "../dataset/Kinect2/labels/parts_orders_path.log"
     shuffle: true
     is_color: true
-    max_size: 280
-    min_size: 256
+    max_size: 256 
+    min_size: 240
     label_num: 38
     is_scale_image: true
     always_max_size: true
@@ -58,8 +58,8 @@ layer {
     parts_orders_path: "../dataset/Kinect2/labels/parts_orders_path.log"
     shuffle: false
     is_color: true
-    max_size: 280
-    min_size: 256
+    max_size: 256
+    min_size: 240
     label_num: 38
     is_scale_image: true
     always_max_size: true
@@ -100,8 +100,8 @@ layer {
   bottom: "data_bank1"
   top: "data_bank2"
   resize_param {
-    height_fac: 0.5
-    width_fac: 0.5
+    height_fac: 0.707
+    width_fac: 0.707
   }
 }
 

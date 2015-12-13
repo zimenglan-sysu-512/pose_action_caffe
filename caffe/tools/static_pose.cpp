@@ -39,13 +39,17 @@ int _hip_id;
 int _sho_id2;
 int _hip_id2;
 int _g_width;
+double _ratio;
 int _g_height;
 int _min_size;
 int _max_size;
 int _part_num;
 int _has_torso;
 int _batch_size;
+bool _is_draw_text;
+bool _is_disp_info;
 std::string _tp_file;
+std::string _img_ext;
 const float zero = 0;
 const int _radius = 2;
 const int _thickness = 2;
@@ -59,6 +63,8 @@ const cv::Scalar _color5 = cv::Scalar(216, 26,   118);
 const cv::Scalar _color6 = cv::Scalar(15,  12,  210);
 const cv::Scalar _color7 = cv::Scalar(55,  155, 119);
 const cv::Scalar _color8 = cv::Scalar(255, 205,  25);
+const int _fontFace = cv::FONT_HERSHEY_SIMPLEX;
+const float _fontScale = .5;
 
 DEFINE_string(gpu, "",
     "Optional; run in GPU mode on given device IDs separated by ','."
@@ -69,6 +75,9 @@ DEFINE_string(deployprototxt, "",
 DEFINE_string(trainedmodel, "",
     "Optional; the pretrained weights to initialize finetuning. "
     "Cannot be set simultaneously with snapshot.");
+DEFINE_int32(isdrawtext, 1, "Draw the text.");
+DEFINE_int32(isdispinfo, 0, "Display information.");
+DEFINE_int32(ratio, 0, "ratio of torso width.");
 DEFINE_int32(shoid, -1,
     "The index of the shoulder joint (left or right).");
 DEFINE_int32(hipid, -1,
@@ -98,6 +107,7 @@ DEFINE_string(tpfile, "",
     "corresponding label information, like torso/person bbox");
 DEFINE_string(outdirectory, "",
     "Optional; the output of the results, like files or visualized images.");
+DEFINE_string(imgext, "", "extension of image, e.g. `.jpg`");
 
 // A simple registry for caffe commands.
 typedef int (*BrewFunction)();
@@ -238,6 +248,7 @@ void _init() {
   // FLAGS args
   _sho_id = FLAGS_shoid;
   _hip_id = FLAGS_hipid;
+  _img_ext = FLAGS_imgext;
   _sho_id2 = FLAGS_shoid2;
   _hip_id2 = FLAGS_hipid2;
   _tp_file = FLAGS_tpfile;
@@ -250,8 +261,24 @@ void _init() {
   _out_directory = FLAGS_outdirectory;
   _g_width  = FLAGS_gwidth;
   _g_height  = FLAGS_gheight;
+  _is_draw_text = FLAGS_isdrawtext != 0;
+  _is_disp_info = FLAGS_isdispinfo != 0;
   caffe::GlobalVars::set_g_width(_g_width);
   caffe::GlobalVars::set_g_height(_g_height);
+  _ratio = FLAGS_ratio / 100.0;
+  _ratio = max(min(_ratio, 1.0), 0.);
+
+  if(_is_disp_info) {
+    LOG(INFO) << "ratio: " << _ratio;
+    LOG(INFO) << "sho id: " << _sho_id;
+    LOG(INFO) << "hip id: " << _hip_id;
+    LOG(INFO) << "sho id2: " << _sho_id2;
+    LOG(INFO) << "hip id2: " << _hip_id2;
+    LOG(INFO) << "min size: " << _min_size;
+    LOG(INFO) << "max size: " << _max_size;
+    LOG(INFO) << "has_torso: " << _has_torso;
+    LOG(INFO) << "batch size: " << _batch_size;
+  }
 }
 
 void _read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file,
@@ -280,7 +307,7 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file,
     tp_info.im_name = info[1];
     boost::trim(tp_info.im_dir);
     boost::trim(tp_info.im_name);
-    tp_info.im_path = tp_info.im_dir + tp_info.im_name;
+    tp_info.im_path = tp_info.im_dir + tp_info.im_name + _img_ext;
 
     int n2 = l2 / n;
     for(int j = 0; j < n2; j++) {
@@ -364,6 +391,9 @@ int _pose_estimate() {
       std::vector<BBox>& bboxes = tp_info.bboxes;
 
       std::string im_path = tp_info.im_path;
+      if(_is_disp_info) {
+        LOG(INFO) << im_path;
+      }
       cv::Mat im = cv::imread(im_path);
       ims_vec.push_back(im);
       im_names.push_back(tp_info.im_name);
@@ -379,6 +409,13 @@ int _pose_estimate() {
           scale = float(_max_size) / float(max_size);
         }
         
+        {
+          int tw = bboxes[j].tx2 - bboxes[j].tx1 + 1;
+          // int th = bboxes[j].ty2 - bboxes[j].ty1 + 1;
+          bboxes[j].tx1 += int(tw * _ratio);
+          bboxes[j].tx2 -= int(tw * _ratio);
+        }
+
         // reset
         bboxes[j].scale = scale;  
         max_width = std::max(max_width, int(pw * scale));
@@ -534,11 +571,11 @@ int _pose_estimate() {
       cv::Point p2(bbox.tx2, bbox.ty2);
       cv::rectangle(ims_vec[bchidx], p1, p2, 
           cv::Scalar(2, 33, 245), 1);
-      // cv::Point p3(bbox.px1, bbox.py1);
-      // cv::Point p4(bbox.px2, bbox.py2);
-      // cv::rectangle(ims_vec[bchidx], p3, p4, 
-      //     cv::Scalar(152, 33, 45), 1);
-
+      cv::Point p3(bbox.px1, bbox.py1);
+      cv::Point p4(bbox.px2, bbox.py2);
+      cv::rectangle(ims_vec[bchidx], p3, p4, 
+          cv::Scalar(245, 33, 2), 1);
+      
       // one person
       for(int c = 0; c < channels; c += 2) {
         // int x = int(coord[o + c + 0] / bbox.scale);
@@ -549,25 +586,21 @@ int _pose_estimate() {
         y += bbox.py1;
 
         cv::Point p(x, y);
-        // if(c / 2 == 4 || c / 2 == 5 ){
-        //   cv::circle(ims_vec[bchidx], p, _radius, _color1, _thickness);
-        // }else if (c / 2 == 7 || c / 2 == 8 ) {
-        //   cv::circle(ims_vec[bchidx], p, _radius, _color2, _thickness);
-        // } else {
-        //   cv::circle(ims_vec[bchidx], p, _radius, _color3, _thickness);
-        // }
-        int idx = c / 2;
-        if(idx < 3) {
-          cv::circle(ims_vec[bchidx], p, _radius, _color1, _thickness);
-        } else if(idx < 6) {
-          cv::circle(ims_vec[bchidx], p, _radius, _color2, _thickness);
-        } else if(idx < 9) {
-          cv::circle(ims_vec[bchidx], p, _radius, _color3, _thickness);
-        } else if(idx == 11 or idx == 10) {
-          cv::circle(ims_vec[bchidx], p, _radius, _color4, _thickness);
-        } else {
-          cv::circle(ims_vec[bchidx], p, _radius, _color5, _thickness);
-        }
+        cv::circle(ims_vec[bchidx], p, _radius, _color1, _thickness);
+
+        if(_is_draw_text) {
+          const int idx = c / 2;
+          const std::string text = boost::to_string(idx);
+          if(idx % 2) {
+            const cv::Point text_point(x - 5, y - 5);
+            cv::putText(ims_vec[bchidx], text, text_point, 
+                _fontFace, _fontScale, _color2);
+          } else {
+            const cv::Point text_point(x + 5, y + 5);
+            cv::putText(ims_vec[bchidx], text, text_point, 
+                _fontFace, _fontScale, _color2);
+          }
+        } // end if
       } // end inner fori
     } // end outer for
 

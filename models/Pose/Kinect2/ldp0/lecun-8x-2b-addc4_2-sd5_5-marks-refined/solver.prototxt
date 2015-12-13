@@ -7,7 +7,7 @@ snapshot_prefix: "../asserts/models/Pose/Kinect2/ldp0/lecun-8x-2b-addc4_2-sd5_5-
 
 test_interval: 1000
 
-test_iter: 3427
+test_iter: 13707 # 3427
 
 # test_initialization: false
 

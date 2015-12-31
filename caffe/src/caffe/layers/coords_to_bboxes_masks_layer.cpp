@@ -14,8 +14,8 @@
 namespace caffe {
 
 template <typename Dtype>
-void CoordsToBboxesMasksLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void CoordsToBboxesMasksLayer<Dtype>::LayerSetUp(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   CHECK(this->layer_param_.has_coord_to_bbox_masks_param());
   const CoordsToBboxMasksParameter coord_to_bbox_masks_param = 
@@ -26,11 +26,14 @@ void CoordsToBboxesMasksLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bot
   CHECK(coord_to_bbox_masks_param.has_bottom_id2());
   CHECK(coord_to_bbox_masks_param.has_value()); 
 
-  this->top_id_ = coord_to_bbox_masks_param.top_id();
-  this->top_id2_ = coord_to_bbox_masks_param.top_id2();
-  this->bottom_id_ = coord_to_bbox_masks_param.bottom_id();
-  this->bottom_id2_ = coord_to_bbox_masks_param.bottom_id2();
+  this->top_id_         = coord_to_bbox_masks_param.top_id();
+  this->top_id2_        = coord_to_bbox_masks_param.top_id2();
+  this->bottom_id_      = coord_to_bbox_masks_param.bottom_id();
+  this->bottom_id2_     = coord_to_bbox_masks_param.bottom_id2();
   this->value_ = Dtype(coord_to_bbox_masks_param.value());
+  this->perturb_num_    = coord_to_bbox_masks_param.perturb_num();
+  this->is_perturb_num_ = this->perturb_num_ > 0;
+
   this->has_visual_path_ = coord_to_bbox_masks_param.has_visual_path();
   if(this->has_visual_path_) {
     this->visual_path_ = coord_to_bbox_masks_param.visual_path();  
@@ -51,51 +54,58 @@ void CoordsToBboxesMasksLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bot
     this->bottom_id2_ = 0;
     this->whole_ = true;
   }
-  this->top_idx_ = this->top_id_ * 2;
-  this->top_idx2_ = this->top_id2_ * 2;
-  this->bottom_idx_ = this->bottom_id_ * 2;
+  this->top_idx_     = this->top_id_ * 2;
+  this->top_idx2_    = this->top_id2_ * 2;
+  this->bottom_idx_  = this->bottom_id_ * 2;
   this->bottom_idx2_ = this->bottom_id2_ * 2;
-  LOG(INFO) << "top_id: " << this->top_id_ 
-      << ", top_idx: " << this->top_idx_;
-  LOG(INFO) << "top_id2: " << this->top_id2_ 
-      << ", top_idx2: " << this->top_idx2_;
-  LOG(INFO) << "bottom_id: " << this->bottom_id_ 
-      << ", bottom_idx: " << this->bottom_idx_;
-  LOG(INFO) << "bottom_id2: " << this->bottom_id2_ 
-      << ", bottom_idx2: " << this->bottom_idx2_;
-  LOG(INFO) << "value: " << this->value_;
-  LOG(INFO) << "whole or not: " << this->whole_;
-  if(this->has_visual_path_) {
-    LOG(INFO) << "visual_path: " << this->visual_path_;
+
+  CHECK_GE(this->top_id_,     0);
+  CHECK_GE(this->top_id2_,    0);
+  CHECK_GE(this->bottom_id_,  0);
+  CHECK_GE(this->bottom_id2_, 0);
+
+  bool is_disp_info = this->layer_param_.is_disp_info();
+  if(is_disp_info) {
+    LOG(INFO) << "top_id: "     << this->top_id_ 
+        << ", top_idx: " << this->top_idx_;
+    LOG(INFO) << "top_id2: "    << this->top_id2_ 
+        << ", top_idx2: " << this->top_idx2_;
+    LOG(INFO) << "bottom_id: "  << this->bottom_id_ 
+        << ", bottom_idx: " << this->bottom_idx_;
+    LOG(INFO) << "bottom_id2: " << this->bottom_id2_ 
+        << ", bottom_idx2: " << this->bottom_idx2_;
+    LOG(INFO) << "value: "      << this->value_;
+    LOG(INFO) << "whole: "      << this->whole_;
+    if(this->has_visual_path_) {
+      LOG(INFO) << "visual_path: " << this->visual_path_;
+    }
   }
 }
-
 
 // bottom[0]: coords -- have been scaled
 // bottom[1]: aux_info -- origin height & width
 template <typename Dtype>
-void CoordsToBboxesMasksLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void CoordsToBboxesMasksLayer<Dtype>::Reshape(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
-  CHECK_GE(this->top_id_, 0);
-  CHECK_GE(this->top_id2_, 0);
-  CHECK_GE(this->bottom_id_, 0);
-  CHECK_GE(this->bottom_id2_, 0);
-  CHECK_LT(this->top_id_, bottom[0]->channels());
-  CHECK_LT(this->top_id2_, bottom[0]->channels());
-  CHECK_LT(this->bottom_id_, bottom[0]->channels());
-  CHECK_LT(this->bottom_id2_, bottom[0]->channels());
-  CHECK_EQ(bottom[0]->num(), bottom[1]->num());
-  CHECK_EQ(bottom[0]->channels(), 
-      bottom[0]->count() / bottom[0]->num());
+  int num      = bottom[0]->num();
+  int count    = bottom[0]->count();
+  int channels = bottom[0]->channels();
+  CHECK_LT(this->top_id_,     channels);
+  CHECK_LT(this->top_id2_,    channels);
+  CHECK_LT(this->bottom_id_,  channels);
+  CHECK_LT(this->bottom_id2_, channels);
+  CHECK_EQ(num,  bottom[1]->num());
+  CHECK_EQ(channels, count / num);
 
-  this->num_ = bottom[0]->num();
-  this->channels_ = bottom[0]->channels();
-  this->new_channels_ = 1;
+  this->num_        = num;
+  this->channels_   = channels;
+  this->n_channels_ = 1;
 
-  Dtype max_height = Dtype(-1);
-  Dtype max_width = Dtype(-1);
+  Dtype max_height      = Dtype(-1);
+  Dtype max_width       = Dtype(-1);
   const Dtype* aux_info = bottom[1]->cpu_data();
+
   for(int item_id = 0; item_id < this->num_; item_id++) {
     // (img_ind, width, height, im_scale, flippable)
     const int offset = bottom[1]->offset(item_id);
@@ -104,9 +114,9 @@ void CoordsToBboxesMasksLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
     const Dtype height    = aux_info[offset + 2];
     const Dtype im_scale  = aux_info[offset + 3];
     // const Dtype flippable = aux_info[offset + 4];
-    const Dtype r_width = width * im_scale;
+    const Dtype r_width  = width * im_scale;
     const Dtype r_height = height * im_scale;
-    max_width = std::max(max_width, r_width);
+    max_width  = std::max(max_width,  r_width);
     max_height = std::max(max_height, r_height);
   }
   this->width_ = int(max_width);
@@ -117,17 +127,13 @@ void CoordsToBboxesMasksLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
     // Just for the initialization, like the deploy.prototxt
     //    in tools/camera_pose.cpp
     // The shape must keep the same as input layer
-    const int g_width = GlobalVars::g_width();
+    const int g_width  = GlobalVars::g_width();
     const int g_height = GlobalVars::g_height();
     top[0]->Reshape(this->num_, 
-        this->new_channels_, 
-        g_width, 
-        g_height);
+        this->n_channels_, g_width, g_height);
   } else {
     top[0]->Reshape(this->num_, 
-        this->new_channels_, 
-        this->height_, 
-        this->width_);
+        this->n_channels_, this->height_, this->width_);
   }
   // 
   this->InitRand();
@@ -155,16 +161,15 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
   int mo = 0;
   int pco = 0;
   Dtype x1, y1, x2, y2;
-  const Dtype Zero = Dtype(0);
+
+  const Dtype Zero         = Dtype(0);
   const Dtype* part_coords = bottom[0]->cpu_data();
-  Dtype* bbox_masks = top[0]->mutable_cpu_data();
+  Dtype* bbox_masks        = top[0]->mutable_cpu_data();
   caffe_set(top[0]->count(), Zero, bbox_masks);
 
   for(int n = 0; n < this->num_; n++) {
-    // get offset
     pco = bottom[0]->offset(n);
     if(this->whole_) {
-      // init
       x1 = part_coords[pco];
       x2 = part_coords[pco];
       y1 = part_coords[pco + 1];
@@ -198,10 +203,8 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
     // check bound
     if(x1 > x2) std::swap(x1, x2);
     if(y1 > y2) std::swap(y1, y2);
-    CHECK(x2 >= x1);
-    CHECK(y2 >= y1);
-    if(x1 < Zero || x1 >= this->width_) continue;
-    if(x2 < Zero || x2 >= this->width_) continue;
+    if(x1 < Zero || x1 >= this->width_)  continue;
+    if(x2 < Zero || x2 >= this->width_)  continue;
     if(y1 < Zero || y1 >= this->height_) continue;
     if(y2 < Zero || y2 >= this->height_) continue;
     // set the corresponding bbox/area to non-zero value
@@ -224,9 +227,7 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
     
     const Dtype* bbox_masks = top[0]->cpu_data();
     for(int n = 0; n < this->num_; n++) {
-      cv::Mat img = cv::Mat::zeros(this->height_, 
-          this->width_, CV_8UC1);
-      // get offset
+      cv::Mat img = cv::Mat::zeros(this->height_, this->width_, CV_8UC1);
       for(int h = 0; h < this->height_; h++) {
         for(int w = 0; w < this->width_; w++) {
           const int offset = top[0]->offset(n, 0, h, w);

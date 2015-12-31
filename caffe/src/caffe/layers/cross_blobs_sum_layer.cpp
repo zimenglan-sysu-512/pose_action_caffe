@@ -5,14 +5,11 @@
 #include "caffe/vision_layers.hpp"
 #include "caffe/fast_rcnn_action_layers.hpp"
 
-
 namespace caffe {
 
-
-
 template <typename Dtype>
-void CrossBlobsSumLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void CrossBlobsSumLayer<Dtype>::LayerSetUp(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   const int num = bottom[0]->num();
   const int channels = bottom[0]->channels();
@@ -28,11 +25,9 @@ void CrossBlobsSumLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
-
-
 template <typename Dtype>
-void CrossBlobsSumLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void CrossBlobsSumLayer<Dtype>::Reshape(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   const int num = bottom[0]->num();
   const int channels = bottom[0]->channels();
@@ -45,11 +40,9 @@ void CrossBlobsSumLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
-
-
 template <typename Dtype>
-void CrossBlobsSumLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void CrossBlobsSumLayer<Dtype>::Forward_cpu(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   // 
   const int count = top[0]->count();
@@ -75,13 +68,12 @@ void CrossBlobsSumLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
-
-
 template <typename Dtype>
-void CrossBlobsSumLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) 
+void CrossBlobsSumLayer<Dtype>::Backward_cpu(
+    const vector<Blob<Dtype>*>& top,
+    const vector<bool>& propagate_down, 
+    const vector<Blob<Dtype>*>& bottom) 
 {
-  // 
   if(!propagate_down[0]) {
     return;
   }
@@ -89,9 +81,7 @@ void CrossBlobsSumLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   const Dtype* top_diff = top[0]->cpu_diff();
 
   for (int idx = 0; idx < bottom.size(); idx++) {
-    // 
     // if (!propagate_down[idx]) { continue; }
-
     // need to be reset bottom_diff ??
     Dtype* bottom_diff = bottom[idx]->mutable_cpu_diff();
     caffe_copy(
@@ -102,16 +92,11 @@ void CrossBlobsSumLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
   } 
 }
 
-
-
-
 #ifdef CPU_ONLY
 STUB_GPU(CrossBlobsSumLayer);
 #endif
 
-
 INSTANTIATE_CLASS(CrossBlobsSumLayer);
 REGISTER_LAYER_CLASS(CrossBlobsSum);
-
 
 }  // namespace caffe

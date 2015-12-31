@@ -334,6 +334,39 @@ class RandomImageData2Layer : public BasePrefetchingDataLayer<Dtype> {
   shared_ptr<Blob<Dtype> > perturbed_labels_bias_;  // default for coordinates
 };
 
+// load the person masks, motion map or other imaegs as input
+//    by GlobalVars -- imgidxs, objidx, and `aux_info` blob
+//    which can corrspond to the input image data layer
+// and then concat them with the output image data layer
+template <typename Dtype>
+class LoadImageDataLayer : public Layer<Dtype> {
+ public:
+  explicit LoadImageDataLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual inline const char* type() const { return "LoadImageData"; }
+  virtual inline int ExactNumBottomBlobs() const { return 1; }
+  virtual inline int ExactNumTopBlobs()    const { return 1; }
+
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  /// @brief Not implemented -- 
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {}
+  
+ protected:
+  virtual void load_data_image2blob(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  bool is_color_;
+  std::string img_ext_;
+  bool has_visual_path_;
+  std::string root_folder_;
+  std::string visual_path_;
+};
+
 /**
  * @brief During training only, sets a random portion of @f$x@f$ to 0, adjusting
  *        the rest of the vector magnitude accordingly.
@@ -675,17 +708,10 @@ class CoordsToBboxesLayer : public Layer<Dtype>{
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-  // virtual void Forward_gpu(
-  //     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
-  // virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-  //     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-
  protected:
-  int num_;
-  int channels_;
-  int height_;
-  int width_;
-  int new_channels_;
+  int bbox_id1_;
+  int bbox_id2_;
+  bool as_whole_;
 };
 
 
@@ -706,23 +732,22 @@ class CoordsToBboxesMasksLayer : public Layer<Dtype>{
    virtual inline const char* type() const { 
     return "CoordsToBboxesMasks"; 
   }
+  
   virtual inline int ExactNumBottomBlobs() const { return 2; }
   virtual inline int ExactNumTopBlobs() const { return 1; }
-  virtual int Rand(int n);
+
   void InitRand();
+  virtual int Rand(int n);
 
  protected:
   virtual void Forward_cpu(
       const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-  virtual void Forward_gpu(
-      const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
-  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-
+ 
  protected:
   bool whole_;
+  bool is_perturb_num_;
   bool has_visual_path_;
   int top_id_;
   int top_id2_;
@@ -734,9 +759,10 @@ class CoordsToBboxesMasksLayer : public Layer<Dtype>{
   int bottom_idx2_;
   int num_;
   int channels_;
-  int new_channels_;
+  int n_channels_;
   int height_;
   int width_;
+  int perturb_num_;
   Dtype value_;
   std::string img_ext_;
   std::string visual_path_;
@@ -745,8 +771,73 @@ class CoordsToBboxesMasksLayer : public Layer<Dtype>{
 
 /**
  * @brief convert the coordinates of all parts to the whole bbox
- * bottom[0]: scale-origin coordinates (has been scaled, that means x' = x * im_scale)
+ * bottom[0]: has been scaled, that means x' = x * im_scale
+ *    scale-origin coordinates of all joints
+ *  or
+ *    the scale-bbox coordinates of only two joints which form a bbox
  * bottom[1]: aux_info
+ * bottom[2]: some layer to resize the mask
+ *  the mask maybe concat with intermediate layer, e.g. data layer, conv4 layer
+ */
+template <typename Dtype>
+class MaskFromBboxLayer : public Layer<Dtype>{
+ public:
+  explicit MaskFromBboxLayer(const LayerParameter& param)
+  : Layer<Dtype>(param){}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+   virtual inline const char* type() const { 
+    return "MaskFromBbox"; 
+  }
+  virtual inline int MinBottomBlobs()   const { return 2; }
+  virtual inline int MaxBottomBlobs()   const { return 3; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+  virtual int Rand(int n);
+  void InitRand();
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+ protected:
+  bool whole_;
+  bool has_input_path_;
+  bool has_visual_path_;
+  bool has_perb_num_;
+  int perb_num_;
+  int top_id_;
+  int top_id2_;
+  int top_idx_;
+  int top_idx2_;
+  int bottom_id_;
+  int bottom_id2_;
+  int bottom_idx_;
+  int bottom_idx2_;
+  int num_;
+  int channels_;
+  int n_channels_;
+  int height_;
+  int width_;
+  Dtype value_;
+  std::string img_ext_;
+  std::string input_path_;
+  std::string visual_path_;
+  shared_ptr<Caffe::RNG> rng_;
+};
+
+/**
+ * @brief convert the coordinates of all parts to the whole bbox
+ * bottom[0]: has been scaled, that means x' = x * im_scale
+ *    scale-origin coordinates of all joints
+ *  or
+ *    the scale-bbox coordinates of only two joints which form a bbox
+ * bottom[1]: aux_info
+ * bottom[2]: some layer to resize the mask
+ *  the mask maybe concat with intermediate layer, e.g. data layer, conv4 layer
  */
 template <typename Dtype>
 class TorsoMaskFromCoordsLayer : public Layer<Dtype>{
@@ -761,7 +852,7 @@ class TorsoMaskFromCoordsLayer : public Layer<Dtype>{
     return "TorsoMaskFromCoords"; 
   }
   virtual inline int ExactNumBottomBlobs() const { return 2; }
-  virtual inline int ExactNumTopBlobs() const { return 1; }
+  virtual inline int ExactNumTopBlobs()    const { return 1; }
   virtual int Rand(int n);
   void InitRand();
 
@@ -791,7 +882,7 @@ class TorsoMaskFromCoordsLayer : public Layer<Dtype>{
   int bottom_idx2_;
   int num_;
   int channels_;
-  int new_channels_;
+  int n_channels_;
   int height_;
   int width_;
   Dtype value_;

@@ -377,12 +377,15 @@ message LayerParameter {
   optional CropPatchFromMaxFeaturePositionParameter crop_patch_from_max_feature_position_param = 321;
   optional EuclideanMaskParameter euclidean_mask_param = 322;
   optional EuclideanSelectiveLossParameter euclidean_selective_loss_param = 323;
-  optional TorsoMaskFromCoordsParameter torso_mask_from_coords_param = 330;
+  optional MaskFromBboxParameter mask_from_bbox_param = 330;
   /// Wanglan.Face.Torso.Detection.Model
   optional WindowMultiScaleDataParameter window_multi_scale_data_param = 401;
   optional CenterFromConnectedParameter center_from_connected_param = 402;
   //
   optional ELUParameter elu_param = 403;
+  optional CoordsToBboxesParameter coord2bbox_param = 405;
+  optional LoadDataImageParameter load_data_image_param = 406;
+  optional TorsoMaskFromCoordsParameter torso_mask_from_coords_param = 407; 
 }
 
 // #################################################################################
@@ -577,6 +580,16 @@ message RandomImageData2Parameter {
 }
 
 // Message that stores parameters used by RandomImageDataLayer
+message LoadDataImageParameter { 
+  optional bool is_color      = 1 [default = true];
+  // specify the image directory of hte images
+  optional string root_folder = 2;
+  // the image's visual path
+  optional string visual_path = 3;
+  optional string img_ext     = 4 [default = ".jpg"];
+}
+
+// Message that stores parameters used by RandomImageDataLayer
 message CharImageDataParameter {
   // Specify the data source -- annotation file.
   repeated string source = 1;
@@ -615,6 +628,21 @@ message CoordsToBboxMasksParameter {
   optional int32 value = 3 [default = 255];
   optional string visual_path = 4 [default = ""];
   optional string img_ext = 5 [default = ".jpg"];
+  optional int32 perturb_num = 8[default = 0];
+}
+
+// message that stores parameters used by
+message MaskFromBboxParameter {
+  // index starts from zero
+  optional int32 top_id = 1;
+  optional int32 top_id2 = 6;
+  optional int32 bottom_id = 2;
+  optional int32 bottom_id2 = 7;
+  optional int32 value = 3 [default = 255];
+  optional string img_ext = 4 [default = ".jpg"];
+  optional string visual_path = 5 [default = ""];
+  optional string input_path = 8 [default = ""];
+  optional int32 perb_num = 9 [default = 10];
 }
 
 // message that stores parameters used by
@@ -929,6 +957,13 @@ message ELUParameter {
   }
   optional Engine engine = 2 [default = DEFAULT];
   optional float alpha = 3 [default = 1];
+}
+
+message CoordsToBboxesParameter {
+  // index from zero
+  // id1==id2 or (id1<0 && id2<0)
+  optional int32 bbox_id1 = 1;
+  optional int32 bbox_id2 = 2;
 }
 
 // ####################################################################

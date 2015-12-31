@@ -14,40 +14,42 @@
 namespace caffe {
 
 template <typename Dtype>
-void TorsoMaskFromCoordsLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+void MaskFromBboxLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) 
 {
-  CHECK(this->layer_param_.has_torso_mask_from_coords_param());
-  const TorsoMaskFromCoordsParameter torso_mask_from_coords_param = 
-      this->layer_param_.torso_mask_from_coords_param();
-  CHECK(torso_mask_from_coords_param.has_top_id());
-  CHECK(torso_mask_from_coords_param.has_top_id2());
-  CHECK(torso_mask_from_coords_param.has_bottom_id());
-  CHECK(torso_mask_from_coords_param.has_bottom_id2());
-  CHECK(torso_mask_from_coords_param.has_value()); 
-  this->has_perb_num_ = torso_mask_from_coords_param.has_perb_num(); 
+  CHECK(this->layer_param_.has_mask_from_bbox_param());
+  const MaskFromBboxParameter mask_from_bbox_param = 
+      this->layer_param_.mask_from_bbox_param();
+  CHECK(mask_from_bbox_param.has_top_id());
+  CHECK(mask_from_bbox_param.has_top_id2());
+  CHECK(mask_from_bbox_param.has_bottom_id());
+  CHECK(mask_from_bbox_param.has_bottom_id2());
+  CHECK(mask_from_bbox_param.has_value()); 
+  this->has_perb_num_ = mask_from_bbox_param.has_perb_num(); 
   if(this->has_perb_num_) {
-    this->perb_num_ = torso_mask_from_coords_param.perb_num();
+    this->perb_num_ = mask_from_bbox_param.perb_num();
     if(this->perb_num_ <= 1) {
       this->has_perb_num_ = false;
     }
   }
 
-  this->top_id_ = torso_mask_from_coords_param.top_id();
-  this->top_id2_ = torso_mask_from_coords_param.top_id2();
-  this->bottom_id_ = torso_mask_from_coords_param.bottom_id();
-  this->bottom_id2_ = torso_mask_from_coords_param.bottom_id2();
-  this->value_ = Dtype(torso_mask_from_coords_param.value());
-  this->has_input_path_ = torso_mask_from_coords_param.has_input_path();
-  this->has_visual_path_ = torso_mask_from_coords_param.has_visual_path();
+  this->top_id_          = mask_from_bbox_param.top_id();
+  this->top_id2_         = mask_from_bbox_param.top_id2();
+  this->bottom_id_       = mask_from_bbox_param.bottom_id();
+  this->bottom_id2_      = mask_from_bbox_param.bottom_id2();
+  this->value_           = Dtype(mask_from_bbox_param.value());
+  this->has_input_path_  = mask_from_bbox_param.has_input_path();
+  this->has_visual_path_ = mask_from_bbox_param.has_visual_path();
+  // maybe read from file
   if(this->has_input_path_) {
-    this->input_path_ = torso_mask_from_coords_param.input_path();
+    this->input_path_ = mask_from_bbox_param.input_path();
   }
   if(this->has_visual_path_) {
-    this->visual_path_ = torso_mask_from_coords_param.visual_path();  
+    this->visual_path_ = mask_from_bbox_param.visual_path();  
     CreateDir(this->visual_path_.c_str(), 0);  
-    CHECK(torso_mask_from_coords_param.has_img_ext()); 
-    this->img_ext_ = torso_mask_from_coords_param.img_ext();
+    // image extension
+    CHECK(mask_from_bbox_param.has_img_ext()); 
+    this->img_ext_ = mask_from_bbox_param.img_ext();
   }
   
   this->whole_ = false;
@@ -56,53 +58,57 @@ void TorsoMaskFromCoordsLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bot
   const bool bo3 = this->bottom_id_ == this->top_id_;
   const bool bo4 = this->bottom_id2_ == this->top_id2_;
   if(bo1 || bo2 || bo3 || bo4) {
-    this->top_id_ = 0;
-    this->top_id2_ = 0;
-    this->bottom_id_ = 0;
+    this->top_id_     = 0;
+    this->top_id2_    = 0;
+    this->bottom_id_  = 0;
     this->bottom_id2_ = 0;
-    this->whole_ = true;
+    this->whole_      = true;
   }
   this->top_idx_     = this->top_id_ * 2;
   this->top_idx2_    = this->top_id2_ * 2;
   this->bottom_idx_  = this->bottom_id_ * 2;
   this->bottom_idx2_ = this->bottom_id2_ * 2;
-  LOG(INFO) << "top_id: " << this->top_id_;
-  LOG(INFO) << "top_idx: " << this->top_idx_;
-  LOG(INFO) << "top_id2: " << this->top_id2_;
-  LOG(INFO) << "top_idx2: " << this->top_idx2_;
-  LOG(INFO) << "bottom_id: " << this->bottom_id_;
-  LOG(INFO) << "bottom_idx: " << this->bottom_idx_;
-  LOG(INFO) << "bottom_id2: " << this->bottom_id2_;
-  LOG(INFO) << "bottom_idx2: " << this->bottom_idx2_;
-  LOG(INFO) << "value: " << this->value_;
-  LOG(INFO) << "whole or not: " << this->whole_;
-  if(this->has_visual_path_) {
-    LOG(INFO) << "visual_path: " << this->visual_path_;
-  }
-  if(this->has_input_path_) {
-    LOG(INFO) << "input_path: " << this->input_path_;
-  }
-  if(this->has_perb_num_) {
-    LOG(INFO) << "perb_num: " << this->perb_num_;
+  CHECK_GE(this->top_id_,     0);
+  CHECK_GE(this->top_id2_,    0);
+  CHECK_GE(this->bottom_id_,  0);
+  CHECK_GE(this->bottom_id2_, 0);
+
+  bool is_disp_info = this->layer_param_.is_disp_info();
+  if(is_disp_info) {
+    LOG(INFO) << "top_id: "      << this->top_id_;
+    LOG(INFO) << "top_idx: "     << this->top_idx_;
+    LOG(INFO) << "top_id2: "     << this->top_id2_;
+    LOG(INFO) << "top_idx2: "    << this->top_idx2_;
+    LOG(INFO) << "bottom_id: "   << this->bottom_id_;
+    LOG(INFO) << "bottom_idx: "  << this->bottom_idx_;
+    LOG(INFO) << "bottom_id2: "  << this->bottom_id2_;
+    LOG(INFO) << "bottom_idx2: " << this->bottom_idx2_;
+    LOG(INFO) << "value: "       << this->value_;
+    LOG(INFO) << "whole: "       << this->whole_;
+    if(this->has_visual_path_) {
+      LOG(INFO) << "visual_path: " << this->visual_path_;
+    }
+    if(this->has_input_path_) {
+      LOG(INFO) << "input_path: "  << this->input_path_;
+    }
+    if(this->has_perb_num_) { 
+      LOG(INFO) << "perb_num: "    << this->perb_num_;
+    }
   }
 }
 
-
 // bottom[0]: coords
 // bottom[1]: aux_info
+// bottom[2]: some layer -- only to get the width and height
 template <typename Dtype>
-void TorsoMaskFromCoordsLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
+void MaskFromBboxLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) 
 {
-  CHECK_GE(this->top_id_, 0);
-  CHECK_GE(this->top_id2_, 0);
-  CHECK_GE(this->bottom_id_, 0);
-  CHECK_GE(this->bottom_id2_, 0);
-  CHECK_LT(this->top_id_, bottom[0]->channels());
-  CHECK_LT(this->top_id2_, bottom[0]->channels());
-  CHECK_LT(this->bottom_id_, bottom[0]->channels());
+  CHECK_LT(this->top_id_,     bottom[0]->channels());
+  CHECK_LT(this->top_id2_,    bottom[0]->channels());
+  CHECK_LT(this->bottom_id_,  bottom[0]->channels());
   CHECK_LT(this->bottom_id2_, bottom[0]->channels());
-  CHECK_EQ(bottom[0]->num(), bottom[1]->num());
+  CHECK_EQ(bottom[0]->num(),  bottom[1]->num());
   CHECK_EQ(bottom[0]->channels(), bottom[0]->count() / bottom[0]->num());
 
   this->num_        = bottom[0]->num();
@@ -110,7 +116,7 @@ void TorsoMaskFromCoordsLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
   this->n_channels_ = 1;
 
   Dtype max_height = Dtype(-1);
-  Dtype max_width = Dtype(-1);
+  Dtype max_width  = Dtype(-1);
   const Dtype* aux_info = bottom[1]->cpu_data();
   for(int item_id = 0; item_id < this->num_; item_id++) {
     // (img_ind, width, height, im_scale, flippable)
@@ -134,13 +140,13 @@ void TorsoMaskFromCoordsLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom
 }
 
 template <typename Dtype>
-void TorsoMaskFromCoordsLayer<Dtype>::InitRand() {
+void MaskFromBboxLayer<Dtype>::InitRand() {
   const unsigned int rng_seed = caffe_rng_rand();
   rng_.reset(new Caffe::RNG(rng_seed));
 }
 
 template <typename Dtype>
-int TorsoMaskFromCoordsLayer<Dtype>::Rand(int n) {
+int MaskFromBboxLayer<Dtype>::Rand(int n) {
   CHECK(rng_);
   CHECK_GT(n, 0);
   caffe::rng_t* rng =
@@ -149,8 +155,8 @@ int TorsoMaskFromCoordsLayer<Dtype>::Rand(int n) {
 }
 
 template <typename Dtype>
-void TorsoMaskFromCoordsLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top) 
+void MaskFromBboxLayer<Dtype>::Forward_cpu(
+    const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   int mo = 0;
   int pco = 0;
@@ -252,7 +258,7 @@ void TorsoMaskFromCoordsLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bo
 }
 
 template <typename Dtype>
-void TorsoMaskFromCoordsLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+void MaskFromBboxLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) 
 {
   const Dtype Zero = Dtype(0);
@@ -267,10 +273,10 @@ void TorsoMaskFromCoordsLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& t
 }
 
 #ifdef CPU_ONLY
-STUB_GPU(TorsoMaskFromCoordsLayer);
+STUB_GPU(MaskFromBboxLayer);
 #endif
 
-INSTANTIATE_CLASS(TorsoMaskFromCoordsLayer);
-REGISTER_LAYER_CLASS(TorsoMaskFromCoords);
+INSTANTIATE_CLASS(MaskFromBboxLayer);
+REGISTER_LAYER_CLASS(MaskFromBbox);
 
 }  // namespace caffe

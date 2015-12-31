@@ -1,7 +1,7 @@
 Note:
 	1 hard negatives, use top k
 	2 two banks,
-	3 torso masks
+	3 torso masks & person mask
 	4 thres: 0.243
 	5 prob_num: 7
 	6 remove conv4_2*, use conv4 instead

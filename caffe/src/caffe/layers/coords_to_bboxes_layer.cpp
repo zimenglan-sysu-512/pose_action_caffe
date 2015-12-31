@@ -44,6 +44,7 @@ void CoordsToBboxesLayer<Dtype>::Reshape(
   top[0]->Reshape(num, 4, 1, 1);
 }
 
+// coords: has been rescaled by some layer, like data layer or ...
 template <typename Dtype>
 void CoordsToBboxesLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 

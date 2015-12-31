@@ -11,7 +11,6 @@
 #include "boost/algorithm/string.hpp"
 #include "google/protobuf/text_format.h"
 
-#include "caffe/layer.hpp"
 #include "caffe/util/util_img.hpp"
 #include "caffe/util/util_img.hpp"
 #include "caffe/util/pose_tool.hpp"
@@ -35,9 +34,12 @@ void LoadImageDataLayer<Dtype>::LayerSetUp(
   is_color_    		 = load_data_image_param.is_color();
   root_folder_ 		 = load_data_image_param.root_folder();
   visual_path_ 		 = load_data_image_param.visual_path();
-  has_visual_path_ = load_data_image_param.has_visual_path();
+  has_visual_path_ = load_data_image_param.has_visual_path() 
+      && visual_path_.length() > 0;
+  LOG(INFO) << "root_folder: " << root_folder_;
   if(has_visual_path_) {
-  	CreateDir(visual_path_.c_str(), 0);
+    CreateDir(visual_path_.c_str(), 0);
+    LOG(INFO) << "visual_path: " << visual_path_;
   }
 }
 

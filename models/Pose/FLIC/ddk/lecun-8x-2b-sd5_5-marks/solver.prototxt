@@ -1,0 +1,38 @@
+# Solver prototxt
+net: "models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/train_val.prototxt"
+# Snapshot
+snapshot: 1000
+# Snapshot prefix
+snapshot_prefix: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/models/flic"
+
+# # Train images num(where is 3987) = test_iter(443) * test_batch(where is 9)
+# test_iter: 443
+# Test images num(where is 1016) = test_iter(127) * test_batch(where is 8)
+test_iter: 127
+# Test when reaching the test_interval
+test_interval: 1000
+# 
+test_initialization: false
+
+# 0.001 fast convergence
+base_lr: 0.001
+# Learning rate
+lr_policy: "step"
+
+# SGD
+gamma: 0.0001
+power: 0.75
+momentum: 0.9
+weight_decay: 0.0005
+
+# Change learning rate
+stepsize: 80000
+# Iterations
+max_iter: 80000
+# Display
+display: 200
+
+# CPU or GPU
+solver_mode: GPU
+# GPU ID
+device_id: 0

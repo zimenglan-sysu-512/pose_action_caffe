@@ -714,6 +714,40 @@ class CoordsToBboxesLayer : public Layer<Dtype>{
   bool as_whole_;
 };
 
+// used to load one bbox of one image, like the torso
+// use aux info to specify the `imgidxs` and `objidxs`
+// 12
+template <typename Dtype>
+class LoadBboxFromFileLayer : public Layer<Dtype>{
+ public:
+  explicit LoadBboxFromFileLayer(const LayerParameter& param)
+  : Layer<Dtype>(param){}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+   virtual inline const char* type() const { 
+    return "LoadBboxFromFile"; 
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 1; }
+  virtual inline int ExactNumTopBlobs()    const { return 1; }
+
+ protected:
+  virtual void Forward_cpu(
+      const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+
+ protected:
+  bool is_color_;
+  bool has_visual_path_;
+  std::string img_ext_;
+  std::string bbox_file_;
+  std::string root_folder_;
+  std::string visual_path_;
+  // map: <imgidx, <objidx, coords>>
+  std::map<std::string, std::map<int, std::vector<float> > > lines_;
+};
 
 /**
  * @brief convert the coordinates of all parts to the whole bbox
@@ -765,66 +799,6 @@ class CoordsToBboxesMasksLayer : public Layer<Dtype>{
   int perturb_num_;
   Dtype value_;
   std::string img_ext_;
-  std::string visual_path_;
-  shared_ptr<Caffe::RNG> rng_;
-};
-
-/**
- * @brief convert the coordinates of all parts to the whole bbox
- * bottom[0]: has been scaled, that means x' = x * im_scale
- *    scale-origin coordinates of all joints
- *  or
- *    the scale-bbox coordinates of only two joints which form a bbox
- * bottom[1]: aux_info
- * bottom[2]: some layer to resize the mask
- *  the mask maybe concat with intermediate layer, e.g. data layer, conv4 layer
- */
-template <typename Dtype>
-class MaskFromBboxLayer : public Layer<Dtype>{
- public:
-  explicit MaskFromBboxLayer(const LayerParameter& param)
-  : Layer<Dtype>(param){}
-  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-   virtual inline const char* type() const { 
-    return "MaskFromBbox"; 
-  }
-  virtual inline int MinBottomBlobs()   const { return 2; }
-  virtual inline int MaxBottomBlobs()   const { return 3; }
-  virtual inline int ExactNumTopBlobs() const { return 1; }
-  virtual int Rand(int n);
-  void InitRand();
-
- protected:
-  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
-      const vector<Blob<Dtype>*>& top);
-  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
-
- protected:
-  bool whole_;
-  bool has_input_path_;
-  bool has_visual_path_;
-  bool has_perb_num_;
-  int perb_num_;
-  int top_id_;
-  int top_id2_;
-  int top_idx_;
-  int top_idx2_;
-  int bottom_id_;
-  int bottom_id2_;
-  int bottom_idx_;
-  int bottom_idx2_;
-  int num_;
-  int channels_;
-  int n_channels_;
-  int height_;
-  int width_;
-  Dtype value_;
-  std::string img_ext_;
-  std::string input_path_;
   std::string visual_path_;
   shared_ptr<Caffe::RNG> rng_;
 };

@@ -154,6 +154,7 @@ int CoordsToBboxesMasksLayer<Dtype>::Rand(int n) {
   return ((*rng)() % n);
 }
 
+// coords: has been rescaled by some layer, like data layer or ... 
 template <typename Dtype>
 void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 

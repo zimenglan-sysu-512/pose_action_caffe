@@ -2,8 +2,7 @@
 # @proto: train_val.prototxt
 # @author: ddk
 # @method: heat map
-# @time: 15.12.31
-# @recepive field: 132*132
+# @time: 15.11.19
 # ##############################
 name: "HumanPoseEstimation"
 
@@ -21,7 +20,7 @@ layer {
     # opencv: B, G, R
   }
   random_image_data2_param {
-    batch_size: 24
+    batch_size: 18
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
@@ -35,7 +34,7 @@ layer {
     img_ext: ".jpg"
     # receptive_field_size: 100
     # visual_images_path: "m_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-nomarks-pmask/visual_data/train/"
+    # visual_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/visual_data/train/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
@@ -68,40 +67,27 @@ layer {
     img_ext: ".jpg"
     # receptive_field_size: 100
     # visual_images_path: "nm_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-nomarks-pmask/visual_data/test/"
+    # visual_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/visual_data/test/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
-
 layer {
-  name: "person_masks"
-  type: "LoadImageData"
+  name: "data_masks"
+  type: "CoordsToBboxesMasks"
+  bottom: "gt_pose_coords"
   bottom: "aux_info"
-  top: "person_masks"
-  include {
-    phase: TRAIN
-  }
-  load_data_image_param {
-    img_ext: ".png"
-    is_color: true
-    root_folder: "../dataset/FLIC/crop.images2/crfasrnn.train/"
-    # visual_path: "../dataset/FLIC/crop.images2/v.crfasrnn.train/"
-  }
-}
-
-layer {
-  name: "person_masks"
-  type: "LoadImageData"
-  bottom: "aux_info"
-  top: "person_masks"
-  include {
-    phase: TEST
-  }
-  load_data_image_param {
-    img_ext: ".png"
-    is_color: true
-    root_folder: "../dataset/FLIC/crop.images2/crfasrnn.test/"
-    # visual_path: "../dataset/FLIC/crop.images2/v.crfasrnn.test/"
+  top: "data_masks"
+  coord_to_bbox_masks_param {
+    # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
+    # top_id/bottom_id: (lsho,rhip)
+    # top_id2/bottom_id2: (rsho,lhip)
+    top_id: 6
+    bottom_id: 10
+    top_id2: 6
+    bottom_id2: 10
+    value: 255
+    # visual_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/data_masks/"
+    # img_ext: ".jpg"
   }
 }
 
@@ -109,7 +95,7 @@ layer {
   name: "concat_data"
   type: "Concat"
   bottom: "data"
-  bottom: "person_masks"
+  bottom: "data_masks"
   top: "data_bank1"
   concat_param {
     concat_dim: 1
@@ -139,7 +125,7 @@ layer {
     # 决定了heat map的pixels不为0的区域(菱形)的边长
     # radius: 10
     # radius_str: "2,2,2,6,6,4,6,6,4,6,6,6,6,6"
-    radius_str: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
+    radius_str: "3,3,3,6,6,5,6,6,5,6,6,6,6,6"
     gau_mean: 0
     gau_stds: 1.5
   }
@@ -290,10 +276,10 @@ layer {
 # ####################
 
 layer {
-  name: "conv4_bank1"
+  name: "conv4_1_bank1"
   type: "Convolution"
   bottom: "pool3_bank1"
-  top: "conv4_bank1"
+  top: "conv4_1_bank1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -303,7 +289,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     pad: 4
     kernel_size: 9
     weight_filler {
@@ -317,10 +303,44 @@ layer {
   }
 }
 layer {
-  name: "relu4_bank1"
+  name: "relu4_1_bank1"
   type: "ReLU"
-  bottom: "conv4_bank1"
-  top: "conv4_bank1"
+  bottom: "conv4_1_bank1"
+  top: "conv4_1_bank1"
+}
+
+layer {
+  name: "conv4_2_bank1"
+  type: "Convolution" 
+  bottom: "conv4_1_bank1"
+  top: "conv4_2_bank1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "relu4_2_bank1"
+  type: "ReLU"
+  bottom: "conv4_2_bank1"
+  top: "conv4_2_bank1"
 }
 
 # ##########################
@@ -468,65 +488,10 @@ layer {
 # ####################
 
 layer {
-  name: "conv4_bank2"
+  name: "conv4_1_bank2"
   type: "Convolution"
   bottom: "pool3_bank2"
-  top: "conv4_bank2"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 256
-    pad: 4
-    kernel_size: 9
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0.
-    }
-  }
-}
-layer {
-  name: "relu4_bank2"
-  type: "ReLU"
-  bottom: "conv4_bank2"
-  top: "conv4_bank2"
-}
-
-layer {
-  name: "re_conv4_bank2"
-  type: "Resize"
-  bottom: "conv4_bank2"
-  bottom: "conv4_bank1"
-  top: "re_conv4_bank2"
-}
-
-# ############
-# merge banks
-layer {
-  name: "merge_banks"
-  type: "Eltwise"
-  bottom: "conv4_bank1"
-  bottom: "re_conv4_bank2"
-  top: "merge_banks"
-  eltwise_param {
-    operation: SUM
-  }
-}
-
-layer {
-  name: "conv4"
-  type: "Convolution"
-  bottom: "merge_banks"
-  top: "conv4"
+  top: "conv4_1_bank2"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -550,18 +515,71 @@ layer {
   }
 }
 layer {
-  name: "relu4"
+  name: "relu4_1_bank2"
   type: "ReLU"
-  bottom: "conv4"
-  top: "conv4"
+  bottom: "conv4_1_bank2"
+  top: "conv4_1_bank2"
 }
 
+layer {
+  name: "conv4_2_bank2"
+  type: "Convolution"
+  bottom: "conv4_1_bank2"
+  top: "conv4_2_bank2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "relu4_2_bank2"
+  type: "ReLU"
+  bottom: "conv4_2_bank2"
+  top: "conv4_2_bank2"
+}
+layer {
+  name: "re_conv4_2_bank2"
+  type: "Resize"
+  bottom: "conv4_2_bank2"
+  bottom: "conv4_2_bank1"
+  top: "re_conv4_2_bank2"
+}
+
+# ############
+# merge banks
+layer {
+  name: "merge_banks"
+  type: "Eltwise"
+  bottom: "conv4_2_bank1"
+  bottom: "re_conv4_2_bank2"
+  top: "conv4"
+  eltwise_param {
+    operation: SUM
+  }
+}
 # Spatial Dropout Layer
 layer {
   name: "spatial_drop"
   type: "SpatialDropout"
   bottom: "conv4"
-  top: "spatial_drop"
+  top: "conv4"
   spatial_dropout_param {
     dropout_ratio: 0.5
   }
@@ -572,7 +590,7 @@ layer {
 layer {
   name: "conv5"
   type: "Convolution"
-  bottom: "spatial_drop"
+  bottom: "conv4"
   top: "conv5"
   param {
     lr_mult: 1
@@ -699,9 +717,9 @@ layer {
     ratio: 0.005
     # when loss continues to decrease, but accuracy does not keep increasing,
     # modify the prob_num to be smaller, e.g. 11 to 7
-    prob_num: 7
+    prob_num: 9
     #hards_num_arr: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
-    heat_score_thres: 0.243
+    heat_score_thres: 0.273
     #heat_score_thres_arr: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
     parts_err_num_thres: 3
     hard_negative_filepath: "NotImplemented."
@@ -761,7 +779,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-nomarks-pmask/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -770,7 +788,7 @@ layer {
     # phase_name: "test_predicted/"
     # phase_name: "test_ground_truths/"
     phase_name: "test_fusion/"
-    threshold: 0.243
+    threshold: 0.273
   }
 }
 
@@ -784,7 +802,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-nomarks-pmask/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -812,7 +830,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-nomarks-pmask/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/ddk/lecun-8x-2b-sd5_5-marks/test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

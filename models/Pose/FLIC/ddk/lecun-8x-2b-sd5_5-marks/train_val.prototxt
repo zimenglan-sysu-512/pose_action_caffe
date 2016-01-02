@@ -2,8 +2,7 @@
 # @proto: train_val.prototxt
 # @author: ddk
 # @method: heat map
-# @time: 15.12.31
-# @recepive field: 132*132
+# @time: 15.11.19
 # ##############################
 name: "HumanPoseEstimation"
 
@@ -21,7 +20,7 @@ layer {
     # opencv: B, G, R
   }
   random_image_data2_param {
-    batch_size: 24
+    batch_size: 18
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
@@ -29,8 +28,8 @@ layer {
     is_color: true
     is_scale_image: true
     always_max_size: true
-    max_size: 256
-    min_size: 240
+    max_size: 320
+    min_size: 256
     label_num: 28
     img_ext: ".jpg"
     # receptive_field_size: 100
@@ -54,7 +53,7 @@ layer {
     # opencv: B, G, R
   }
   random_image_data2_param {
-    batch_size: 8
+    batch_size: 1
     source: "../dataset/FLIC/labels/crop_test_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/test/"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
@@ -62,8 +61,8 @@ layer {
     is_color: true
     is_scale_image: true
     always_max_size: true
-    max_size: 256
-    min_size: 240
+    max_size: 320
+    min_size: 256
     label_num: 28
     img_ext: ".jpg"
     # receptive_field_size: 100
@@ -243,7 +242,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 128
+    num_output: 256
     pad: 2
     kernel_size: 5
     weight_filler {
@@ -277,10 +276,10 @@ layer {
 # ####################
 
 layer {
-  name: "conv4_bank1"
+  name: "conv4_1_bank1"
   type: "Convolution"
   bottom: "pool3_bank1"
-  top: "conv4_bank1"
+  top: "conv4_1_bank1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -290,7 +289,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     pad: 2
     kernel_size: 5
     weight_filler {
@@ -304,10 +303,44 @@ layer {
   }
 }
 layer {
-  name: "relu4_bank1"
+  name: "relu4_1_bank1"
   type: "ReLU"
-  bottom: "conv4_bank1"
-  top: "conv4_bank1"
+  bottom: "conv4_1_bank1"
+  top: "conv4_1_bank1"
+}
+
+layer {
+  name: "conv4_2_bank1"
+  type: "Convolution" 
+  bottom: "conv4_1_bank1"
+  top: "conv4_2_bank1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "relu4_2_bank1"
+  type: "ReLU"
+  bottom: "conv4_2_bank1"
+  top: "conv4_2_bank1"
 }
 
 # ##########################
@@ -421,7 +454,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 128
+    num_output: 256
     pad: 2
     kernel_size: 5
     weight_filler {
@@ -455,10 +488,10 @@ layer {
 # ####################
 
 layer {
-  name: "conv4_bank2"
+  name: "conv4_1_bank2"
   type: "Convolution"
   bottom: "pool3_bank2"
-  top: "conv4_bank2"
+  top: "conv4_1_bank2"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -468,7 +501,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 256
+    num_output: 512
     pad: 2
     kernel_size: 5
     weight_filler {
@@ -482,38 +515,17 @@ layer {
   }
 }
 layer {
-  name: "relu4_bank2"
+  name: "relu4_1_bank2"
   type: "ReLU"
-  bottom: "conv4_bank2"
-  top: "conv4_bank2"
+  bottom: "conv4_1_bank2"
+  top: "conv4_1_bank2"
 }
 
 layer {
-  name: "re_conv4_bank2"
-  type: "Resize"
-  bottom: "conv4_bank2"
-  bottom: "conv4_bank1"
-  top: "re_conv4_bank2"
-}
-
-# ############
-# merge banks
-layer {
-  name: "merge_banks"
-  type: "Eltwise"
-  bottom: "conv4_bank1"
-  bottom: "re_conv4_bank2"
-  top: "merge_banks"
-  eltwise_param {
-    operation: SUM
-  }
-}
-
-layer {
-  name: "conv4"
+  name: "conv4_2_bank2"
   type: "Convolution"
-  bottom: "merge_banks"
-  top: "conv4"
+  bottom: "conv4_1_bank2"
+  top: "conv4_2_bank2"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -537,18 +549,37 @@ layer {
   }
 }
 layer {
-  name: "relu4"
+  name: "relu4_2_bank2"
   type: "ReLU"
-  bottom: "conv4"
-  top: "conv4"
+  bottom: "conv4_2_bank2"
+  top: "conv4_2_bank2"
+}
+layer {
+  name: "re_conv4_2_bank2"
+  type: "Resize"
+  bottom: "conv4_2_bank2"
+  bottom: "conv4_2_bank1"
+  top: "re_conv4_2_bank2"
 }
 
+# ############
+# merge banks
+layer {
+  name: "merge_banks"
+  type: "Eltwise"
+  bottom: "conv4_2_bank1"
+  bottom: "re_conv4_2_bank2"
+  top: "conv4"
+  eltwise_param {
+    operation: SUM
+  }
+}
 # Spatial Dropout Layer
 layer {
   name: "spatial_drop"
   type: "SpatialDropout"
   bottom: "conv4"
-  top: "spatial_drop"
+  top: "conv4"
   spatial_dropout_param {
     dropout_ratio: 0.5
   }
@@ -559,7 +590,7 @@ layer {
 layer {
   name: "conv5"
   type: "Convolution"
-  bottom: "spatial_drop"
+  bottom: "conv4"
   top: "conv5"
   param {
     lr_mult: 1
@@ -686,9 +717,9 @@ layer {
     ratio: 0.005
     # when loss continues to decrease, but accuracy does not keep increasing,
     # modify the prob_num to be smaller, e.g. 11 to 7
-    prob_num: 7
+    prob_num: 11
     #hards_num_arr: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
-    heat_score_thres: 0.243
+    heat_score_thres: 0.273
     #heat_score_thres_arr: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
     parts_err_num_thres: 3
     hard_negative_filepath: "NotImplemented."
@@ -757,7 +788,7 @@ layer {
     # phase_name: "test_predicted/"
     # phase_name: "test_ground_truths/"
     phase_name: "test_fusion/"
-    threshold: 0.243
+    threshold: 0.273
   }
 }
 

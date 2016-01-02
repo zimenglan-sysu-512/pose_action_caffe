@@ -42,6 +42,20 @@ cv::Mat BlobToGreyImage(const Blob<Dtype>* blob, const int n, const int c,
 		const Dtype scale = Dtype(1.0));
 
 template <typename Dtype>
+cv::Mat BlobToGrayImage(const Blob<Dtype>* blob, const int n);
+
+template <typename Dtype>
+cv::Mat BlobToGrayImage(const Blob<Dtype>* blob, const int n,
+		const std::vector<Dtype> mean_values);
+
+template <typename Dtype>
+void GrayImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image);
+
+template <typename Dtype>
+void GrayImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image,
+		const std::vector<Dtype> mean_values);
+
+template <typename Dtype>
 cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n);
 
 template <typename Dtype>

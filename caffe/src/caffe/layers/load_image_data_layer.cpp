@@ -40,6 +40,9 @@ void LoadImageDataLayer<Dtype>::LayerSetUp(
   LOG(INFO) << "is_color: "    << is_color_;
   LOG(INFO) << "is_rgb2gray: " << is_rgb2gray_;
   LOG(INFO) << "root_folder: " << root_folder_;
+  if(is_color_ && is_rgb2gray_) {
+    LOG(INFO) << "convert color into gray...";
+  }
   if(has_visual_path_) {
     CreateDir(visual_path_.c_str(), 0);
     LOG(INFO) << "visual_path: " << visual_path_;
@@ -137,7 +140,15 @@ void LoadImageDataLayer<Dtype>::load_data_image2blob(
 	    return;
 	  }
     if(is_rgb2gray_ && is_color_) {
-      cv::cvtColor(im, im, CV_RGB2GRAY);
+      // cv::imshow(caffe::to_string(im.channels()), im);
+      // cv::waitKey(0);
+
+      // CV_RGB2GRAY, CV_BGR2GRAY
+      cv::cvtColor(im, im, CV_BGR2GRAY);
+      
+      // LOG(INFO) << "CV_BGR2GRAY";
+      // cv::imshow(caffe::to_string(im.channels()), im);
+      // cv::waitKey(0);
     }
 	  // check whether match the size
 	  CHECK_EQ(im_width,  im.cols) << "does not match the width (size) of input image";
@@ -148,6 +159,8 @@ void LoadImageDataLayer<Dtype>::load_data_image2blob(
 	  height = int(r_height);
 	  cv::resize(im, im2, cv::Size(width, height));
 	  CHECK(im2.data) << "2 Could not open or find file " << im_path;
+    // cv::imshow("im2", im2);
+    // cv::waitKey(0);
 
 	  if(im_flipped) {
 	    // >0: horizontal; <0: horizontal&vertical; =0: vertical
@@ -156,7 +169,12 @@ void LoadImageDataLayer<Dtype>::load_data_image2blob(
 	  }
 
 	  // 把图片拷贝到放在blob的右上角
-	  ImageDataToBlob(top[0], n_idx, im2);
+    if((is_rgb2gray_ && is_color_) || (!is_color_)) {
+     GrayImageDataToBlob(top[0], n_idx, im2);
+     // LOG(INFO) << "GRAY2BLOB";
+    } else {
+	   ImageDataToBlob(top[0], n_idx, im2);
+    }
 
 	  // visualization
 	  #ifdef __LOAD_DATA_IMAGE_LAYER_VISUAL__
@@ -165,13 +183,20 @@ void LoadImageDataLayer<Dtype>::load_data_image2blob(
 	  		continue;
 	  	}
       cv::Mat im3, im4, im5;
-      im3 = BlobToColorImage(top[0], n_idx);
+      if((is_rgb2gray_ && is_color_) || (!is_color_)) {
+        im3 = BlobToGrayImage(top[0], n_idx);
+        // LOG(INFO) << "BLOB2GRAY";
+      } else {
+        im3 = BlobToColorImage(top[0], n_idx);
+      }
       im4 = im3(cv::Rect(0, 0, width, height)).clone();
       int width2  = int(im_width);
       int height2 = int(im_height);
       cv::resize(im4, im5, cv::Size(width2, height2));
+      // CV_GRAY2RGB, CV_GRAY2BGR
       if(is_rgb2gray_ && is_color_) {
-        cv::cvtColor(im5, im5, CV_GRAY2RGB);
+        cv::cvtColor(im5, im5, CV_GRAY2BGR);
+        // LOG(INFO) << "COLOR_GRAY2BGR";
       }
       const std::string im_path2 = visual_path_ + imgidx + img_ext_;
       LOG(INFO) << "visualized image path: " << im_path2;

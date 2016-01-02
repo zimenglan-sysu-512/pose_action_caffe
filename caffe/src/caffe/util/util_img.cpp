@@ -601,25 +601,35 @@ void CropAndResizePatch(
 	cv::resize(dst_tmp, dst, resize_size, 0, 0, cv::INTER_LINEAR);
 }
 
-// template <typename Dtype>
-// void ImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image) {
-//   const int height = blob->height();
-//   const int width = blob->width();
-//   const int channels = blob->channels();
-//   CHECK_EQ(channels, 3);
-//   const int dims = channels * height * width;
-//   const int size = height * width;
+template <typename Dtype>
+void GrayImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image) {
+  const int height       = blob->height();
+  const int width        = blob->width();
+  const int channels     = blob->channels();
+  const int img_width    = image.cols;	// w
+  const int img_height   = image.rows;	// h
+  const int img_channels = image.channels();
+  CHECK_EQ(channels,   1) << "Only support gray image";
+  CHECK_LE(img_width,  width);
+  CHECK_LE(img_height, height);
+  CHECK_EQ(channels,   img_channels);
 
-//   Dtype* data = blob->mutable_cpu_data();
-// 	for (int h = 0, offset_h = n * dims; h < height; ++h, offset_h += width) {
-// 		const uchar* img_ptr = image.ptr<uchar>(h);
-// 		for (int w = 0, offset_w = offset_h; w < width; ++w, ++offset_w) {
-// 			for (int c = 0, top_index = offset_w; c < channels; ++c, top_index += size) {
-//         data[top_index] = static_cast<Dtype>(*img_ptr++);
-//       }
-//     }
-//   }
-// }
+  int offset;
+  Dtype* data = blob->mutable_cpu_data();
+
+  for(int c = 0; c < channels; c++) {
+  	for(int h = 0; h < img_height; h++) {
+  		for(int w = 0; w < img_width; w++) {
+  			offset = blob->offset(n, c, h, w);
+  			// (rows, cols) <---> (height, width) <--> (y, x)
+  			data[offset] = static_cast<Dtype>(image.at<uchar>(h,w));
+  		}
+  	}
+  }
+}
+template void GrayImageDataToBlob(Blob<float>* blob, const int n, const cv::Mat& image);
+template void GrayImageDataToBlob(Blob<double>* blob, const int n, const cv::Mat& image);
+
 template <typename Dtype>
 void ImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image) {
   const int height = blob->height();
@@ -647,6 +657,40 @@ void ImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image) {
 }
 template void ImageDataToBlob(Blob<float>* blob, const int n, const cv::Mat& image);
 template void ImageDataToBlob(Blob<double>* blob, const int n, const cv::Mat& image);
+
+template <typename Dtype>
+void GrayImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image,
+		const std::vector<Dtype> mean_values) 
+{
+  const int height = blob->height();
+  const int width = blob->width();
+  const int channels = blob->channels();
+  const int img_width = image.cols;
+  const int img_height = image.rows;
+  const int img_channels = image.channels();
+  CHECK_EQ(channels, 1) << "Only support gray image";
+  CHECK_LE(img_width, width);
+  CHECK_LE(img_height, height);
+  CHECK_EQ(channels, img_channels);
+  CHECK(mean_values.size() == channels);
+
+  int offset;
+  Dtype* data = blob->mutable_cpu_data();
+
+  for(int c = 0; c < channels; c++) {
+  	for(int h = 0; h < img_height; h++) {
+  		for(int w = 0; w < img_width; w++) {
+  			offset = blob->offset(n, c, h, w);
+  			// (rows, cols) <---> (height, width) <--> (y, x)
+  			data[offset] = static_cast<Dtype>(image.at<uchar>(h,w)) - mean_values[c];
+  		}
+  	}
+  }
+}
+template void GrayImageDataToBlob(Blob<float>* blob, const int n, const cv::Mat& image,
+		const std::vector<float> mean_values);
+template void GrayImageDataToBlob(Blob<double>* blob, const int n, const cv::Mat& image,
+		const std::vector<double> mean_values);
 
 template <typename Dtype>
 void ImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image,
@@ -682,6 +726,30 @@ template void ImageDataToBlob(Blob<double>* blob, const int n, const cv::Mat& im
 		const std::vector<double> mean_values);
 
 template <typename Dtype>
+cv::Mat BlobToGrayImage(const Blob<Dtype>* blob, const int n) {
+	const int channels = 1;
+	CHECK_EQ(blob->channels(), channels) << "Only support gray images";
+	cv::Mat img = cv::Mat::zeros(blob->height(), blob->width(), CV_8UC1);
+	for (int c = 0; c < channels; ++c) {
+		for (int h = 0; h < img.rows; ++h) {
+			for (int w = 0; w < img.cols; ++w) {
+				Dtype v1 = blob->data_at(n, c, h, w);
+				uchar v2 = 0;
+				if (v1 < 0) v2 = 0;
+				else if (v1 > 255) v2 = 255;
+				else v2 = static_cast<uchar>(v1);
+				// (rows, cols) <---> (height, width)
+        img.at<uchar>(h, w) = v2;
+			}
+		}
+	}
+
+	return img;
+}
+template cv::Mat BlobToGrayImage(const Blob<float>* blob, const int n);
+template cv::Mat BlobToGrayImage(const Blob<double>* blob, const int n);
+
+template <typename Dtype>
 cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n) {
 	CHECK_EQ(blob->channels(), 3) << "Only Support Color images";
 	cv::Mat img(blob->height(), blob->width(), CV_8UC3);
@@ -702,6 +770,35 @@ cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n) {
 }
 template cv::Mat BlobToColorImage(const Blob<float>* blob, const int n);
 template cv::Mat BlobToColorImage(const Blob<double>* blob, const int n);
+
+template <typename Dtype>
+cv::Mat BlobToGrayImage(const Blob<Dtype>* blob, const int n,
+		const std::vector<Dtype> mean_values) 
+{
+	const int channels = 1;
+	CHECK_EQ(blob->channels(), channels) << "Only support gray images";
+	CHECK(mean_values.size() == channels);
+	cv::Mat img = cv::Mat::zeros(blob->height(), blob->width(), CV_8UC1);
+	for (int c = 0; c < channels; ++c) {
+		for (int h = 0; h < img.rows; ++h) {
+			for (int w = 0; w < img.cols; ++w) {
+				Dtype v1 = blob->data_at(n, c, h, w);
+				uchar v2 = 0;
+				if (v1 < 0) v2 = 0;
+				else if (v1 > 255) v2 = 255;
+				else v2 = static_cast<uchar>(v1);
+				// (rows, cols) <---> (height, width)
+        img.at<uchar>(h, w) = v2 + mean_values[c];
+			}
+		}
+	}
+	
+	return img;
+}
+template cv::Mat BlobToGrayImage(const Blob<float>* blob, const int n,
+		const std::vector<float> mean_values);
+template cv::Mat BlobToGrayImage(const Blob<double>* blob, const int n,
+		const std::vector<double> mean_values);
 
 template <typename Dtype>
 cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n,

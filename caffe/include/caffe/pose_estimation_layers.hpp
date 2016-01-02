@@ -361,6 +361,7 @@ class LoadImageDataLayer : public Layer<Dtype> {
   virtual void load_data_image2blob(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   bool is_color_;
+  bool is_rgb2gray_;
   std::string img_ext_;
   bool has_visual_path_;
   std::string root_folder_;

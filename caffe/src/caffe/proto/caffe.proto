@@ -583,6 +583,7 @@ message RandomImageData2Parameter {
 // Message that stores parameters used by RandomImageDataLayer
 message LoadDataImageParameter { 
   optional bool is_color      = 1 [default = true];
+  optional bool is_rgb2gray   = 5 [default = false];
   // specify the image directory of hte images
   optional string root_folder = 2;
   // the image's visual path

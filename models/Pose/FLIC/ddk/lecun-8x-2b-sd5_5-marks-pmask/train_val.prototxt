@@ -104,6 +104,7 @@ layer {
   load_data_image_param {
     img_ext: ".png"
     is_color: true
+    is_rgb2gray: true
     root_folder: "../dataset/FLIC/crop.images2/crfasrnn.train/"
     # visual_path: "../dataset/FLIC/crop.images2/v.crfasrnn.train/"
   }
@@ -120,6 +121,7 @@ layer {
   load_data_image_param {
     img_ext: ".png"
     is_color: true
+    is_rgb2gray: true
     root_folder: "../dataset/FLIC/crop.images2/crfasrnn.test/"
     # visual_path: "../dataset/FLIC/crop.images2/v.crfasrnn.test/"
   }

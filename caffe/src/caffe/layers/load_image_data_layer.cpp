@@ -34,8 +34,11 @@ void LoadImageDataLayer<Dtype>::LayerSetUp(
   is_color_    		 = load_data_image_param.is_color();
   root_folder_ 		 = load_data_image_param.root_folder();
   visual_path_ 		 = load_data_image_param.visual_path();
+  is_rgb2gray_     = load_data_image_param.is_rgb2gray();
   has_visual_path_ = load_data_image_param.has_visual_path() 
       && visual_path_.length() > 0;
+  LOG(INFO) << "is_color: "    << is_color_;
+  LOG(INFO) << "is_rgb2gray: " << is_rgb2gray_;
   LOG(INFO) << "root_folder: " << root_folder_;
   if(has_visual_path_) {
     CreateDir(visual_path_.c_str(), 0);
@@ -73,6 +76,9 @@ void LoadImageDataLayer<Dtype>::Reshape(
   int width  = int(max_width);
   int height = int(max_height);
   int n_channels = is_color_ ? 3 : 1;
+  if(is_rgb2gray_ && is_color_) {
+    n_channels = 1;
+  }
   if(height <= 0 || width <= 0) {
     // You must know where to set `g_width` and `g_height`
     // Just for the initialization, like the deploy.prototxt
@@ -130,6 +136,9 @@ void LoadImageDataLayer<Dtype>::load_data_image2blob(
 	    LOG(ERROR) << "1 Could not open or find file " << im_path;
 	    return;
 	  }
+    if(is_rgb2gray_ && is_color_) {
+      cv::cvtColor(im, im, CV_RGB2GRAY);
+    }
 	  // check whether match the size
 	  CHECK_EQ(im_width,  im.cols) << "does not match the width (size) of input image";
 	  CHECK_EQ(im_height, im.rows) << "does not match the height (size) of input image";
@@ -161,6 +170,9 @@ void LoadImageDataLayer<Dtype>::load_data_image2blob(
       int width2  = int(im_width);
       int height2 = int(im_height);
       cv::resize(im4, im5, cv::Size(width2, height2));
+      if(is_rgb2gray_ && is_color_) {
+        cv::cvtColor(im5, im5, CV_GRAY2RGB);
+      }
       const std::string im_path2 = visual_path_ + imgidx + img_ext_;
       LOG(INFO) << "visualized image path: " << im_path2;
       cv::imwrite(im_path2, im5);

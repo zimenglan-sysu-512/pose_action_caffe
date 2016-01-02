@@ -29,8 +29,8 @@ layer {
     is_color: true
     is_scale_image: true
     always_max_size: true
-    max_size: 256
-    min_size: 240
+    max_size: 320
+    min_size: 256
     label_num: 28
     img_ext: ".jpg"
     # receptive_field_size: 100
@@ -54,7 +54,7 @@ layer {
     # opencv: B, G, R
   }
   random_image_data2_param {
-    batch_size: 8
+    batch_size: 1
     source: "../dataset/FLIC/labels/crop_test_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/test/"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
@@ -62,8 +62,8 @@ layer {
     is_color: true
     is_scale_image: true
     always_max_size: true
-    max_size: 256
-    min_size: 240
+    max_size: 320
+    min_size: 256
     label_num: 28
     img_ext: ".jpg"
     # receptive_field_size: 100

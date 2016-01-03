@@ -728,6 +728,9 @@ layer {
   bottom: "heat_maps"
   bottom: "conv7"
   top: "re_heat_maps"
+  include {
+    phase: TRAIN
+  }
 }
 
 # ###########

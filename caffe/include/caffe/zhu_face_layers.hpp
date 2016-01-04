@@ -144,6 +144,11 @@ class CropPatchFromMaxFeaturePositionLayer : public Layer<Dtype> {
   virtual void DeriveCropBeg(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
+  // so far we only use the highest score to get the corase predicted part location
+  // and modify it to be get top k highest scores to crop the image, widh nms
+  int top_k_;
+  int nms_x_;
+  int nms_y_;
   // 表示bottom[1]到bottom[0]的变换
   Blob<Dtype> coefs_;
   int crop_w_, crop_h_;

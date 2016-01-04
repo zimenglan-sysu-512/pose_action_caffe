@@ -33,21 +33,21 @@ void TorsoMaskFromCoordsLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bot
     }
   }
 
-  this->top_id_ = torso_mask_from_coords_param.top_id();
-  this->top_id2_ = torso_mask_from_coords_param.top_id2();
-  this->bottom_id_ = torso_mask_from_coords_param.bottom_id();
-  this->bottom_id2_ = torso_mask_from_coords_param.bottom_id2();
-  this->value_ = Dtype(torso_mask_from_coords_param.value());
-  this->has_input_path_ = torso_mask_from_coords_param.has_input_path();
+  this->top_id_          = torso_mask_from_coords_param.top_id();
+  this->top_id2_         = torso_mask_from_coords_param.top_id2();
+  this->bottom_id_       = torso_mask_from_coords_param.bottom_id();
+  this->bottom_id2_      = torso_mask_from_coords_param.bottom_id2();
+  this->value_           = Dtype(torso_mask_from_coords_param.value());
+  this->has_input_path_  = torso_mask_from_coords_param.has_input_path();
   this->has_visual_path_ = torso_mask_from_coords_param.has_visual_path();
   if(this->has_input_path_) {
-    this->input_path_ = torso_mask_from_coords_param.input_path();
+    this->input_path_    = torso_mask_from_coords_param.input_path();
   }
   if(this->has_visual_path_) {
-    this->visual_path_ = torso_mask_from_coords_param.visual_path();  
+    this->visual_path_   = torso_mask_from_coords_param.visual_path();  
     CreateDir(this->visual_path_.c_str(), 0);  
     CHECK(torso_mask_from_coords_param.has_img_ext()); 
-    this->img_ext_ = torso_mask_from_coords_param.img_ext();
+    this->img_ext_       = torso_mask_from_coords_param.img_ext();
   }
   
   this->whole_ = false;
@@ -66,24 +66,24 @@ void TorsoMaskFromCoordsLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bot
   this->top_idx2_    = this->top_id2_ * 2;
   this->bottom_idx_  = this->bottom_id_ * 2;
   this->bottom_idx2_ = this->bottom_id2_ * 2;
-  LOG(INFO) << "top_id: " << this->top_id_;
-  LOG(INFO) << "top_idx: " << this->top_idx_;
-  LOG(INFO) << "top_id2: " << this->top_id2_;
-  LOG(INFO) << "top_idx2: " << this->top_idx2_;
-  LOG(INFO) << "bottom_id: " << this->bottom_id_;
-  LOG(INFO) << "bottom_idx: " << this->bottom_idx_;
-  LOG(INFO) << "bottom_id2: " << this->bottom_id2_;
-  LOG(INFO) << "bottom_idx2: " << this->bottom_idx2_;
-  LOG(INFO) << "value: " << this->value_;
-  LOG(INFO) << "whole or not: " << this->whole_;
+  LOG(INFO) << "top_id: "        << this->top_id_;
+  LOG(INFO) << "top_idx: "       << this->top_idx_;
+  LOG(INFO) << "top_id2: "       << this->top_id2_;
+  LOG(INFO) << "top_idx2: "      << this->top_idx2_;
+  LOG(INFO) << "bottom_id: "     << this->bottom_id_;
+  LOG(INFO) << "bottom_idx: "    << this->bottom_idx_;
+  LOG(INFO) << "bottom_id2: "    << this->bottom_id2_;
+  LOG(INFO) << "bottom_idx2: "   << this->bottom_idx2_;
+  LOG(INFO) << "value: "         << this->value_;
+  LOG(INFO) << "whole or not: "  << this->whole_;
   if(this->has_visual_path_) {
     LOG(INFO) << "visual_path: " << this->visual_path_;
   }
   if(this->has_input_path_) {
-    LOG(INFO) << "input_path: " << this->input_path_;
+    LOG(INFO) << "input_path: "  << this->input_path_;
   }
   if(this->has_perb_num_) {
-    LOG(INFO) << "perb_num: " << this->perb_num_;
+    LOG(INFO) << "perb_num: "    << this->perb_num_;
   }
 }
 

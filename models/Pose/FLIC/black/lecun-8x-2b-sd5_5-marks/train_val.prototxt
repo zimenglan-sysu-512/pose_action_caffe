@@ -75,11 +75,11 @@ layer {
 }
 
 layer {
-  name: "data_masks"
+  name: "torso_masks"
   type: "CoordsToBboxesMasks"
   bottom: "gt_pose_coords"
   bottom: "aux_info"
-  top: "data_masks"
+  top: "torso_masks"
   coord_to_bbox_masks_param {
     # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
     # top_id/bottom_id: (lsho,rhip)
@@ -89,7 +89,7 @@ layer {
     top_id2: 6
     bottom_id2: 10
     value: 255
-    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/data_masks/"
+    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/torso_masks/"
     # img_ext: ".jpg"
   }
 }
@@ -98,7 +98,7 @@ layer {
   name: "concat_data"
   type: "Concat"
   bottom: "data"
-  bottom: "data_masks"
+  bottom: "torso_masks"
   top: "data_bank1"
   concat_param {
     concat_dim: 1
@@ -769,6 +769,12 @@ layer {
   top: "pred_pose_coords"
   include {
     phase: TEST
+  }
+  is_disp_info: true
+  pose_coords_from_heat_maps_param {
+    top_k: 100
+    heat_map_a: 1
+    heat_map_b: 0
   }
 }
 layer {

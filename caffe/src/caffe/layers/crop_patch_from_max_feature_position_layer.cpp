@@ -43,9 +43,9 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Init(
 	CHECK_EQ(bottom[0]->num(), bottom[1]->num());
 
 	for (int i = 2; i < bottom.size(); ++i) {
-		CHECK_EQ(bottom[0]->num(), bottom[i]->num())
+		CHECK_EQ(bottom[0]->num(),    bottom[i]->num())
 				<< "The num of bottom[2..n] shoud be equal to bottom[0]";
-		CHECK_EQ(bottom[0]->width(), bottom[i]->width())
+		CHECK_EQ(bottom[0]->width(),  bottom[i]->width())
 				<< "The width of bottom[2..n] shoud be equal to bottom[0]";
 		CHECK_EQ(bottom[0]->height(), bottom[i]->height())
 				<< "The height of bottom[2..n] shoud be equal to bottom[0]";
@@ -58,7 +58,7 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Init(
 	// 目前先固定死，截取的patch的是bottom[0]的 1/3
 	const float scale = crop_param.crop_factor();
 	crop_h_ = MAX(1, std::floor(bottom[0]->height() * scale));
-	crop_w_ = MAX(1, std::floor(bottom[0]->width() * scale));
+	crop_w_ = MAX(1, std::floor(bottom[0]->width()  * scale));
 
 	is_match_channel_.Reshape(top.size(), 1, 1, 1);
 	int* is_match_channel = is_match_channel_.mutable_cpu_data();
@@ -70,11 +70,20 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Init(
 		}
 	}
 
+	top_k_ = crop_param.top_k();
+	nms_x_ = crop_param.nms_x();
+	nms_y_ = crop_param.nms_y();
+	CHECK_GT(top_k_, 0);
+	CHECK_GE(nms_x_, 0);
+	CHECK_GE(nms_y_, 0);
 	// use default value
   if(this->layer_param_.is_disp_info()) {
   	LOG(INFO) << "layer name: " << this->layer_param_.name()
-  			<< " crop width: " << crop_w_
-  			<< " crop height: " << crop_h_;
+  			<< " top_k: "						<< top_k_
+  			<< " nms_x: "						<< nms_x_
+  			<< " nms_y: "						<< nms_y_
+  			<< " crop width: "      << crop_w_
+  			<< " crop height: "     << crop_h_;
   }
 }
 
@@ -89,14 +98,14 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Reshape(
 			CHECK_EQ(bottom[i + 2]->channels(), bottom[1]->channels());
 			top[i]->Reshape(
 					bottom[i]->num(), 
-					bottom[i + 2]->channels(), 
+					bottom[i + 2]->channels() * top_k_, 
 					crop_h_, 
 					crop_w_
 			);
 		} else {
 			top[i]->Reshape(
 					bottom[i]->num(), 
-					bottom[i + 2]->channels() * bottom[1]->channels(),
+					bottom[i + 2]->channels() * bottom[1]->channels() * top_k_,
 					crop_h_, 
 					crop_w_
 			);
@@ -104,7 +113,7 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Reshape(
 	}
 	crop_beg_.Reshape(
 			bottom[1]->num(), 
-			bottom[1]->channels(), 
+			bottom[1]->channels() * top_k_, 
 			1, 
 			2
 	);

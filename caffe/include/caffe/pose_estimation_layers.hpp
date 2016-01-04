@@ -659,7 +659,11 @@ class CoordsFromHeatMapsLayer : public Layer<Dtype> {
   /// @brief Not implemented -- 
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
       const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+  virtual void FilterHeatMap(const vector<Blob<Dtype>*>& bottom, 
+        const vector<Blob<Dtype>*>& top);
   virtual void CreateCoordsFromHeatMap_cpu(const vector<Blob<Dtype>*>& bottom, 
+      const vector<Blob<Dtype>*>& top);
+  virtual void CreateCoordsFromHeatMapFromTopK_cpu(const vector<Blob<Dtype>*>& bottom, 
       const vector<Blob<Dtype>*>& top);
 
   // virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
@@ -670,6 +674,7 @@ class CoordsFromHeatMapsLayer : public Layer<Dtype> {
   // void CreateCoordsFromHeatMap_gpu(const vector<Blob<Dtype>*>& bottom, 
   //     const vector<Blob<Dtype>*>& top);
   
+  int topK_;
   int label_num_;
   int heat_map_a_;
   int heat_map_b_;

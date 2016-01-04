@@ -693,8 +693,9 @@ message PoseHeatMapLossParameter {
 // message that for heat map to coordinates layer -- loss
 // ignore the loss, only forward to create coordinates from heat maps
 message PoseCoordsFromHeatMapsParameter {
-  optional int32 heat_map_a = 1;
+  optional int32 heat_map_a = 1 [default = 1];
   optional int32 heat_map_b = 2 [default = 0];
+  optional int32 top_k      = 3 [default = 0];
 }
 
 // message that stores parameters used by 
@@ -838,12 +839,15 @@ message CharAccuracyParameter {
 // 会根据input2每个height*width上的最大值去截input1
 message CropPatchFromMaxFeaturePositionParameter {
   // 截取原图的比例
-  optional float crop_factor = 1 [ default = 0.3333334 ];
+  optional float crop_factor  = 1 [ default = 0.3333334 ];
   
   // match_channel = false: 截出来的patch会包括input1的所有channels
   // match_channel = true: input2在channel n上的最大值只会用来截取input1 channel n的最大值
   // 缺省情况下是false 
   repeated bool match_channel = 2;
+  optional int32 top_k        = 3 [default = 1];
+  optional int32 nms_x        = 4 [default = 0];
+  optional int32 nms_y        = 5 [default = 0];
 }
 
 // 
@@ -1705,7 +1709,7 @@ message HeatMapTrainParameter {
   
   // parameters of mapping the points of heat map to input images 
   // x_original = heat_map_a * x_heat_map + heat_map_b
-  optional float heat_map_a = 6 [default = 0];
+  optional float heat_map_a = 6 [default = 1];
   optional float heat_map_b = 7 [default = 0];
 }
 

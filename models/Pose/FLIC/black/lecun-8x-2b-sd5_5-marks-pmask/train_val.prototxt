@@ -36,7 +36,7 @@ layer {
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
     # receptive_field_size: 100
     # visual_images_path: "m_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/visual_data/train/"
+    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-pmask/visual_data/train/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
@@ -69,17 +69,17 @@ layer {
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
     # receptive_field_size: 100
     # visual_images_path: "nm_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/visual_data/test/"
+    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-pmask/visual_data/test/"
     # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
 
 layer {
-  name: "data_masks"
+  name: "torso_masks"
   type: "CoordsToBboxesMasks"
   bottom: "gt_pose_coords"
   bottom: "aux_info"
-  top: "data_masks"
+  top: "torso_masks"
   coord_to_bbox_masks_param {
     # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
     # top_id/bottom_id: (lsho,rhip)
@@ -89,8 +89,42 @@ layer {
     top_id2: 6
     bottom_id2: 10
     value: 255
-    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/data_masks/"
+    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-pmask/torso_masks/"
     # img_ext: ".jpg"
+  }
+}
+
+layer {
+  name: "person_masks"
+  type: "LoadImageData"
+  bottom: "aux_info"
+  top: "person_masks"
+  include {
+    phase: TRAIN
+  }
+  load_data_image_param {
+    img_ext: ".png"
+    is_color: true
+    is_rgb2gray: true
+    root_folder: "../dataset/FLIC/crop.images2/crfasrnn.train/"
+    # visual_path: "../dataset/FLIC/crop.images2/v.crfasrnn.train/"
+  }
+}
+
+layer {
+  name: "person_masks"
+  type: "LoadImageData"
+  bottom: "aux_info"
+  top: "person_masks"
+  include {
+    phase: TEST
+  }
+  load_data_image_param {
+    img_ext: ".png"
+    is_color: true
+    is_rgb2gray: true
+    root_folder: "../dataset/FLIC/crop.images2/crfasrnn.test/"
+    # visual_path: "../dataset/FLIC/crop.images2/v.crfasrnn.test/"
   }
 }
 
@@ -98,7 +132,8 @@ layer {
   name: "concat_data"
   type: "Concat"
   bottom: "data"
-  bottom: "data_masks"
+  bottom: "torso_masks"
+  bottom: "person_masks"
   top: "data_bank1"
   concat_param {
     concat_dim: 1
@@ -803,7 +838,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-pmask/test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -826,7 +861,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-pmask/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -854,7 +889,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-pmask/test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

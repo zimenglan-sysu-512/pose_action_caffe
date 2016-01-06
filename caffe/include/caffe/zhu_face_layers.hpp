@@ -144,6 +144,74 @@ class CropPatchFromMaxFeaturePositionLayer : public Layer<Dtype> {
   virtual void DeriveCropBeg(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
+  // 表示bottom[1]到bottom[0]的变换
+  Blob<Dtype> coefs_;
+  int crop_w_, crop_h_;
+  Blob<int> crop_beg_;
+  // is_match_channel_ = 0: 截出来的patch会包括input1的所有channels
+  // is_match_channel_ = 1: input2在channel n上的最大值只会用来截取input1 channel n的最大值
+  Blob<int> is_match_channel_;
+};
+
+/* using top k 
+ * @brief bottom的size至少为3，
+ *        bottom[2...n]跟bottom[0]的长和宽要严格一致
+ *        先计算得到bottom[1]到bottom[0]的映射关系
+ *        然后对于不同的channel，求出bottom[1]在height*width上的最大值的位置h, w
+ *        把h, w映射到bottom[1]的下h', w'，
+ *        然后再以h', w'为中心bottom[2...n]截patch
+ *        如果patch超出bottom[0]范围则补0
+ */
+template <typename Dtype>
+class CropPatchFromMaxFeatureFromTopKPositionsLayer : public Layer<Dtype> {
+ public:
+  explicit CropPatchFromMaxFeatureFromTopKPositionsLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const { return "CropPatchFromMaxFeatureFromTopKPositions"; }
+  virtual inline int MinBottomBlobs() const { return 3; }
+  virtual inline int MinTopBlobs() const { return 1; }
+
+  // 以当前crop的状态返回
+  virtual inline DiagonalAffineMap<Dtype> coord_map() {
+    CHECK_GT(crop_beg_.count(), 0) 
+        << "Forward the net before calling this function";
+    vector<pair<Dtype, Dtype> > coefs;
+    for (int c = 0; c < crop_beg_.count(); c += 2) {
+      coefs.push_back(make_pair(1, -crop_beg_.cpu_data()[c]));
+      coefs.push_back(make_pair(1, -crop_beg_.cpu_data()[c + 1]));
+    }
+    return DiagonalAffineMap<Dtype>(coefs);
+  }
+
+  /* define in include/caffe/layer.hpp
+  virtual inline DiagonalAffineMap<Dtype> coord_map() {
+    // LOG(INFO) << "layer.hpp coord_map";
+    NOT_IMPLEMENTED;
+    // suppress warnings
+    return DiagonalAffineMap<Dtype>(vector<pair<Dtype, Dtype> >());
+  }
+  */
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+  virtual void Init(const vector<Blob<Dtype>*>& bottom, 
+      const vector<Blob<Dtype>*>& top);
+  virtual void DeriveCropBeg(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void DeriveCropBegFromTopK(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
   // so far we only use the highest score to get the corase predicted part location
   // and modify it to be get top k highest scores to crop the image, widh nms
   int top_k_;
@@ -157,6 +225,7 @@ class CropPatchFromMaxFeaturePositionLayer : public Layer<Dtype> {
   // is_match_channel_ = 1: input2在channel n上的最大值只会用来截取input1 channel n的最大值
   Blob<int> is_match_channel_;
 };
+
 
 /**
  * @brief Computes the Euclidean (L2) loss @f$

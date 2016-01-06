@@ -1,9 +1,10 @@
-// Copyright 2015 Zhu.Jin Liang
+// Copyright 2015 ZhuJin Liang
 
 
 #include <algorithm>
 #include <map>
 #include <set>
+#include <cfloat>
 #include <vector>
 
 #include "caffe/layer.hpp"
@@ -17,18 +18,24 @@
 namespace caffe {
 
 template <typename Dtype>
-__global__ void find_max_kernel(const int n, const Dtype* input,
-		int* crop_beg, const Dtype* coefs,
-		const int step, const int width,
-		const int crop_h, const int crop_w) {
+__global__ void find_max_kernel(
+		const int n,      
+		const Dtype* input,
+		int* crop_beg,    
+		const Dtype* coefs,
+		const int step,   
+		const int width,
+		const int crop_h, 
+		const int crop_w) 
+{
   CUDA_KERNEL_LOOP(index, n) {
+		int max_idx 		 = 0;
   	const int offset = index * step;
-		Dtype max_val = input[offset];
-		int max_idx = 0;
+		Dtype max_score  = input[offset];
 
 		for (int i = 1; i < step; ++i) {
-			if (input[offset + i] > max_val) {
-				max_val = input[offset + i];
+			if (input[offset + i] > max_score) {
+				max_score = input[offset + i];
 				max_idx = i;
 			}
 		}
@@ -38,6 +45,63 @@ __global__ void find_max_kernel(const int n, const Dtype* input,
 		crop_beg[index * 2 + 1] = std::floor((coefs[2] * (max_idx % width) + coefs[3])
 				- crop_w / Dtype(2.));
   }
+}
+
+template <typename Dtype>
+__global__ void find_max_kernel_from_topK(
+		const int n, 
+		const int topK,   
+		const int nms_x,  
+		const int nms_y,     
+		const Dtype* input,
+		int* crop_beg,    
+		const Dtype* coefs,
+		int* skips,
+		const int step,   
+		const int width,
+		const int height,
+		const int crop_h, 
+		const int crop_w) 
+{
+  CUDA_KERNEL_LOOP(index, n) {
+  	// find top k
+		for(int k = 0; k < topK; k++) {
+			int max_idx 		 = -1;
+			Dtype max_score  = Dtype(-FLT_MAX);
+	  	const int offset = index * step;
+
+	  	// finding maximum score and cooresponding coordinates
+			for (int i = 0; i < step; ++i) {
+				if (skips[offset + i] == 0 && input[offset + i] > max_score) {
+					max_score = input[offset + i];
+					max_idx = i;
+				}
+			}	// end finding maximum score and cooresponding coordinates
+
+			int x = max_idx % width;
+			int y = max_idx / width;
+
+			int index2 = index * topK + k;
+			crop_beg[index2 * 2 + 0] = std::floor((coefs[0] * y + coefs[1])
+					- crop_h / Dtype(2.));
+			crop_beg[index2 * 2 + 1] = std::floor((coefs[2] * x + coefs[3])
+					- crop_w / Dtype(2.));
+
+			// nms
+			if(k < topK - 1) {
+				int x1 = max(0, 			   x - nms_x);
+				int y1 = max(0, 			   y - nms_y);
+				int x2 = min(width  - 1, x + nms_x);
+				int y2 = min(height - 1, y + nms_y);
+				for(int p = x1; p <= x2; p++) {
+					for(int q = y1; q <= y2; q++) {
+						int nms_offset = q * width + p;
+						skips[offset + nms_offset] = 1;
+					}
+				}
+			}	// end nms
+		}	// end finding top k		
+  }	// end cuda kernel loop
 }
 
 template <typename Dtype>
@@ -86,17 +150,18 @@ __global__ void crop_patch_forward_kernel(const int nthreads,
 }
 
 template <typename Dtype>
-void CropPatchFromMaxFeaturePositionLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
-    const vector<Blob<Dtype>*>& top) {
+void CropPatchFromMaxFeatureFromTopKPositionsLayer<Dtype>::Forward_gpu(
+		const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
 
 	for (int i = 0; i < top.size(); ++i) {
 		caffe::caffe_gpu_set(top[i]->count(), Dtype(0), top[i]->mutable_gpu_data());
 	}
 
-	const int step = bottom[1]->height() * bottom[1]->width();
-	const int count = bottom[1]->num() * bottom[1]->channels();
+	const int step  = bottom[1]->height() * bottom[1]->width();
+	const int count = bottom[1]->num()    * bottom[1]->channels();
 
-	find_max_kernel<Dtype><<<CAFFE_GET_BLOCKS(count), CAFFE_CUDA_NUM_THREADS>>>(
+	find_max_kernel<Dtype><<<CAFFE_GET_BLOCKS(count), 
+			CAFFE_CUDA_NUM_THREADS>>>(
 	        count, bottom[1]->gpu_data(),
 	        crop_beg_.mutable_gpu_data(), coefs_.gpu_data(),
 	        step, bottom[1]->width(),
@@ -106,19 +171,26 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Forward_gpu(const vector<Blob<
 	const int* is_match_channel = is_match_channel_.cpu_data();
 	for (int i = 0; i < top.size(); ++i) {
 
-		crop_patch_forward_kernel<Dtype><<<CAFFE_GET_BLOCKS(top[i]->count()), CAFFE_CUDA_NUM_THREADS>>>(
-				top[i]->count(),
-				bottom[i + 2]->gpu_data(), top[i]->mutable_gpu_data(),
-				crop_beg_.gpu_data(), (is_match_channel[i] == 1),
-				bottom[i + 2]->channels(), bottom[i + 2]->height(), bottom[i + 2]->width(),
-				top[i]->channels(), top[i]->height(), top[i]->width(),
-				bottom[1]->channels());
+		crop_patch_forward_kernel<Dtype><<<CAFFE_GET_BLOCKS(top[i]->count()), 
+				CAFFE_CUDA_NUM_THREADS>>>(
+					top[i]->count(),
+					bottom[i + 2]->gpu_data(), 
+					top[i]->mutable_gpu_data(),
+					crop_beg_.gpu_data(), 
+					(is_match_channel[i] == 1),
+					bottom[i + 2]->channels(), 
+					bottom[i + 2]->height(), 
+					bottom[i + 2]->width(),
+					top[i]->channels(), 
+					top[i]->height(), 
+					top[i]->width(),
+					bottom[1]->channels());
 		CUDA_POST_KERNEL_CHECK;
 	}
 }
 
 template <typename Dtype>
-void CropPatchFromMaxFeaturePositionLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
+void CropPatchFromMaxFeatureFromTopKPositionsLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
 	for (int i = 0; i < top.size(); ++i) {
 		if (propagate_down[i + 2]) {
@@ -160,7 +232,7 @@ void CropPatchFromMaxFeaturePositionLayer<Dtype>::Backward_gpu(const vector<Blob
 		}
 	}
 }
-INSTANTIATE_LAYER_GPU_FUNCS(CropPatchFromMaxFeaturePositionLayer);
+INSTANTIATE_LAYER_GPU_FUNCS(CropPatchFromMaxFeatureFromTopKPositionsLayer);
 
 
 }  // namespace caffe

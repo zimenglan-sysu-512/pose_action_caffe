@@ -370,6 +370,6 @@ STUB_GPU(CropPatchFromMaxFeatureFromTopKPositionsLayer);
 #endif
 
 INSTANTIATE_CLASS(CropPatchFromMaxFeatureFromTopKPositionsLayer);
-REGISTER_LAYER_CLASS(CropPatchFromMaxFeaturePosition);
+REGISTER_LAYER_CLASS(CropPatchFromMaxFeatureFromTopKPositions);
 
 }  // namespace caffe

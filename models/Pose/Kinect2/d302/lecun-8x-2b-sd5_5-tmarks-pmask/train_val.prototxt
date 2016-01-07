@@ -23,7 +23,7 @@ layer {
     mirror: true
   }
   random_image_data2_param {
-    batch_size: 12
+    batch_size: 24
     source: "../dataset/Kinect2/labels/up.crop.color2_train_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     skel_points_path: "../dataset/Kinect2/labels/skel_path.log"
@@ -756,7 +756,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 30
+    top_k: 40
     heat_map_a: 1
     heat_map_b: 0
   }

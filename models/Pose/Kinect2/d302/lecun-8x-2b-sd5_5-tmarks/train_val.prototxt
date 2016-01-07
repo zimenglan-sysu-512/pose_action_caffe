@@ -23,7 +23,7 @@ layer {
     mirror: true
   }
   random_image_data2_param {
-    batch_size: 12
+    batch_size: 24
     source: "../dataset/Kinect2/labels/up.crop.color2_train_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     skel_points_path: "../dataset/Kinect2/labels/skel_path.log"

@@ -33,6 +33,7 @@ Dtype PoseHeatMapLossLayer<Dtype>::PrintLoss_gpu()
   const Dtype key_point_num = Dtype(this->key_point_num_ + 0.);
   const Dtype per_heat_map_loss = per_frame_loss / key_point_num;
 
+  LOG(INFO) << "layer name: " << this->layer_param_.name();
   LOG(INFO) << "iter: " << GlobalVars::caffe_iter();
   LOG(INFO) << "learn_lr: " << GlobalVars::learn_lr();
   LOG(INFO) << "euclidean loss (batch): " << batch_loss ;

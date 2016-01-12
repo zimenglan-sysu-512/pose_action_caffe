@@ -1,0 +1,36 @@
+# Solver prototxt
+net: "models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/train_val.prototxt"
+# Snapshot
+snapshot: 1000
+# Snapshot prefix
+snapshot_prefix: "../asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/models/Kinect2"
+
+test_interval: 1000
+
+# 8 * 1714
+test_iter: 13707
+
+test_initialization: true
+
+# 0.001 fast convergence
+# base_lr: 0.001 iter: 14000 acc: 0.85 
+base_lr: 0.001
+lr_policy: "step"
+
+# SGD
+gamma: 0.0001
+power: 0.75
+momentum: 0.9
+weight_decay: 0.0005
+
+# Display
+display: 200
+# Change learning rate
+stepsize: 80000
+# Iterations
+max_iter: 80000
+
+# CPU or GPU
+solver_mode: GPU
+# GPU ID
+device_id: 0

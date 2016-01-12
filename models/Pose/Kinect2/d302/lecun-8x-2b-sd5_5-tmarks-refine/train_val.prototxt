@@ -816,7 +816,7 @@ layer {
   }
   convolution_param {
     num_output: 1216  # 64
-    pad: 3
+    pad: 2
     group: 19
     kernel_size: 5
     weight_filler {

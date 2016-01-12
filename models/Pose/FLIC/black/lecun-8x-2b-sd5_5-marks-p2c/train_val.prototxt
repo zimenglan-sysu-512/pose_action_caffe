@@ -2,7 +2,7 @@
 # @proto: train_val.prototxt
 # @author: ddk
 # @method: heat map
-# @time: 16.01.03
+# @time: 16.01.12
 # ##############################
 name: "HumanPoseEstimation"
 
@@ -73,6 +73,9 @@ layer {
   bottom: "aux_info"
   top: "torso_masks"
   coord_to_bbox_masks_param {
+    # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
+    # top_id/bottom_id: (lsho,rhip)
+    # top_id2/bottom_id2: (rsho,lhip)
     top_id: 6
     bottom_id: 10
     top_id2: 6
@@ -112,6 +115,9 @@ layer {
   top: "heat_maps_masks"
   # top: "heat_maps_infos"
   heat_maps_from_coords_origin_param {
+    # 决定了heat map的pixels不为0的区域(菱形)的边长
+    # radius: 10
+    # radius_str: "2,2,2,6,6,4,6,6,4,6,6,6,6,6"
     is_binary: true
     gau_mean: 0
     gau_stds: 1.5
@@ -160,13 +166,29 @@ layer {
 
 layer {
   name: "pool1_bank1"
-  type: "Pooling"
+  type: "Convolution"
   bottom: "conv1_bank1"
   top: "pool1_bank1"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
     stride: 2
+    kernel_size: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
@@ -208,13 +230,29 @@ layer {
 
 layer {
   name: "pool2_bank1"
-  type: "Pooling"
+  type: "Convolution"
   bottom: "conv2_bank1"
   top: "pool2_bank1"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
     stride: 2
+    kernel_size: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
@@ -256,13 +294,29 @@ layer {
 
 layer {
   name: "pool3_bank1"
-  type: "Pooling"
+  type: "Convolution"
   bottom: "conv3_bank1"
   top: "pool3_bank1"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
     stride: 2
+    kernel_size: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
@@ -338,71 +392,6 @@ layer {
   top: "conv4_2_bank1"
 }
 
-# ########### conv4_bank1 for dsn
-# loss
-# conv & resize
-layer {
-  name: "dsn_conv4_bank1"
-  type: "Convolution"
-  bottom: "conv4_2_bank1"
-  top: "dsn_conv4_bank1"
-  param {
-    lr_mult: 0.01
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 0.02
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 14
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-layer {
-  name: "re_heat_maps_dsn_conv4_bank1"
-  type: "Resize"
-  bottom: "heat_maps"
-  bottom: "dsn_conv4_bank1"
-  top: "re_heat_maps_dsn_conv4_bank1"
-  include {
-    phase: TRAIN
-  }
-}
-
-layer {
-  name: "pose_heap_map_loss_by_conv4_bank1"
-  type: "PoseHeatMapLoss"
-  bottom: "dsn_conv4_bank1"
-  bottom: "re_heat_maps_dsn_conv4_bank1"
-  bottom: "heat_maps_masks"
-  top: "pose_heap_map_loss_by_conv4_bank1"
-  include {
-    phase: TRAIN
-  }
-  loss_weight: 0.1
-  pose_heat_map_loss_param {
-    loss_emphase_type: 3
-    fg_eof: 3
-    bg_eof: 1
-    ratio: 0.005
-    prob_num: 11
-    heat_score_thres: 0.273
-    parts_err_num_thres: 3
-    hard_negative_filepath: "NotImplemented."
-  }
-}
-
 # ##############################
 # bank2
 # conv & relu & pool & resize
@@ -443,13 +432,29 @@ layer {
 
 layer {
   name: "pool1_bank2"
-  type: "Pooling"
+  type: "Convolution"
   bottom: "conv1_bank2"
   top: "pool1_bank2"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
     stride: 2
+    kernel_size: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
@@ -491,13 +496,29 @@ layer {
 
 layer {
   name: "pool2_bank2"
-  type: "Pooling"
+  type: "Convolution"
   bottom: "conv2_bank2"
   top: "pool2_bank2"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
     stride: 2
+    kernel_size: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
@@ -539,13 +560,29 @@ layer {
 
 layer {
   name: "pool3_bank2"
-  type: "Pooling"
+  type: "Convolution"
   bottom: "conv3_bank2"
   top: "pool3_bank2"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
     stride: 2
+    kernel_size: 2
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 
@@ -627,71 +664,6 @@ layer {
   bottom: "conv4_2_bank2"
   bottom: "conv4_2_bank1"
   top: "re_conv4_2_bank2"
-}
-
-# ########### conv4_bank2 for dsn
-# loss
-# conv & resize
-layer {
-  name: "dsn_conv4_bank2"
-  type: "Convolution"
-  bottom: "conv4_2_bank2"
-  top: "dsn_conv4_bank2"
-  param {
-    lr_mult: 0.01
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 0.02
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 14
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-layer {
-  name: "re_heat_maps_dsn_conv4_bank2"
-  type: "Resize"
-  bottom: "heat_maps"
-  bottom: "dsn_conv4_bank2"
-  top: "re_heat_maps_dsn_conv4_bank2"
-  include {
-    phase: TRAIN
-  }
-}
-
-layer {
-  name: "pose_heap_map_loss_by_conv4_bank2"
-  type: "PoseHeatMapLoss"
-  bottom: "dsn_conv4_bank2"
-  bottom: "re_heat_maps_dsn_conv4_bank2"
-  bottom: "heat_maps_masks"
-  top: "pose_heap_map_loss_by_conv4_bank2"
-  include {
-    phase: TRAIN
-  }
-  loss_weight: 0.1
-  pose_heat_map_loss_param {
-    loss_emphase_type: 3
-    fg_eof: 3
-    bg_eof: 1
-    ratio: 0.005
-    prob_num: 11
-    heat_score_thres: 0.273
-    parts_err_num_thres: 3
-    hard_negative_filepath: "NotImplemented."
-  }
 }
 
 # ##############################
@@ -841,14 +813,23 @@ layer {
   include {
     phase: TRAIN
   }
-  loss_weight: 1
   pose_heat_map_loss_param {
+    # 0: normal
+    # 1: only fg
+    # 2: nornmal + fg_eof
+    # 3: ratio between fg and bg
+    # 4: ratio between fg and bg with fg_eof
     loss_emphase_type: 3
     fg_eof: 3
     bg_eof: 1
+    # bg_num: 5
     ratio: 0.005
+    # when loss continues to decrease, but accuracy does not keep increasing,
+    # modify the prob_num to be smaller, e.g. 11 to 7
     prob_num: 11
+    #hards_num_arr: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
     heat_score_thres: 0.273
+    #heat_score_thres_arr: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
     parts_err_num_thres: 3
     hard_negative_filepath: "NotImplemented."
   }
@@ -857,26 +838,6 @@ layer {
 # ##############################
 # test
 # visualize & accuracy
-layer {
-  name: "re_dsn_conv4_bank1"
-  type: "Resize"
-  bottom: "dsn_conv4_bank1"
-  bottom: "heat_maps"
-  top: "re_dsn_conv4_bank1"
-  include {
-    phase: TEST
-  }
-}
-layer {
-  name: "re_dsn_conv4_bank2"
-  type: "Resize"
-  bottom: "dsn_conv4_bank2"
-  bottom: "heat_maps"
-  top: "re_dsn_conv4_bank2"
-  include {
-    phase: TEST
-  }
-}
 layer {
   name: "re_conv7"
   type: "Resize"
@@ -887,70 +848,29 @@ layer {
     phase: TEST
   }
 }
-layer {
-  name: "fusion_heat_map"
-  type: "Eltwise"
-  bottom: "re_dsn_conv4_bank1"
-  bottom: "re_dsn_conv4_bank2"
-  bottom: "re_conv7"
-  top: "fusion_heat_map"
-  include {
-    phase: TEST
-  }
-  eltwise_param {
-    operation: SUM
-  }
-}
 
-# re_conv7
 layer {
-  name: "pred_coords_from_maps1"
+  name: "pred_coords_from_maps"
   type: "CoordsFromHeatMaps"
   bottom: "re_conv7"
-  top: "pred_pose_coords1"
+  top: "pred_pose_coords"
   include {
     phase: TEST
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 40
+    top_k: 100
     heat_map_a: 1
     heat_map_b: 0
-  }
-}
-layer {
-  name: "pred_rescale_pose_coords1"
-  type: "RescaledPoseCoords"
-  bottom: "pred_pose_coords1"
-  bottom: "aux_info"
-  top: "pred_pose_coords1"
-  include {
-    phase: TEST
   }
 }
 
-# fusion
 layer {
-  name: "pred_coords_from_maps2"
-  type: "CoordsFromHeatMaps"
-  bottom: "fusion_heat_map"
-  top: "pred_pose_coords2"
-  include {
-    phase: TEST
-  }
-  is_disp_info: true
-  pose_coords_from_heat_maps_param {
-    top_k: 40
-    heat_map_a: 1
-    heat_map_b: 0
-  }
-}
-layer {
-  name: "pred_rescale_pose_coords2"
+  name: "pred_rescale_pose_coords"
   type: "RescaledPoseCoords"
-  bottom: "pred_pose_coords2"
+  bottom: "pred_pose_coords"
   bottom: "aux_info"
-  top: "pred_pose_coords2"
+  top: "pred_pose_coords"
   include {
     phase: TEST
   }
@@ -979,7 +899,7 @@ layer {
 #   visual_heat_maps_param {
 #     # 0: files; 1: images, 2: both
 #     visual_type: 1
-#     heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-dsn/test_heat_maps2_2/"
+#     heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-p2c/test_heat_maps2_2/"
 #     heat_map_files_name: "files/"
 #     heat_map_images_name: "images/"
 #     # if bottom.size() is 1, then only one phase_name
@@ -1002,7 +922,7 @@ layer {
 #     phase: TEST
 #   }
 #   visual_pose_coords_param {
-#     coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-dsn/poses_coords/"
+#     coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-p2c/poses_coords/"
 #     skel_path: "../dataset/FLIC/labels/skel_path.txt"
 #     coords_files_name: "files/"
 #     coords_images_name: "images/"
@@ -1017,11 +937,11 @@ layer {
 # }
 
 layer {
-  name: "accuracy1"
+  name: "accuracy"
   type: "PosePDJAccuracy"
-  bottom: "pred_pose_coords1"
+  bottom: "pred_pose_coords"
   bottom: "gt_origin_pose_coords"
-  top: "accuracy1"
+  top: "accuracy"
   include {
     phase: TEST
   }
@@ -1029,30 +949,15 @@ layer {
     acc_factor: 0.05
     acc_factor_num: 10
     images_num: 1016
-    acc_name: "pose_pdj_acc1.log"
-    log_name: "pose_pdj_log1.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-dsn/test_acc_joint/"
-    shoulder_id: 6
-    hip_id: 10
-  }
-}
-
-layer {
-  name: "accuracy2"
-  type: "PosePDJAccuracy"
-  bottom: "pred_pose_coords2"
-  bottom: "gt_origin_pose_coords"
-  top: "accuracy2"
-  include {
-    phase: TEST
-  }
-  pose_pdj_accuracy_param {
-    acc_factor: 0.05
-    acc_factor_num: 10
-    images_num: 1016
-    acc_name: "pose_pdj_acc2.log"
-    log_name: "pose_pdj_log2.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-dsn/test_acc_joint/"
+    acc_name: "pose_pdj_acc.log"
+    log_name: "pose_pdj_log.log"
+    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-marks-p2c/test_acc/"
+    # 0: leye, 1: reye, 2: nose, 
+    # 3: lsho, 4: lelb, 5: lwri, 
+    # 6: rsho, 7: relb, 8: rwri, 
+    # 9: neck(lsho, rsho), 12: waist(lhip, rhip)
+    # 10: lhip, 11: rhip, 13: torso
+    # here use (rsho, lhip)
     shoulder_id: 6
     hip_id: 10
   }

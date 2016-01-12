@@ -55,7 +55,7 @@ if [ ! -n "$1" ] ;then
 	$caffe_bin train --solver=$solver_side_proto 2>&1 | tee -a $log_filename
 else
 	re_iter=$1
-	resume_model_file="flic_iter_"$re_iter".solver_sidestate"
+	resume_model_file="flic_iter_"$re_iter".solverstate"
 	resume_model_file=$model_path$resume_model_file
 	echo
 	echo "re_iter:" $re_iter

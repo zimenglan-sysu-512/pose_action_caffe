@@ -1,9 +1,10 @@
 Note:
 	1 hard negatives, use top k
-	2 two banks, with conv4_2
+	2 two banks, (0.707)
 	3 torso masks
-	4 thres: 0.273
-	5 prob_num: 11
+	4 for kinect 2 dataset
+	5 use conv4_1 and conv4_2
+	6 replace pooling layers with conv layers
 
 batch size increases, the iteration for devergence decreases, and accuracy 
 (PDJ@0.1) increases
@@ -21,5 +22,7 @@ step3
  when loss continues to decrease, but accuracy does not keep increasing,
  modify the lr_rate, e.g. lr_rate /= 10
 
+
 test:
 	cd ../../../../../caffe/ && make -j8 && cd - && sh test.sh
+	cd ../../../../../caffe/ && make -j8 && cd - && sh train.sh

@@ -110,7 +110,7 @@ layer {
   bottom: "aux_info"
   top: "heat_maps"
   top: "heat_maps_masks"
-  top: "heat_maps_infos"
+  # top: "heat_maps_infos"
   heat_maps_from_coords_origin_param {
     is_binary: true
     gau_mean: 0

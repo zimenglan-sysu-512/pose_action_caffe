@@ -4,6 +4,8 @@ Note:
 	3 torso masks
 	4 thres: 0.273
 	5 prob_num: 11
+	6 
+
 
 batch size increases, the iteration for devergence decreases, and accuracy 
 (PDJ@0.1) increases

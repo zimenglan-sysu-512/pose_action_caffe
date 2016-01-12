@@ -201,9 +201,15 @@ void Solver<Dtype>::Step(int iters) {
       const vector<Blob<Dtype>*>& result = net_->output_blobs();
       int score_index = 0;
       for (int j = 0; j < result.size(); ++j) {
-        const Dtype* result_vec = result[j]->cpu_data();
         const string& output_name =
             net_->blob_names()[net_->output_blob_indices()[j]];
+        const bool train_net_output_disp = 
+            net_->layer_by_name(output_name)->layer_param().train_net_output_disp();
+        // LOG(INFO) << "layer name: "            << output_name;
+        // LOG(INFO) << "train_net_output_disp: " << train_net_output_disp;
+        if(!train_net_output_disp) continue;
+        
+        const Dtype* result_vec = result[j]->cpu_data();
         const Dtype loss_weight =
             net_->blob_loss_weights()[net_->output_blob_indices()[j]];
         for (int k = 0; k < result[j]->count(); ++k) {

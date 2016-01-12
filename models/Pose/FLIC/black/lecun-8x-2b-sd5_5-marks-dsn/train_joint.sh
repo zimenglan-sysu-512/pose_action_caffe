@@ -51,18 +51,21 @@ sleep $sleep_time
 # resume model file
 if [ ! -n "$1" ] ;then
 	re_iter=0
-	# run & log command
-	$caffe_bin train --solver=$solver_joint_proto 2>&1 | tee -a $log_filename
+	resume_model_file="flic_iter_"$re_iter".caffemodel"
 else
 	re_iter=$1
-	resume_model_file="flic_iter_"$re_iter".solver_jointstate"
-	resume_model_file=$model_path$resume_model_file
-	echo
-	echo "re_iter:" $re_iter
-	echo "snapshot path:" $resume_model_file
-	echo
-	# run & log command
+	resume_model_file="flic_iter_"$re_iter".solverstate"
+fi
+resume_model_file=$model_path$resume_model_file
+echo
+echo "re_iter:" $re_iter
+echo "snapshot path:" $resume_model_file
+echo
+
+# run & log command
+if [ ! -n "$1" ] ;then
+	$caffe_bin train --solver=$solver_joint_proto --weights=$resume_model_file 2>&1 | tee -a $log_filename
+else
 	$caffe_bin train --solver=$solver_joint_proto --snapshot=$resume_model_file 2>&1 | tee -a $log_filename
 fi
-
 echo "Done!"

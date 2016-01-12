@@ -1,11 +1,11 @@
 # Solver prototxt
 net: "models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/train_val.prototxt"
 # Snapshot
-snapshot: 1000
+snapshot: 500
 # Snapshot prefix
 snapshot_prefix: "../asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/models/Kinect2"
 
-test_interval: 1000
+test_interval: 500
 
 # 8 * 1714
 test_iter: 13707

@@ -12,7 +12,7 @@ test_iter: 13707 # 3427
 # test_initialization: false
 
 # 0.00001 fast convergence
-base_lr: 0.00001
+base_lr: 0.001
 lr_policy: "step"
 
 # SGD

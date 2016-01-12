@@ -12,10 +12,10 @@ test_iter: 1016
 # Test when reaching the test_interval
 test_interval: 500
 # 
-test_initialization: true
+test_initialization: false
 
 # 0.001 fast convergence
-base_lr: 0.001
+base_lr: 0.00001
 # Learning rate
 lr_policy: "step"
 

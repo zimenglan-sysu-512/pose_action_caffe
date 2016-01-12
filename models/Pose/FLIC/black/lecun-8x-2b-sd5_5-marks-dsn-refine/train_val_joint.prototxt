@@ -25,7 +25,7 @@ layer {
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     label_num: 28
-    batch_size: 2
+    batch_size: 4
     always_max_size: true
     is_scale_image: true
     shuffle: true
@@ -115,7 +115,7 @@ layer {
     is_binary: true
     gau_mean: 0
     gau_stds: 1.5
-    radius_str: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
+    radius_str: "3,3,3,5,5,4,5,5,4,5,5,5,5,5"
   }
 }
 
@@ -823,9 +823,9 @@ layer {
   }
   convolution_param {
     num_output: 896  # 64
-    pad: 3
+    pad: 2
     group: 14
-    kernel_size: 7
+    kernel_size: 5
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -888,11 +888,11 @@ layer {
   bottom: "crop_conv4_bank1"
   top: "crop_conv5_bank1"
   param {
-    lr_mult: 0.01
+    lr_mult: 1
     decay_mult: 1
   }
   param {
-    lr_mult: 0.02
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {

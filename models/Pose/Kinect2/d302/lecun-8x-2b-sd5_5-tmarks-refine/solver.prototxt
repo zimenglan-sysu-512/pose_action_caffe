@@ -14,7 +14,7 @@ test_initialization: false
 
 # 0.001 fast convergence
 # base_lr: 0.001 iter: 14000 acc: 0.85 
-base_lr: 0.0001
+base_lr: 0.00001
 lr_policy: "step"
 
 # SGD

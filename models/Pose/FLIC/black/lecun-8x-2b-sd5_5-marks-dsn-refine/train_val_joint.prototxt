@@ -698,16 +698,39 @@ layer {
   top: "re_conv7"
 }
 
-layer {
-  name: "concat_data"
-  type: "Concat"
-  bottom: "data"
-  bottom: "re_conv7"
-  top: "new_data"
-  concat_param {
-    concat_dim: 1
-  }
-}
+# layer {
+#   name: "concat_data"
+#   type: "Concat"
+#   bottom: "data"
+#   bottom: "re_conv7"
+#   top: "new_data"
+#   concat_param {
+#     concat_dim: 1
+#   }
+# }
+
+# # #############
+# # crop data
+# layer {
+#   name: "crop_data"
+#   type: "CropPatchFromMaxFeaturePosition"
+
+#   ## this is for getting mapping relationship
+#   bottom: "new_data"
+#   bottom: "re_conv7"
+
+#   bottom: "new_data"
+#   top: "crop_data"
+
+#   bottom: "heat_maps"
+#   top: "crop_heat_maps"
+
+#   crop_patch_from_max_feature_position_param {
+#     crop_factor: 0.5
+#     match_channel: false
+#     match_channel: true
+#   }
+# }
 
 # #############
 # crop data
@@ -716,10 +739,10 @@ layer {
   type: "CropPatchFromMaxFeaturePosition"
 
   ## this is for getting mapping relationship
-  bottom: "new_data"
+  bottom: "conv1_bank1"
   bottom: "re_conv7"
 
-  bottom: "new_data"
+  bottom: "conv1_bank1"
   top: "crop_data"
 
   bottom: "heat_maps"
@@ -748,7 +771,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896  # 64
+    num_output: 448  # 32
     pad: 2
     group: 14
     kernel_size: 5
@@ -785,7 +808,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896  # 64
+    num_output: 448  # 32
     pad: 2
     group: 14
     kernel_size: 5
@@ -822,7 +845,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 896  # 64
+    num_output: 448  # 32
     pad: 2
     group: 14
     kernel_size: 5
@@ -859,7 +882,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 3584  # 256
+    num_output: 1792  # 128
     pad: 4
     kernel_size: 9
     group: 14
@@ -940,7 +963,8 @@ layer {
   name: "resize_crop_heat_map"
   type: "ResizeWithMap"
   bottom: "crop_conv5_bank1"
-  bottom: "new_data"
+  bottom: "conv1_bank1"
+  # bottom: "new_data"
 
   bottom: "crop_conv5_bank1"
   top: "re_crop_conv5_bank1"

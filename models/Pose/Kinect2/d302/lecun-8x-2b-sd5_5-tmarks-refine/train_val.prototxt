@@ -23,7 +23,7 @@ layer {
     mirror: true
   }
   random_image_data2_param {
-    batch_size: 4
+    batch_size: 8
     source: "../dataset/Kinect2/labels/up.crop.color2_train_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     skel_points_path: "../dataset/Kinect2/labels/skel_path.log"
@@ -691,16 +691,39 @@ layer {
   top: "re_conv7"
 }
 
-layer {
-  name: "concat_data"
-  type: "Concat"
-  bottom: "data"
-  bottom: "re_conv7"
-  top: "new_data"
-  concat_param {
-    concat_dim: 1
-  }
-}
+# layer {
+#   name: "concat_data"
+#   type: "Concat"
+#   bottom: "data"
+#   bottom: "re_conv7"
+#   top: "new_data"
+#   concat_param {
+#     concat_dim: 1
+#   }
+# }
+
+# # #############
+# # crop data
+# layer {
+#   name: "crop_data"
+#   type: "CropPatchFromMaxFeaturePosition"
+
+#   ## this is for getting mapping relationship
+#   bottom: "new_data"
+#   bottom: "re_conv7"
+
+#   bottom: "new_data"
+#   top: "crop_data"
+
+#   bottom: "heat_maps"
+#   top: "crop_heat_maps"
+
+#   crop_patch_from_max_feature_position_param {
+#     crop_factor: 0.4
+#     match_channel: false
+#     match_channel: true
+#   }
+# }
 
 # #############
 # crop data
@@ -709,17 +732,17 @@ layer {
   type: "CropPatchFromMaxFeaturePosition"
 
   ## this is for getting mapping relationship
-  bottom: "new_data"
+  bottom: "conv1_bank1"
   bottom: "re_conv7"
 
-  bottom: "new_data"
+  bottom: "conv1_bank1"
   top: "crop_data"
 
   bottom: "heat_maps"
   top: "crop_heat_maps"
 
   crop_patch_from_max_feature_position_param {
-    crop_factor: 0.5
+    crop_factor: 0.4
     match_channel: false
     match_channel: true
   }
@@ -741,7 +764,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 1216  # 64
+    num_output: 608  # 32
     pad: 2
     group: 19
     kernel_size: 5
@@ -778,7 +801,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 1216  # 64
+    num_output: 608  # 32
     pad: 2
     group: 19
     kernel_size: 5
@@ -815,7 +838,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 1216  # 64
+    num_output: 608  # 32
     pad: 2
     group: 19
     kernel_size: 5
@@ -852,7 +875,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 4864  # 256
+    num_output: 2432  # 128
     pad: 4
     kernel_size: 9
     group: 19
@@ -933,7 +956,8 @@ layer {
   name: "resize_crop_heat_map"
   type: "ResizeWithMap"
   bottom: "crop_conv5_bank1"
-  bottom: "new_data"
+  bottom: "conv1_bank1"
+  # bottom: "new_data"
 
   bottom: "crop_conv5_bank1"
   top: "re_crop_conv5_bank1"

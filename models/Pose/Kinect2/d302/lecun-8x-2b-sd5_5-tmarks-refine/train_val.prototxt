@@ -23,7 +23,7 @@ layer {
     mirror: true
   }
   random_image_data2_param {
-    batch_size: 8
+    batch_size: 4
     source: "../dataset/Kinect2/labels/up.crop.color2_train_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     skel_points_path: "../dataset/Kinect2/labels/skel_path.log"
@@ -719,7 +719,7 @@ layer {
 #   top: "crop_heat_maps"
 
 #   crop_patch_from_max_feature_position_param {
-#     crop_factor: 0.4
+#     crop_factor: 0.5
 #     match_channel: false
 #     match_channel: true
 #   }
@@ -742,7 +742,7 @@ layer {
   top: "crop_heat_maps"
 
   crop_patch_from_max_feature_position_param {
-    crop_factor: 0.4
+    crop_factor: 0.5
     match_channel: false
     match_channel: true
   }

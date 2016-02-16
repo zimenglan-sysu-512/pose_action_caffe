@@ -11,7 +11,7 @@ name: "HumanPoseEstimation"
 layer {
   name: "data"
   type: "RandomImageData2"
-  top: "data_bank1"
+  top: "data"
   top: "gt_pose_coords"
   top: "aux_info"
   include {
@@ -34,13 +34,17 @@ layer {
     is_color: true
     img_ext: ".jpg"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
+    # receptive_field_size: 100
+    # visual_images_path: "m_256_c/"
+    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/visual_data/train/"
+    # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
 
 layer {
   name: "data"
   type: "RandomImageData2"
-  top: "data_bank1"
+  top: "data"
   top: "gt_pose_coords"
   top: "aux_info"
   include {
@@ -63,6 +67,10 @@ layer {
     is_color: true
     img_ext: ".jpg"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
+    # receptive_field_size: 100
+    # visual_images_path: "nm_256_c/"
+    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/visual_data/test/"
+    # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
 
@@ -74,11 +82,26 @@ layer {
   top: "torso_masks"
   coord_to_bbox_masks_param {
     # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
+    # top_id/bottom_id: (lsho,rhip)
+    # top_id2/bottom_id2: (rsho,lhip)
     top_id: 6
     bottom_id: 10
     top_id2: 6
     bottom_id2: 10
     value: 255
+    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/torso_masks/"
+    # img_ext: ".jpg"
+  }
+}
+
+layer {
+  name: "concat_data"
+  type: "Concat"
+  bottom: "data"
+  bottom: "torso_masks"
+  top: "data_bank1"
+  concat_param {
+    concat_dim: 1
   }
 }
 
@@ -100,7 +123,8 @@ layer {
   bottom: "aux_info"
   top: "heat_maps"
   top: "heat_maps_masks"
-    heat_maps_from_coords_origin_param {
+  top: "heat_maps_infos"
+  heat_maps_from_coords_origin_param {
     # 决定了heat map的pixels不为0的区域(菱形)的边长
     # radius: 10
     # radius_str: "2,2,2,6,6,4,6,6,4,6,6,6,6,6"
@@ -570,40 +594,11 @@ layer {
   }
 }
 
-# layer {
-#   name: "spatial_drop"
-#   type: "SpatialDropout"
-#   bottom: "conv4"
-#   top: "conv4"
-#   spatial_dropout_param {
-#     dropout_ratio: 0.5
-#   }
-# }
-
-layer {
-  name: "re_torso_masks"
-  type: "Resize"
-  bottom: "torso_masks"
-  bottom: "conv4"
-  top: "re_torso_masks"
-}
-
-layer {
-  name: "concat_ft_tmask"
-  type: "Concat"
-  bottom: "conv4"
-  bottom: "re_torso_masks"
-  top: "t_conv4"
-  concat_param {
-    concat_dim: 1
-  }
-}
-
 # ########### conv5
 layer {
   name: "conv5"
   type: "Convolution"
-  bottom: "t_conv4"
+  bottom: "conv4"
   top: "conv5"
   param {
     lr_mult: 1
@@ -767,7 +762,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 30
+    top_k: 100
     heat_map_a: 1
     heat_map_b: 0
   }
@@ -804,7 +799,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -827,7 +822,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -855,7 +850,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

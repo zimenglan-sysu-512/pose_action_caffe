@@ -587,9 +587,6 @@ layer {
   bottom: "torso_masks"
   bottom: "conv4"
   top: "re_torso_masks"
-  include {
-    phase: TRAIN
-  }
 }
 
 layer {

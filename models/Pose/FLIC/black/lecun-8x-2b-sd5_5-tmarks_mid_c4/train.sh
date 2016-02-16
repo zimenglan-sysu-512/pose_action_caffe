@@ -8,26 +8,26 @@ CaffeRootDir="caffe/"
 # build/tools/
 Tools="build/tools/"
 Tools=$CaffeRootDir$Tools
-# models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks_mid_c4/
+# models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/
 ProtosDir="models/Pose/"
 SubProtosDir="FLIC/black/"
-ExperName="lecun-8x-2b-sd5_5-marks/"
+ExperName="lecun-8x-2b-sd5_5-tmarks_mid_c4/"
 ExperPath=$ProtosDir$SubProtosDir$ExperName
 mkdir -p $ExperPath
-# models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks_mid_c4/solver.prototxt
+# models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/solver.prototxt
 solver_proto="solver.prototxt"
 solver_proto=$ExperPath$solver_proto
 echo $solver_proto
-# ../asserts/models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks_mid_c4/
+# ../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/
 ModelsDir="../asserts/"
 ModelsDir=$ModelsDir$ExperPath
 mkdir -p $ModelsDir
-# ../asserts/models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks_mid_c4/models/
+# ../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/models/
 model_path="models/"
 model_path=$ModelsDir$model_path
 mkdir -p $model_path
 echo $model_path
-# ../asserts/models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks_mid_c4/log/
+# ../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/log/
 log_path="log/"
 log_path=$ModelsDir$log_path
 mkdir -p $log_path

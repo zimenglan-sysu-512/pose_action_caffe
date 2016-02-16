@@ -1,9 +1,9 @@
 # Solver prototxt
-net: "models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks_mid_c4/train_val.prototxt"
+net: "models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/train_val.prototxt"
 # Snapshot
 snapshot: 1000
 # Snapshot prefix
-snapshot_prefix: "../asserts/models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks_mid_c4/models/flic"
+snapshot_prefix: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/models/flic"
 
 # # Train images num(where is 3987) = test_iter(443) * test_batch(where is 9)
 # test_iter: 443
@@ -15,7 +15,7 @@ test_interval: 1000
 test_initialization: false
 
 # 0.001 fast convergence
-base_lr: 0.0001
+base_lr: 0.001
 # Learning rate
 lr_policy: "step"
 

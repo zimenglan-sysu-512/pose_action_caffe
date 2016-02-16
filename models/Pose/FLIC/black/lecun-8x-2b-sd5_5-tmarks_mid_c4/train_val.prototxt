@@ -100,7 +100,7 @@ layer {
   bottom: "aux_info"
   top: "heat_maps"
   top: "heat_maps_masks"
-  heat_maps_from_coords_origin_param {
+    heat_maps_from_coords_origin_param {
     # 决定了heat map的pixels不为0的区域(菱形)的边长
     # radius: 10
     # radius_str: "2,2,2,6,6,4,6,6,4,6,6,6,6,6"
@@ -767,7 +767,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 100
+    top_k: 30
     heat_map_a: 1
     heat_map_b: 0
   }

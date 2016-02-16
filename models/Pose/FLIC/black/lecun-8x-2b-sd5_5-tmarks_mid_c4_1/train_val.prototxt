@@ -79,7 +79,7 @@ layer {
     top_id2: 6
     bottom_id2: 10
     # used for cancating in middle layer, so value is 1 better than 255
-    value: 1
+    value: 1  
   }
 }
 
@@ -616,7 +616,7 @@ layer {
   }
   convolution_param {
     num_output: 256
-    kernel_size: 1
+    kernel_size: 3
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -805,7 +805,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4_1/test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -828,7 +828,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4_1/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -856,7 +856,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_mid_c4_1/test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

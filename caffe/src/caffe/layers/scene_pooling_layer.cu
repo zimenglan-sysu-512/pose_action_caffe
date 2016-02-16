@@ -14,9 +14,7 @@
 using std::max;
 using std::min;
 
-
 namespace caffe {
-
 
 template <typename Dtype>
 __global__ void ROIPoolForward(const int nthreads, const Dtype* bottom_data,
@@ -28,8 +26,8 @@ __global__ void ROIPoolForward(const int nthreads, const Dtype* bottom_data,
     // (n, c, ph, pw) is an element in the pooled output
     int pw = index % pooled_width;
     int ph = (index / pooled_width) % pooled_height;
-    int c = (index / pooled_width / pooled_height) % channels;
-    int n = index / pooled_width / pooled_height / channels;
+    int c  = (index / pooled_width / pooled_height) % channels;
+    int n  = index / pooled_width / pooled_height / channels;
 
     bottom_rois += n * 5;
     int roi_batch_ind = bottom_rois[0];
@@ -81,8 +79,6 @@ __global__ void ROIPoolForward(const int nthreads, const Dtype* bottom_data,
   }
 }
 
-
-
 template <typename Dtype>
 void ScenePoolingLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) 
@@ -107,11 +103,6 @@ void ScenePoolingLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
       pooled_height_, pooled_width_, bottom_rois, top_data, argmax_data);
   CUDA_POST_KERNEL_CHECK;
 }
-
-
-
-
-
 
 template <typename Dtype>
 __global__ void ROIPoolBackward(const int nthreads, const Dtype* top_diff,
@@ -186,9 +177,6 @@ __global__ void ROIPoolBackward(const int nthreads, const Dtype* top_diff,
     bottom_diff[index] = gradient;
   }
 }
-
-
-
 
 template <typename Dtype>
 void ScenePoolingLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,

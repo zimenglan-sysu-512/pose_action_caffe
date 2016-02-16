@@ -1,0 +1,21 @@
+cp.pt.d302
+	cropped target person using predicted person bbox from person detector or ground-truth person bbox.
+		here use ground-truth person bbox
+	take cropped image patch as input
+	output corresponding torso bbox and pose estimation results (joint coordinate)
+		here predicted torso bbox is used for pose estimation.
+		please refer to "Instance-aware Semantic Segmentation via Multi-task Network Cascades" and "faster-rcnn".
+
+	the network of pose estimation task is based on the paper of lecun's "Efficient Object Localiation Using Convolutional Networks".
+
+steps:
+	1 train a network for torso prediction task, in which the network share the conv layers with the network of pose estimation task.
+	2 fix the shared conv layers and train a network for pose estimation task.
+
+to do:
+	design desired network
+	
+validation:
+	1 check the performace of torso prediction
+	2 check the predicted torso how to effect the pose estimation task
+

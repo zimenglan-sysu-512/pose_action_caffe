@@ -30,7 +30,7 @@ void ScenePoolingLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       << "pooled_w must be > 0";
   // 
   pooled_height_ = scene_pooling_param.pooled_h();
-  pooled_width_ = scene_pooling_param.pooled_w();
+  pooled_width_  = scene_pooling_param.pooled_w();
 }
 
 
@@ -39,37 +39,28 @@ template <typename Dtype>
 void ScenePoolingLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) 
 {
-  num_ = bottom[0]->num();
+  num_      = bottom[0]->num();
   channels_ = bottom[0]->channels();
-  height_ = bottom[0]->height();
-  width_ = bottom[0]->width();
+  height_   = bottom[0]->height();
+  width_    = bottom[0]->width();
   // Reshape
-  top[0]->Reshape(
-      num_, 
-      channels_, 
-      pooled_height_,
-      pooled_width_
-  );
-  max_idx_.Reshape(
-      num_, 
-      channels_, 
-      pooled_height_,
-      pooled_width_
-  );
+  top[0]->Reshape( num_, channels_, pooled_height_, pooled_width_);
+  max_idx_.Reshape(num_, channels_, pooled_height_, pooled_width_);
 
   // where [img_ind, x1, y1, x2, y2]
   const int rois_channels = 5;
   rois_blob_.Reshape(num_, rois_channels, 1, 1);
+
   int rois_offset = 0;
   for(int idx = 0; idx < num_; idx++) {
     rois_blob_.mutable_cpu_data()[rois_offset++] = Dtype(idx);
     rois_blob_.mutable_cpu_data()[rois_offset++] = Dtype(0);
     rois_blob_.mutable_cpu_data()[rois_offset++] = Dtype(0);
-    rois_blob_.mutable_cpu_data()[rois_offset++] = Dtype(width_ - 1);
+    rois_blob_.mutable_cpu_data()[rois_offset++] = Dtype(width_  - 1);
     rois_blob_.mutable_cpu_data()[rois_offset++] = Dtype(height_ - 1);
   }
   CHECK_EQ(rois_blob_.count(), rois_offset);
-  spatial_scale_ = Dtype(1);
+  spatial_scale_ = Dtype(1.);
 }
 
 
@@ -94,8 +85,8 @@ void ScenePoolingLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     int roi_batch_ind = bottom_rois[0];
     int roi_start_w = round(bottom_rois[1] * spatial_scale_);
     int roi_start_h = round(bottom_rois[2] * spatial_scale_);
-    int roi_end_w = round(bottom_rois[3] * spatial_scale_);
-    int roi_end_h = round(bottom_rois[4] * spatial_scale_);
+    int roi_end_w   = round(bottom_rois[3] * spatial_scale_);
+    int roi_end_h   = round(bottom_rois[4] * spatial_scale_);
     CHECK_GE(roi_batch_ind, 0);
     CHECK_LT(roi_batch_ind, batch_size);
 

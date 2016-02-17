@@ -1,0 +1,11 @@
+tmask_mid_c4*:
+	place the torso mask into conv4 instead of input. and then concat with conv4
+
+	so far, using ground-truth torso bbox to produce torso mask, in which the value is 1 instead of 255
+		(1 or 255: the perfomance is not good but similar)
+	but the kernel size of conv5 will effect the perfomance
+		(1: 78%, 3: 84.8% PDJ@0.1)
+
+tmask_mid_output*:
+	
+

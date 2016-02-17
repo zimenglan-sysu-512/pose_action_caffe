@@ -1,10 +1,11 @@
 Note:
 	1 hard negatives, use top k
 	2 two banks, with conv4_2
-	3 torso masks
+	3 torso masks in the place of conv4
 	4 thres: 0.273
 	5 prob_num: 11
-	6 without spatial dropout layer
+	6 more convs (conv5_2, ...)
+	7 without spatial dropout layer
 
 batch size increases, the iteration for devergence decreases, and accuracy 
 (PDJ@0.1) increases

@@ -1,4 +1,4 @@
-# Solver pt
+# solver pt
 net: "models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s4_train_val.pt"
 # Snapshot
 snapshot: 1000

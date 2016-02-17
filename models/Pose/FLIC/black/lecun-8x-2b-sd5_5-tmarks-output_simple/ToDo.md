@@ -1,16 +1,10 @@
 Note:
 	1 hard negatives, use top k
-	2 two banks, with conv4_2 and spatial dropout
-	3 torso masks
+	2 two banks, with conv4_2
+	3 torso masks as output
 	4 thres: 0.273
 	5 prob_num: 11
-
-training method like faster-rcnn, torso mask net shares conv1~conv4 with heat map net, 
-but torso mask is not for heat map net, meaning there are independent. 
-	s1: train torso mask
-	s2: train heat map
-	s3: train torso mask net with fixing conv1~conv4
-	s4: train heat  map  net with fixing conv1~conv4
+	6 without spatial dropout layer
 
 batch size increases, the iteration for devergence decreases, and accuracy 
 (PDJ@0.1) increases

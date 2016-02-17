@@ -95,7 +95,6 @@ layer {
   }
 }
 
-
 # ##############################
 # bank1
 # conv & relu & pool & resize
@@ -774,7 +773,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s2_test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -797,7 +796,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s2_poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -826,7 +825,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s2_test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

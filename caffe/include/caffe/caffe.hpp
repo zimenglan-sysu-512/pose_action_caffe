@@ -32,6 +32,7 @@
 // 
 // pose estimation
 #include "caffe/pose_estimation_layers.hpp"
+#include "caffe/disp_tool_layers.hpp"
 
 //
 // torso detection

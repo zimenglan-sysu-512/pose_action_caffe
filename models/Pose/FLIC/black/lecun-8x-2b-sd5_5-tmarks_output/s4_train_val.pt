@@ -67,23 +67,6 @@ layer {
 }
 
 layer {
-  name: "torso_masks"
-  type: "CoordsToBboxesMasks"
-  bottom: "gt_pose_coords"
-  bottom: "aux_info"
-  top: "torso_masks"
-  coord_to_bbox_masks_param {
-    # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
-    top_id: 6
-    bottom_id: 10
-    top_id2: 6
-    bottom_id2: 10
-    # used for cancating in middle layer, so value is 1 better than 255
-    value: 1
-  }
-}
-
-layer {
   name: "data_bank2"
   type: "Resize"
   bottom: "data_bank1"
@@ -112,7 +95,6 @@ layer {
   }
 }
 
-
 # ##############################
 # bank1
 # conv & relu & pool & resize
@@ -122,11 +104,11 @@ layer {
   bottom: "data_bank1"
   top: "conv1_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -170,11 +152,11 @@ layer {
   bottom: "pool1_bank1"
   top: "conv2_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -218,11 +200,11 @@ layer {
   bottom: "pool2_bank1"
   top: "conv3_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -266,11 +248,11 @@ layer {
   bottom: "pool3_bank1"
   top: "conv4_1_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -302,11 +284,11 @@ layer {
   bottom: "conv4_1_bank1"
   top: "conv4_2_bank1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -340,11 +322,11 @@ layer {
   bottom: "data_bank2"
   top: "conv1_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -388,11 +370,11 @@ layer {
   bottom: "pool1_bank2"
   top: "conv2_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -436,11 +418,11 @@ layer {
   bottom: "pool2_bank2"
   top: "conv3_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -484,11 +466,11 @@ layer {
   bottom: "pool3_bank2"
   top: "conv4_1_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -520,11 +502,11 @@ layer {
   bottom: "conv4_1_bank2"
   top: "conv4_2_bank2"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -541,7 +523,6 @@ layer {
     }
   }
 }
-
 layer {
   name: "relu4_2_bank2"
   type: "ReLU"
@@ -578,133 +559,6 @@ layer {
   top: "conv4"
   spatial_dropout_param {
     dropout_ratio: 0.5
-  }
-}
-
-
-# ##############################
-# pose -> torso mask
-# ########### t_conv5
-layer {
-  name: "t_conv5"
-  type: "Convolution"
-  bottom: "conv4"
-  top: "t_conv5"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 256
-    kernel_size: 1
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-layer {
-  name: "t_relu5"
-  type: "ReLU"
-  bottom: "t_conv5"
-  top: "t_conv5"
-}
-
-# ########### t_conv6
-layer {
-  name: "t_conv6"
-  type: "Convolution"
-  bottom: "t_conv5"
-  top: "t_conv6"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 256
-    kernel_size: 1
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-layer {
-  name: "t_relu6"
-  type: "ReLU"
-  bottom: "t_conv6"
-  top: "t_conv6"
-}
-
-# ########### t_conv7
-layer {
-  name: "t_conv7"
-  type: "Convolution"
-  bottom: "t_conv6"
-  top: "t_conv7"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 0
-  }
-  convolution_param {
-    num_output: 1
-    kernel_size: 1
-    stride: 1
-    weight_filler {
-      type: "gaussian"
-      std: 0.01
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-
-# ##############################
-# loss
-# conv & resize
-layer {
-  name: "re_torso_masks"
-  type: "Resize"
-  bottom: "torso_masks"
-  bottom: "t_conv7"
-  top: "re_torso_masks"
-  include {
-    phase: TRAIN
-  }
-}
-
-layer {
-  name: "pose_tmask_loss"
-  type: "SoftmaxWithLoss"
-  bottom: "t_conv7"
-  bottom: "re_torso_masks"
-  top: "pose_tmask_loss"
-  include {
-    phase: TRAIN
   }
 }
 
@@ -868,6 +722,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "pred_coords_from_maps"
   type: "CoordsFromHeatMaps"
@@ -883,6 +738,7 @@ layer {
     heat_map_b: 0
   }
 }
+
 layer {
   name: "pred_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -893,6 +749,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "gt_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -903,6 +760,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "visual_heat_maps2_2"
   type: "VisualizedHeatMaps2"
@@ -915,7 +773,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s4_test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -938,7 +796,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s4_poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -951,6 +809,7 @@ layer {
     is_draw_text: true
   }
 }
+
 layer {
   name: "accuracy"
   type: "PosePDJAccuracy"
@@ -966,7 +825,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s4_test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

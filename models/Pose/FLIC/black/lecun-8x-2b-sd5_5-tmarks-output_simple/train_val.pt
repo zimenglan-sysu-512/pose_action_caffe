@@ -11,7 +11,7 @@ name: "HumanPoseEstimation"
 layer {
   name: "data"
   type: "RandomImageData2"
-  top: "data"
+  top: "data_bank1"
   top: "gt_pose_coords"
   top: "aux_info"
   include {
@@ -34,17 +34,13 @@ layer {
     is_color: true
     img_ext: ".jpg"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
-    # receptive_field_size: 100
-    # visual_images_path: "m_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/visual_data/train/"
-    # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
   }
 }
 
 layer {
   name: "data"
   type: "RandomImageData2"
-  top: "data"
+  top: "data_bank1"
   top: "gt_pose_coords"
   top: "aux_info"
   include {
@@ -67,41 +63,6 @@ layer {
     is_color: true
     img_ext: ".jpg"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
-    # receptive_field_size: 100
-    # visual_images_path: "nm_256_c/"
-    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/visual_data/test/"
-    # skel_points_path: "../dataset/FLIC/labels/skel_path.txt"
-  }
-}
-
-layer {
-  name: "torso_masks"
-  type: "CoordsToBboxesMasks"
-  bottom: "gt_pose_coords"
-  bottom: "aux_info"
-  top: "torso_masks"
-  coord_to_bbox_masks_param {
-    # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
-    # top_id/bottom_id: (lsho,rhip)
-    # top_id2/bottom_id2: (rsho,lhip)
-    top_id: 6
-    bottom_id: 10
-    top_id2: 6
-    bottom_id2: 10
-    value: 255
-    # visual_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/torso_masks/"
-    # img_ext: ".jpg"
-  }
-}
-
-layer {
-  name: "concat_data"
-  type: "Concat"
-  bottom: "data"
-  bottom: "torso_masks"
-  top: "data_bank1"
-  concat_param {
-    concat_dim: 1
   }
 }
 
@@ -117,13 +78,30 @@ layer {
 }
 
 layer {
+  name: "torso_masks"
+  type: "CoordsToBboxesMasks"
+  bottom: "gt_pose_coords"
+  bottom: "aux_info"
+  top: "torso_masks"
+  coord_to_bbox_masks_param {
+    # lsho: 3, rsho: 6, lhip: 10, rhip: 11 
+    top_id: 6
+    bottom_id: 10
+    top_id2: 6
+    bottom_id2: 10
+    # used for cancating in middle layer, so value is 1 better than 255
+    value: 1
+  }
+}
+
+layer {
   name: "heat_maps_from_coords"
   type: "HeatMapsFromCoordsOrigin"
   bottom: "gt_pose_coords"
   bottom: "aux_info"
   top: "heat_maps"
   top: "heat_maps_masks"
-  heat_maps_from_coords_origin_param {
+    heat_maps_from_coords_origin_param {
     # 决定了heat map的pixels不为0的区域(菱形)的边长
     # radius: 10
     # radius_str: "2,2,2,6,6,4,6,6,4,6,6,6,6,6"
@@ -593,6 +571,16 @@ layer {
   }
 }
 
+layer {
+  name: "spatial_drop"
+  type: "SpatialDropout"
+  bottom: "conv4"
+  top: "conv4"
+  spatial_dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
 # ########### conv5
 layer {
   name: "conv5"
@@ -663,7 +651,81 @@ layer {
   top: "conv6"
 }
 
-# ########### conv7
+# ##############################
+# loss
+# conv & resize
+
+layer {
+  name: "t_conv7"
+  type: "Convolution"
+  bottom: "conv6"
+  top: "t_conv7"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 2
+    kernel_size: 1
+    stride: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "re_torso_masks"
+  type: "Resize"
+  bottom: "torso_masks"
+  bottom: "t_conv7"
+  top: "re_torso_masks"
+  include {
+    phase: TRAIN
+  }
+}
+
+# layer {
+#   name: "disp_torso_masks"
+#   type: "DispBottoms"
+#   bottom: "torso_masks"
+#   include {
+#   phase: TRAIN
+#   }
+# }
+
+# layer {
+#   name: "disp_re_torso_masks"
+#   type: "DispBottoms"
+#   bottom: "re_torso_masks"
+#   include {
+#   phase: TRAIN
+#   }
+# }
+
+layer {
+  name: "pose_tmask_loss"
+  type: "SoftmaxWithLoss"
+  bottom: "t_conv7"
+  bottom: "re_torso_masks"
+  top: "pose_tmask_loss"
+  is_disp_info: false
+  include {
+    phase: TRAIN
+  }
+}
+
+# ####################
+
 layer {
   name: "conv7"
   type: "Convolution"
@@ -692,9 +754,6 @@ layer {
   }
 }
 
-# ##############################
-# loss
-# conv & resize
 layer {
   name: "re_heat_maps"
   type: "Resize"
@@ -705,6 +764,15 @@ layer {
     phase: TRAIN
   }
 }
+
+# layer {
+#   name: "disp_re_heat_maps"
+#   type: "DispBottoms"
+#   bottom: "re_heat_maps"
+#   include {
+#   phase: TRAIN
+#   }
+# }
 
 layer {
   name: "pose_heap_map_loss"
@@ -751,6 +819,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "pred_coords_from_maps"
   type: "CoordsFromHeatMaps"
@@ -766,6 +835,7 @@ layer {
     heat_map_b: 0
   }
 }
+
 layer {
   name: "pred_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -776,6 +846,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "gt_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -786,6 +857,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "visual_heat_maps2_2"
   type: "VisualizedHeatMaps2"
@@ -798,7 +870,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks-output_simple/test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -821,7 +893,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks-output_simple/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -834,6 +906,7 @@ layer {
     is_draw_text: true
   }
 }
+
 layer {
   name: "accuracy"
   type: "PosePDJAccuracy"
@@ -849,7 +922,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-no_spatial_drop/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/lecun-8x-2b-sd5_5-tmarks-output_simple/test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

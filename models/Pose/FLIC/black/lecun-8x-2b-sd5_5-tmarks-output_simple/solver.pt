@@ -1,12 +1,13 @@
-# solver pt
-net: "models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s3_train_val.pt"
+# solver prototxt
+net: "models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-output_simple/train_val.pt"
 # Snapshot
 snapshot: 1000
 # Snapshot prefix
-snapshot_prefix: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s3_models/flic"
+snapshot_prefix: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks-output_simple/models/flic"
 
-# Train images num(where is 3987) = test_iter(443) * test_batch(where is 9)
-# Test  images num(where is 1016) = test_iter(127) * test_batch(where is 8)
+# # Train images num(where is 3987) = test_iter(443) * test_batch(where is 9)
+# test_iter: 443
+# Test images num(where is 1016) = test_iter(127) * test_batch(where is 8)
 test_iter: 127
 # Test when reaching the test_interval
 test_interval: 1000
@@ -29,7 +30,7 @@ stepsize: 80000
 # Iterations
 max_iter: 80000
 # Display
-display: 200
+display: 1
 
 # CPU or GPU
 solver_mode: GPU

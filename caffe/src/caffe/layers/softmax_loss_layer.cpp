@@ -60,6 +60,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
   int dim = prob_.count() / outer_num_;
   int count = 0;
   Dtype loss = 0;
+
   for (int i = 0; i < outer_num_; ++i) {
     for (int j = 0; j < inner_num_; j++) {
       const int label_value = static_cast<int>(label[i * inner_num_ + j]);
@@ -68,6 +69,7 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
       }
       DCHECK_GE(label_value, 0);
       DCHECK_LT(label_value, prob_.shape(softmax_axis_));
+
       loss -= log(std::max(prob_data[i * dim + label_value * inner_num_ + j],
                            Dtype(FLT_MIN)));
       ++count;
@@ -81,15 +83,22 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
   if (top.size() == 2) {
     top[1]->ShareData(prob_);
   }
+
+  LOG(INFO) << "layer name: " << this->layer_param_.name() 
+      << ", softmax loss: "   << top[0]->mutable_cpu_data()[0];
 }
 
 template <typename Dtype>
 void SoftmaxWithLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  if (propagate_down[1]) {
-    LOG(FATAL) << this->type()
-               << " Layer cannot backpropagate to label inputs.";
+  // if (propagate_down[1]) {
+  //   LOG(FATAL) << this->type()
+  //              << " Layer cannot backpropagate to label inputs.";
+  // }
+  if(propagate_down[1]) {
+    caffe_set(bottom[1]->count(), Dtype(0), bottom[1]->mutable_cpu_diff());
   }
+
   if (propagate_down[0]) {
     Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
     const Dtype* prob_data = prob_.cpu_data();

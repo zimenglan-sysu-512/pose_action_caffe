@@ -38,6 +38,35 @@ layer {
 }
 
 layer {
+  name: "data"
+  type: "RandomImageData2"
+  top: "data_bank1"
+  top: "gt_pose_coords"
+  top: "aux_info"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mirror: false
+    # opencv: B, G, R
+  }
+  random_image_data2_param {
+    source: "../dataset/FLIC/labels/crop_test_labels2.txt"
+    root_folder: "../dataset/FLIC/crop.images2/test/"
+    label_num: 28
+    batch_size: 8
+    always_max_size: true
+    is_scale_image: true
+    shuffle: false
+    max_size: 256
+    min_size: 240
+    is_color: true
+    img_ext: ".jpg"
+    parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
+  }
+}
+
+layer {
   name: "data_bank2"
   type: "Resize"
   bottom: "data_bank1"

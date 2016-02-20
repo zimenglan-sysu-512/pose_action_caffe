@@ -9,7 +9,7 @@ snapshot_prefix: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_out
 # Test  images num(where is 1016) = test_iter(127) * test_batch(where is 8)
 test_iter: 127
 # Test when reaching the test_interval
-test_interval: 20000
+test_interval: 20001
 # 
 test_initialization: false
 
@@ -27,7 +27,7 @@ weight_decay: 0.0005
 # Change learning rate
 stepsize: 12000
 # Iterations
-max_iter: 80000
+max_iter: 20000
 # Display
 display: 200
 

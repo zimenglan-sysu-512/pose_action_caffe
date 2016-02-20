@@ -9,7 +9,7 @@ name: "HumanPoseEstimation"
 # ##############################
 # data & mask & heat map
 layer {
-  name: "data"
+  name: "data_bank1"
   type: "RandomImageData2"
   top: "data_bank1"
   top: "gt_pose_coords"

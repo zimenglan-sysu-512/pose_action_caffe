@@ -809,3 +809,9 @@ layer {
     }
   }
 }
+
+layer {
+  name: "silence_rpn_cls_score"
+  type: "Silence"
+  bottom: "conv7"
+}

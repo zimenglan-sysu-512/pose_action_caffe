@@ -5,6 +5,7 @@
 #include "caffe/layer.hpp"
 #include "caffe/layer_factory.hpp"
 #include "caffe/util/math_functions.hpp"
+#include "caffe/global_variables.hpp"
 #include "caffe/vision_layers.hpp"
 
 namespace caffe {
@@ -85,7 +86,9 @@ void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
   }
 
   LOG(INFO) << "layer name: " << this->layer_param_.name() 
-      << ", softmax loss: "   << top[0]->mutable_cpu_data()[0];
+            << " iter: " << GlobalVars::caffe_iter() 
+            << " learn_lr: " << GlobalVars::learn_lr()
+            << ", softmax loss: "   << top[0]->mutable_cpu_data()[0];
 }
 
 template <typename Dtype>

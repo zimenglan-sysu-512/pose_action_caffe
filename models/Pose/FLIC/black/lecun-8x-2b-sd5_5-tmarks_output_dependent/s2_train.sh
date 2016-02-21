@@ -64,8 +64,8 @@ echo
 
 # run & log command
 if [ ! -n "$1" ] ;then
-	$caffe_bin train --solver=$solver_joint_proto --weights=$resume_model_file 2>&1 | tee -a $log_filename
+	$caffe_bin train --solver=$solver_proto --weights=$resume_model_file 2>&1 | tee -a $log_filename
 else
-	$caffe_bin train --solver=$solver_joint_proto --snapshot=$resume_model_file 2>&1 | tee -a $log_filename
+	$caffe_bin train --solver=$solver_proto --snapshot=$resume_model_file 2>&1 | tee -a $log_filename
 fi
 echo "Done!"

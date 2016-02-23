@@ -529,7 +529,7 @@ int _pose_estimate() {
       const int bchidx = ids[j].bchidx;
       const int imgidx = ids[j].imgidx;
       const int objidx = ids[j].objidx;
-      const BBox& bbox = tp_infos[imgidx].bboxes[objidx];
+      BBox& bbox = tp_infos[imgidx].bboxes[objidx];
 
       cv::Point p1(bbox.p_x1, bbox.p_y1);   // person bbox
       cv::Point p2(bbox.p_x2, bbox.p_y2);

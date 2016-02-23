@@ -387,7 +387,7 @@ int _pose_estimate() {
         }
         
         { /// in general, we set ratio to be 0.
-          int tw = bboxes[j].t_x2 - bboxes[j].t_x1 + 1;
+          int tw          = bboxes[j].t_x2 - bboxes[j].t_x1 + 1;
           bboxes[j].t_x1 += int(tw * _ratio);
           // bboxes[j].t_x2 -= int(tw * _ratio);
         }
@@ -531,12 +531,18 @@ int _pose_estimate() {
       const int objidx = ids[j].objidx;
       const BBox& bbox = tp_infos[imgidx].bboxes[objidx];
 
-      cv::Point p1(bbox.t_x1, bbox.t_y1);
-      cv::Point p2(bbox.t_x2, bbox.t_y2);
-      cv::rectangle(ims_vec[bchidx], p1, p2, cv::Scalar(36, 213, 115), 2);
-      cv::Point p3(bbox.p_x1, bbox.p_y1);
-      cv::Point p4(bbox.p_x2, bbox.p_y2);
-      cv::rectangle(ims_vec[bchidx], p3, p4, cv::Scalar(145, 33, 216), 2);
+      cv::Point p1(bbox.p_x1, bbox.p_y1);   // person bbox
+      cv::Point p2(bbox.p_x2, bbox.p_y2);
+      cv::rectangle(ims_vec[bchidx], p1, p2, cv::Scalar(145, 33, 216), 2);
+
+      { /// in general, we set ratio to be 0.
+        int tw     = bbox.t_x2 - bbox.t_x1 + 1;
+        bbox.t_x1 -= int(tw * _ratio);
+        // bbox.t_x2 += int(tw * _ratio);
+      }
+      cv::Point p3(bbox.t_x1, bbox.t_y1);   // torso bbox
+      cv::Point p4(bbox.t_x2, bbox.t_y2);
+      cv::rectangle(ims_vec[bchidx], p3, p4, cv::Scalar(36, 213, 115), 2);
       
       for(int c = 0; c < channels; c += 2) {  // one person and corresponding torso
         int x = int(coord[o + c + 0]);

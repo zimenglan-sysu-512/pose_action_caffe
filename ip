@@ -1,0 +1,45 @@
+ddk: ddk 172.18.180.86
+	ssh ddk@172.18.180.86
+
+shenji: d302 172.18.181.229
+	ssh d302@172.18.181.229
+
+d302: d302 172.18.183.41
+	ssh d302@172.18.183.41
+		using with lingbo
+
+liangdp: liangdp 172.18.181.186
+	ssh liangdp@172.18.181.186
+
+lauware: lauware 172.18
+
+xieyuan
+	black@172.18.183.61
+	ssh black@172.18.183.61
+
+git
+	git clone --recursive -b ddk ddk@172.18.180.86:/home/ddk/git-server/pose-caffe.git
+
+
+scp:
+	scp person.torso.dataset.ldp.tar.gz ddk@172.18.180.86:/home/ddk/dongdk/dataset/
+	scp person.torso.dataset.ldp.tar.gz ddk@172.18.180.86:/home/ddk/dongdk/dataset/
+
+d302: (d302)
+	d302@172.18.183.41:/home/d302/dongdk/
+	ssh d302@172.18.183.41
+	scp * d302@172.18.183.41:/home/d302/dongdk/
+  scp * d302@172.18.183.41:/home/d302/dongdk/dataset/FLIC/
+  
+  scp labels.tar.gz d302@172.18.183.41:/home/d302/dongdk/dataset/Kinect2/
+
+  scp d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks/models/* . 
+
+  scp d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-pmask/models/* . 
+  scp -r d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-pmask/log . 
+  scp -r d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-pmask/test_acc . 
+
+
+
+	scp -r d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/log .
+	scp -r d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/models .

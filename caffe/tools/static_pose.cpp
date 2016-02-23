@@ -495,7 +495,7 @@ int _pose_estimate() {
       float *torso_info = torso_info_blob->mutable_cpu_data();
       caffe::caffe_set(torso_info_blob->count(), zero, torso_info);
       // don't use `whole` mode -> maybe error
-      // see src/caffe/layers/coords_to)bboxes_masks_layer.cpp for more details
+      // see src/caffe/layers/coords_to_bboxes_masks_layer.cpp for more details
       for(int j = 0; j < n_batch_size; j++) {
         const int imgidx = ids[j].imgidx;
         const int objidx = ids[j].objidx;

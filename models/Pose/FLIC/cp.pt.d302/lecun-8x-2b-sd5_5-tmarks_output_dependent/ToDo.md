@@ -1,10 +1,11 @@
 Note:
 	1 hard negatives, use top k
 	2 two banks, with conv4_2 and spatial dropout
-	3 torso masks predicted (2 categories -> bg v.s. torso, using softmax loss)
+	3 predicted torso masks (2 categories -> bg v.s. torso, using softmax loss)
 	4 thres: 0.273
 	5 prob_num: 11
-	6 predicted torso masks with bg are concated with conv4 for pose net (channels: 512 + 2)
+	6 use argmax layer to produce final torso mask (1 channel)
+	7 final torso mask is concated with conv4 for pose net (channels: 512 + 1)
 
 training method like faster-rcnn, torso mask net shares conv1~conv4 with heat map net, 
 but torso mask is used for heat map net, meaning there are dependent. 

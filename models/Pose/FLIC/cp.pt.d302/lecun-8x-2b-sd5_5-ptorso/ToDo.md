@@ -1,9 +1,10 @@
 Note:
 	1 hard negatives, use top k
 	2 two banks, with conv4_2
-	3 predicted torso bbox
+	3 predicted torso bbox using full connection layers (regression)
 	4 thres: 0.273
 	5 prob_num: 11
+	6 predicted torso bbox will be used for creating torso masks and then concated with conv4 for pose net
 
 batch size increases, the iteration for devergence decreases, and accuracy 
 (PDJ@0.1) increases

@@ -685,12 +685,12 @@ layer {
   }
 }
 
-# ########### conv5
+# ########### conv5_1
 layer {
-  name: "conv5"
+  name: "conv5_1"
   type: "Convolution"
   bottom: "concat_ft_tmask"
-  top: "conv5"
+  top: "conv5_1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -715,17 +715,88 @@ layer {
 }
 
 layer {
-  name: "relu5"
+  name: "relu5_1"
   type: "ReLU"
-  bottom: "conv5"
-  top: "conv5"
+  bottom: "conv5_1"
+  top: "conv5_1"
+}
+
+# ########### conv5_2
+layer {
+  name: "conv5_2"
+  type: "Convolution"
+  bottom: "conv5_1"
+  top: "conv5_2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu5_2"
+  type: "ReLU"
+  bottom: "conv5_2"
+  top: "conv5_2"
+}
+
+# ########### conv5_3
+layer {
+  name: "conv5_3"
+  type: "Convolution"
+  bottom: "conv5_2"
+  top: "conv5_3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu5_3"
+  type: "ReLU"
+  bottom: "conv5_3"
+  top: "conv5_3"
 }
 
 # ########### conv6
 layer {
   name: "conv6"
   type: "Convolution"
-  bottom: "conv5"
+  bottom: "conv5_3"
   top: "conv6"
   param {
     lr_mult: 1

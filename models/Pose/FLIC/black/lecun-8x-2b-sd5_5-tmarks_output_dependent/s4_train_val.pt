@@ -684,12 +684,12 @@ layer {
   }
 }
 
-# ########### conv5
+# ########### conv5_1
 layer {
-  name: "conv5"
+  name: "conv5_1"
   type: "Convolution"
   bottom: "concat_ft_tmask"
-  top: "conv5"
+  top: "conv5_1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -714,17 +714,88 @@ layer {
 }
 
 layer {
-  name: "relu5"
+  name: "relu5_1"
   type: "ReLU"
-  bottom: "conv5"
-  top: "conv5"
+  bottom: "conv5_1"
+  top: "conv5_1"
+}
+
+# ########### conv5_2
+layer {
+  name: "conv5_2"
+  type: "Convolution"
+  bottom: "conv5_1"
+  top: "conv5_2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 1
+    kernel_size: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu5_2"
+  type: "ReLU"
+  bottom: "conv5_2"
+  top: "conv5_2"
+}
+
+# ########### conv5_3
+layer {
+  name: "conv5_3"
+  type: "Convolution"
+  bottom: "conv5_2"
+  top: "conv5_3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu5_3"
+  type: "ReLU"
+  bottom: "conv5_3"
+  top: "conv5_3"
 }
 
 # ########### conv6
 layer {
   name: "conv6"
   type: "Convolution"
-  bottom: "conv5"
+  bottom: "conv5_3"
   top: "conv6"
   param {
     lr_mult: 1
@@ -894,7 +965,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s4_test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output_dependent/s4_test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -917,7 +988,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s4_poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output_dependent/s4_poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -946,7 +1017,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output/s4_test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/black/lecun-8x-2b-sd5_5-tmarks_output_dependent/s4_test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

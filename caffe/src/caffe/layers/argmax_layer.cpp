@@ -57,6 +57,21 @@ void ArgMaxLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
   }
 }
 
+template <typename Dtype>
+void ArgMaxLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) 
+{
+  const Dtype Zero = Dtype(0);
+  CHECK_EQ(propagate_down.size(), bottom.size());
+
+  for (int i = 0; i < propagate_down.size(); ++i) {
+    if (propagate_down[i]) { 
+      // NOT_IMPLEMENTED; 
+      caffe_set(bottom[i]->count(), Zero, bottom[i]->mutable_cpu_diff());
+    }
+  }
+}
+
 INSTANTIATE_CLASS(ArgMaxLayer);
 REGISTER_LAYER_CLASS(ArgMax);
 

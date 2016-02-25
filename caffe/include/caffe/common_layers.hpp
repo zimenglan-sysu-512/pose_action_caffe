@@ -63,9 +63,7 @@ class ArgMaxLayer : public Layer<Dtype> {
       const vector<Blob<Dtype>*>& top);
   /// @brief Not implemented (non-differentiable function)
   virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
-      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-    NOT_IMPLEMENTED;
-  }
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
   bool out_max_val_;
   size_t top_k_;
 };

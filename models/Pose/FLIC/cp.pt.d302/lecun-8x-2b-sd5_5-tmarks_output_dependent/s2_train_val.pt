@@ -667,8 +667,8 @@ layer {
 # ##############################
 # pose -> heat map
 layer {
-  name: "arg_max"
-  type: "ArgMax"
+  name: "arg_max_c"
+  type: "ArgMaxC"
   bottom: "t_conv7"
   top: "t_conv8"
 }

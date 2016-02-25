@@ -388,6 +388,7 @@ message LayerParameter {
   optional LoadDataImageParameter load_data_image_param = 406;
   
   optional LoadBboxFromFileParameter load_bbox_from_file_param = 408;
+  optional ArgMaxCParameter arg_max_c_param = 410;
 }
 
 // #################################################################################
@@ -832,6 +833,12 @@ message CharAccuracyParameter {
   // Record the number of test images dataset
   optional int32 test_images_num = 4;
 }
+
+//
+message ArgMaxCParameter {
+  optional bool out_max_val = 1 [default = false];
+}
+
 
 // ###########################################################
 // Zhu.Face.Refine.Model

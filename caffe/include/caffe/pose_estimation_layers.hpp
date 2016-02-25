@@ -25,6 +25,30 @@ using std::string;
 
 namespace caffe {
 
+// along channle do max-pooling op
+template <typename Dtype>
+class ArgMaxCLayer : public Layer<Dtype> {
+ public:
+  explicit ArgMaxCLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const { return "ArgMaxC"; }
+  virtual inline int ExactNumBottomBlobs() const { return 1; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  /// @brief Not implemented
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
+  bool out_max_val_;
+};
+
 /**
  * @brief Computes the accuracy for human pose/joint estimation
  * Using Percentage of Detected Joints (PDJ)

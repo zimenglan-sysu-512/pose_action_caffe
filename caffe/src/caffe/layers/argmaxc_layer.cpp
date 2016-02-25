@@ -46,7 +46,7 @@ void ArgMaxCLayer<Dtype>::Forward_cpu(
 
   for (int n = 0; n < num; ++n) {
     for(int h = 0; h < height; ++h) {
-      for(int w = 0; w < width; ++h) {
+      for(int w = 0; w < width; ++w) {
         ind = 0;
         v1  = bottom_data[bottom[0]->offset(n, 0, h, w)];
         for(int c = 1; c < channels; ++c){

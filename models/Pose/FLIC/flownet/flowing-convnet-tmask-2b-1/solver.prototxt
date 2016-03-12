@@ -1,9 +1,9 @@
 # Solver prototxt
-net: "models/Pose/FLIC/flownet/flowing-convnet-tmask-1/train_val.prototxt"
+net: "models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1/train_val.prototxt"
 # Snapshot
 snapshot: 1000
 # Snapshot prefix
-snapshot_prefix: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-1/models/FLIC"
+snapshot_prefix: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1/models/FLIC"
 
 # # Train images num(where is 3987) = test_iter(443) * test_batch(where is 9)
 # test_iter: 443
@@ -15,7 +15,7 @@ test_interval: 1000
 test_initialization: false
 
 # 0.00001 fast convergence
-base_lr: 0.000001 # 0.00000001
+base_lr: 0.00001 # 0.00000001
 # Learning rate
 lr_policy: "step"
 

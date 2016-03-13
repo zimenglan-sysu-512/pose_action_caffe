@@ -1,13 +1,12 @@
-# ##############################
+# ###########
 # @proto: train_val.prototxt
 # @author: ddk
 # @method: heat map
 # @time: 16.03.10
-# ##############################
+# ###########
 name: "HumanPoseEstimation"
 
-# ##############################
-# data & mask & heat map
+# ########### data && mask && heat map
 layer {
   name: "data"
   type: "RandomImageData2"
@@ -80,13 +79,24 @@ layer {
 }
 
 layer {
-  name: "concat_data"
+  name: "data_b1"
   type: "Concat"
   bottom: "data"
   bottom: "tmasks"
-  top: "fusion_data"
+  top: "data_b1"
   concat_param {
     concat_dim: 1
+  }
+}
+
+layer {
+  name: "data_b2"
+  type: "Resize"
+  bottom: "data_b1"
+  top: "data_b2"
+  resize_param {
+    height_fac: 0.707
+    width_fac: 0.707
   }
 }
 
@@ -105,12 +115,12 @@ layer {
   }
 }
 
-# ########### conv1
+# ########### conv1_b1
 layer {
-  name: "conv1"
+  name: "conv1_b1"
   type: "Convolution"
-  bottom: "fusion_data"
-  top: "conv1"
+  bottom: "data_b1"
+  top: "conv1_b1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -135,17 +145,17 @@ layer {
 }
 
 layer {
-  name: "relu1"
+  name: "relu1_b1"
   type: "ReLU"
-  bottom: "conv1"
-  top: "conv1"
+  bottom: "conv1_b1"
+  top: "conv1_b1"
 }
 
 layer {
-  name: "pool1"
+  name: "pool1_b1"
   type: "Pooling"
-  bottom: "conv1"
-  top: "pool1"
+  bottom: "conv1_b1"
+  top: "pool1_b1"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -153,12 +163,12 @@ layer {
   }
 }
 
-# ########### conv2
+# ########### conv2_b1
 layer {
-  name: "conv2"
+  name: "conv2_b1"
   type: "Convolution"
-  bottom: "pool1"
-  top: "conv2"
+  bottom: "pool1_b1"
+  top: "conv2_b1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -183,17 +193,17 @@ layer {
 }
 
 layer {
-  name: "relu2"
+  name: "relu2_b1"
   type: "ReLU"
-  bottom: "conv2"
-  top: "conv2"
+  bottom: "conv2_b1"
+  top: "conv2_b1"
 }
 
 layer {
-  name: "pool2"
+  name: "pool2_b1"
   type: "Pooling"
-  bottom: "conv2"
-  top: "pool2"
+  bottom: "conv2_b1"
+  top: "pool2_b1"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -201,12 +211,12 @@ layer {
   }
 }
 
-# ########### conv3
+# ########### conv3_b1
 layer {
-  name: "conv3"
+  name: "conv3_b1"
   type: "Convolution"
-  bottom: "pool2"
-  top: "conv3"
+  bottom: "pool2_b1"
+  top: "conv3_b1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -231,18 +241,18 @@ layer {
 }
 
 layer {
-  name: "relu3"
+  name: "relu3_b1"
   type: "ReLU"
-  bottom: "conv3"
-  top: "conv3"
+  bottom: "conv3_b1"
+  top: "conv3_b1"
 }
 
-# ########### conv4
+# ########### conv4_b1
 layer {
-  name: "conv4"
+  name: "conv4_b1"
   type: "Convolution"
-  bottom: "conv3"
-  top: "conv4"
+  bottom: "conv3_b1"
+  top: "conv4_b1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -267,10 +277,208 @@ layer {
 }
 
 layer {
-  name: "relu4"
+  name: "relu4_b1"
   type: "ReLU"
+  bottom: "conv4_b1"
+  top: "conv4_b1"
+}
+
+# ########### conv1_b2
+layer {
+  name: "conv1_b2"
+  type: "Convolution"
+  bottom: "data_b2"
+  top: "conv1_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu1_b2"
+  type: "ReLU"
+  bottom: "conv1_b2"
+  top: "conv1_b2"
+}
+
+layer {
+  name: "pool1_b2"
+  type: "Pooling"
+  bottom: "conv1_b2"
+  top: "pool1_b2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv2_b2
+layer {
+  name: "conv2_b2"
+  type: "Convolution"
+  bottom: "pool1_b2"
+  top: "conv2_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu2_b2"
+  type: "ReLU"
+  bottom: "conv2_b2"
+  top: "conv2_b2"
+}
+
+layer {
+  name: "pool2_b2"
+  type: "Pooling"
+  bottom: "conv2_b2"
+  top: "pool2_b2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv3_b2
+layer {
+  name: "conv3_b2"
+  type: "Convolution"
+  bottom: "pool2_b2"
+  top: "conv3_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu3_b2"
+  type: "ReLU"
+  bottom: "conv3_b2"
+  top: "conv3_b2"
+}
+
+# ########### conv4_b2
+layer {
+  name: "conv4_b2"
+  type: "Convolution"
+  bottom: "conv3_b2"
+  top: "conv4_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu4_b2"
+  type: "ReLU"
+  bottom: "conv4_b2"
+  top: "conv4_b2"
+}
+
+# ########### resize && merge && spatial-dropout
+layer {
+  name: "conv4_b2r"
+  type: "Resize"
+  bottom: "conv4_b2"
+  bottom: "conv4_b1"
+  top: "conv4_b2r"
+}
+
+layer {
+  name: "merge_banks"
+  type: "Eltwise"
+  bottom: "conv4_b1"
+  bottom: "conv4_b2r"
+  top: "conv4"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  name: "spatial_drop"
+  type: "SpatialDropout"
   bottom: "conv4"
   top: "conv4"
+  spatial_dropout_param {
+    dropout_ratio: 0.5
+  }
 }
 
 # ########### conv5
@@ -408,7 +616,7 @@ layer {
   }
 }
 
-# ############################## loss
+# ########### loss 1
 layer {
   name: "gt_conv8"
   type: "Resize"
@@ -443,12 +651,20 @@ layer {
   }
 }
 
-# ############################## concat_fusion
-# fusion
+# ########### concat_fusion
+layer {
+  name: "conv3_b2r"
+  type: "Resize"
+  bottom: "conv3_b2"
+  bottom: "conv3_b1"
+  top: "conv3_b2r"
+}
+
 layer {
   name: "concat_fusion"
   type: "Concat"
-  bottom: "conv3"
+  bottom: "conv3_b1"
+  bottom: "conv3_b2r"
   bottom: "conv7"
   top: "concat_fusion"
   concat_param {
@@ -456,7 +672,7 @@ layer {
   }
 }
 
-# ############################## conv1_fusion
+# ########### conv1_fusion
 layer {
   name: "conv1_fusion"
   type: "Convolution"
@@ -491,7 +707,7 @@ layer {
   top: "conv1_fusion"
 }
 
-# ############################## conv2_fusion
+# ########### conv2_fusion
 layer {
   name: "conv2_fusion"
   type: "Convolution"
@@ -526,7 +742,7 @@ layer {
   top: "conv2_fusion"
 }
 
-# ############################## conv3_fusion
+# ########### conv3_fusion
 layer {
   name: "conv3_fusion"
   type: "Convolution"
@@ -561,7 +777,7 @@ layer {
   top: "conv3_fusion"
 }
 
-# ############################## conv4_fusion
+# ########### conv4_fusion
 layer {
   name: "conv4_fusion"
   type: "Convolution"
@@ -596,7 +812,7 @@ layer {
   top: "conv4_fusion"
 }
 
-# ############################## conv5_fusion
+# ########### conv5_fusion
 layer {
   name: "conv5_fusion"
   type: "Convolution"
@@ -625,7 +841,7 @@ layer {
   }
 }
 
-# ############################## loss
+# ########### loss 2
 layer {
   name: "gt_conv5_fusion"
   type: "Resize"
@@ -660,8 +876,7 @@ layer {
   }
 }
 
-# ############################## merge
-# merge
+# ########### merge
 layer {
   name: "merge_banks"
   type: "Eltwise"
@@ -686,6 +901,8 @@ layer {
     phase: TEST
   }
 }
+
+# ########### predict coordinates
 layer {
   name: "pred_coords_from_maps"
   type: "CoordsFromHeatMaps"
@@ -701,6 +918,7 @@ layer {
     heat_map_b: 0
   }
 }
+
 layer {
   name: "pred_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -711,6 +929,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "gt_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -721,6 +940,8 @@ layer {
     phase: TEST
   }
 }
+
+# ########### visulization && accuracy
 layer {
   name: "visual_heat_maps2_2"
   type: "VisualizedHeatMaps2"
@@ -769,6 +990,7 @@ layer {
     is_draw_text: true
   }
 }
+
 layer {
   name: "accuracy"
   type: "PosePDJAccuracy"

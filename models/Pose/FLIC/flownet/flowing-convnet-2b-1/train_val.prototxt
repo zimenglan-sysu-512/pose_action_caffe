@@ -1,13 +1,12 @@
-# ##############################
+# ###########
 # @proto: train_val.prototxt
 # @author: ddk
 # @method: heat map
 # @time: 16.03.10
-# ##############################
+# ###########
 name: "HumanPoseEstimation"
 
-# ##############################
-# data & mask & heat map
+# ########### data && mask && heat map
 layer {
   name: "data"
   type: "RandomImageData2"
@@ -426,21 +425,20 @@ layer {
   top: "conv4_b2"
 }
 
-# ##############################
-# resize & merge & spatial-dro
+# ########### resize && merge && spatial-dropout
 layer {
-  name: "re_conv4_b2"
+  name: "conv4_b2r"
   type: "Resize"
   bottom: "conv4_b2"
   bottom: "conv4_b1"
-  top: "re_conv4_b2"
+  top: "conv4_b2r"
 }
 
 layer {
   name: "merge_banks"
   type: "Eltwise"
   bottom: "conv4_b1"
-  bottom: "re_conv4_b2"
+  bottom: "conv4_b2r"
   top: "conv4"
   eltwise_param {
     operation: SUM
@@ -592,7 +590,7 @@ layer {
   }
 }
 
-# ############################## loss
+# ########### loss 1
 layer {
   name: "gt_conv8"
   type: "Resize"
@@ -627,12 +625,20 @@ layer {
   }
 }
 
-# ############################## concat_fusion
-# fusion
+# ########### concat_fusion
+layer {
+  name: "conv3_b2r"
+  type: "Resize"
+  bottom: "conv3_b2"
+  bottom: "conv3_b1"
+  top: "conv3_b2r"
+}
+
 layer {
   name: "concat_fusion"
   type: "Concat"
-  bottom: "conv3"
+  bottom: "conv3_b1"
+  bottom: "conv3_b2r"
   bottom: "conv7"
   top: "concat_fusion"
   concat_param {
@@ -640,7 +646,7 @@ layer {
   }
 }
 
-# ############################## conv1_fusion
+# ########### conv1_fusion
 layer {
   name: "conv1_fusion"
   type: "Convolution"
@@ -675,7 +681,7 @@ layer {
   top: "conv1_fusion"
 }
 
-# ############################## conv2_fusion
+# ########### conv2_fusion
 layer {
   name: "conv2_fusion"
   type: "Convolution"
@@ -710,7 +716,7 @@ layer {
   top: "conv2_fusion"
 }
 
-# ############################## conv3_fusion
+# ########### conv3_fusion
 layer {
   name: "conv3_fusion"
   type: "Convolution"
@@ -745,7 +751,7 @@ layer {
   top: "conv3_fusion"
 }
 
-# ############################## conv4_fusion
+# ########### conv4_fusion
 layer {
   name: "conv4_fusion"
   type: "Convolution"
@@ -780,7 +786,7 @@ layer {
   top: "conv4_fusion"
 }
 
-# ############################## conv5_fusion
+# ########### conv5_fusion
 layer {
   name: "conv5_fusion"
   type: "Convolution"
@@ -809,7 +815,7 @@ layer {
   }
 }
 
-# ############################## loss
+# ########### loss 2
 layer {
   name: "gt_conv5_fusion"
   type: "Resize"
@@ -844,8 +850,7 @@ layer {
   }
 }
 
-# ############################## merge
-# merge
+# ########### merge
 layer {
   name: "merge_banks"
   type: "Eltwise"
@@ -870,6 +875,8 @@ layer {
     phase: TEST
   }
 }
+
+# ########### predict coordinates
 layer {
   name: "pred_coords_from_maps"
   type: "CoordsFromHeatMaps"
@@ -885,6 +892,7 @@ layer {
     heat_map_b: 0
   }
 }
+
 layer {
   name: "pred_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -895,6 +903,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "gt_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -905,6 +914,8 @@ layer {
     phase: TEST
   }
 }
+
+# ########### visulization && accuracy
 layer {
   name: "visual_heat_maps2_2"
   type: "VisualizedHeatMaps2"
@@ -953,6 +964,7 @@ layer {
     is_draw_text: true
   }
 }
+
 layer {
   name: "accuracy"
   type: "PosePDJAccuracy"

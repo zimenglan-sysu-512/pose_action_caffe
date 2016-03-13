@@ -1,13 +1,12 @@
-# ##############################
+# ###########
 # @proto: train_val.prototxt
 # @author: ddk
 # @method: heat map
 # @time: 16.03.10
-# ##############################
+# ###########
 name: "HumanPoseEstimation"
 
-# ##############################
-# data & mask & heat map
+# ########### data && mask && heat map
 layer {
   name: "data"
   type: "RandomImageData2"
@@ -408,7 +407,7 @@ layer {
   }
 }
 
-# ############################## loss
+# ########### loss
 layer {
   name: "gt_conv8"
   type: "Resize"
@@ -443,7 +442,7 @@ layer {
   }
 }
 
-# ############################## concat_fusion
+# ########### concat_fusion
 # fusion
 layer {
   name: "concat_fusion"
@@ -456,7 +455,7 @@ layer {
   }
 }
 
-# ############################## conv1_fusion
+# ########### conv1_fusion
 layer {
   name: "conv1_fusion"
   type: "Convolution"
@@ -491,7 +490,7 @@ layer {
   top: "conv1_fusion"
 }
 
-# ############################## conv2_fusion
+# ########### conv2_fusion
 layer {
   name: "conv2_fusion"
   type: "Convolution"
@@ -526,7 +525,7 @@ layer {
   top: "conv2_fusion"
 }
 
-# ############################## conv3_fusion
+# ########### conv3_fusion
 layer {
   name: "conv3_fusion"
   type: "Convolution"
@@ -561,7 +560,7 @@ layer {
   top: "conv3_fusion"
 }
 
-# ############################## conv4_fusion
+# ########### conv4_fusion
 layer {
   name: "conv4_fusion"
   type: "Convolution"
@@ -596,7 +595,7 @@ layer {
   top: "conv4_fusion"
 }
 
-# ############################## conv5_fusion
+# ########### conv5_fusion
 layer {
   name: "conv5_fusion"
   type: "Convolution"
@@ -625,7 +624,7 @@ layer {
   }
 }
 
-# ############################## loss
+# ########### loss
 layer {
   name: "gt_conv5_fusion"
   type: "Resize"
@@ -660,8 +659,7 @@ layer {
   }
 }
 
-# ############################## merge
-# merge
+# ########### merge
 layer {
   name: "merge_banks"
   type: "Eltwise"
@@ -686,6 +684,8 @@ layer {
     phase: TEST
   }
 }
+
+# ########### predict coordinates
 layer {
   name: "pred_coords_from_maps"
   type: "CoordsFromHeatMaps"
@@ -701,6 +701,7 @@ layer {
     heat_map_b: 0
   }
 }
+
 layer {
   name: "pred_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -711,6 +712,7 @@ layer {
     phase: TEST
   }
 }
+
 layer {
   name: "gt_rescale_pose_coords"
   type: "RescaledPoseCoords"
@@ -721,6 +723,8 @@ layer {
     phase: TEST
   }
 }
+
+# ########### visulization && accuracy
 layer {
   name: "visual_heat_maps2_2"
   type: "VisualizedHeatMaps2"
@@ -769,6 +773,7 @@ layer {
     is_draw_text: true
   }
 }
+
 layer {
   name: "accuracy"
   type: "PosePDJAccuracy"

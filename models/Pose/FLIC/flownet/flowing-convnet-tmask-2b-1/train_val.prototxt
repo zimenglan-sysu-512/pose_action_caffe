@@ -878,7 +878,7 @@ layer {
 
 # ########### merge
 layer {
-  name: "merge_banks"
+  name: "merge_conv9"
   type: "Eltwise"
   bottom: "conv8"
   bottom: "conv5_fusion"

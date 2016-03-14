@@ -913,7 +913,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 100
+    top_k: 40
     heat_map_a: 1
     heat_map_b: 0
   }

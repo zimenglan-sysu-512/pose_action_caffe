@@ -871,18 +871,18 @@ layer {
 
 # ########### refined model -> crop data
 layer {
-  name: "conv2_b2r"
+  name: "conv1_b2r"
   type: "Resize"
-  bottom: "conv2_b2"
-  bottom: "conv2_b1"
-  top: "conv2_b2r"
+  bottom: "conv1_b2"
+  bottom: "conv1_b1"
+  top: "conv1_b2r"
 }
 
 layer {
   name: "concat_fusionr"
   type: "Resize"
   bottom: "concat_fusion"
-  bottom: "conv2_b1"
+  bottom: "conv1_b1"
   top: "concat_fusionr"
 }
 
@@ -890,15 +890,15 @@ layer {
   name: "heat_mapsr"
   type: "Resize"
   bottom: "heat_maps"
-  bottom: "conv2_b1"
+  bottom: "conv1_b1"
   top: "heat_mapsr"
 }
 
 layer {
   name: "concat_refine"
   type: "Concat"
-  bottom: "conv2_b1"
-  bottom: "conv2_b2r"
+  bottom: "conv1_b1"
+  bottom: "conv1_b2r"
   bottom: "concat_fusionr"
   top: "concat_refine"
   concat_param {
@@ -1128,7 +1128,7 @@ layer {
   name: "crop_conv5r"
   type: "ResizeWithMap"
   bottom: "crop_conv5"
-  bottom: "concat_refine"
+  bottom: "conv1_b1"
 
   bottom: "crop_conv5"
   top: "crop_conv5r"
@@ -1143,7 +1143,6 @@ layer {
   type: "Eltwise"
   bottom: "conv8"
   bottom: "conv5_fusion"
-  bottom: "crop_conv5r"
   top: "conv9"
   eltwise_param {
     operation: SUM
@@ -1161,7 +1160,24 @@ layer {
   type: "Resize"
   bottom: "conv9"
   bottom: "heat_maps"
+  top: "conv9r"
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "pred_heat_maps"
+  type: "Eltwise"
+  bottom: "conv9r"
+  bottom: "crop_conv5r"
   top: "pred_heat_maps"
+  eltwise_param {
+    operation: SUM
+    coeff: 1
+    coeff: 1
+    coeff: 1
+  }
   include {
     phase: TEST
   }

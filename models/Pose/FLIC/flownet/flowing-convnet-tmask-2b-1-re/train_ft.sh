@@ -8,26 +8,26 @@ CaffeRootDir="caffe/"
 # build/tools/
 Tools="build/tools/"
 Tools=$CaffeRootDir$Tools
-# models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/
-ProtosDir="models/Pose/"
+# models_ft/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/
+ProtosDir="models_ft/Pose/"
 SubProtosDir="FLIC/flownet/"
 ExperName="flowing-convnet-tmask-2b-1-re/"
 ExperPath=$ProtosDir$SubProtosDir$ExperName
 mkdir -p $ExperPath
-# models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/solver.prototxt
-solver_proto="solver.prototxt"
+# models_ft/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/solver.prototxt
+solver_proto="solver_ft.prototxt"
 solver_proto=$ExperPath$solver_proto
 echo $solver_proto
-# ../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/
+# ../asserts/models_ft/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/
 ModelsDir="../asserts/"
 ModelsDir=$ModelsDir$ExperPath
 mkdir -p $ModelsDir
-# ../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/models/
-model_path="models/"
+# ../asserts/models_ft/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/models_ft/
+model_path="models_ft/"
 model_path=$ModelsDir$model_path
 mkdir -p $model_path
 echo $model_path
-# ../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/log/
+# ../asserts/models_ft/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/log/
 log_path="log/"
 log_path=$ModelsDir$log_path
 mkdir -p $log_path

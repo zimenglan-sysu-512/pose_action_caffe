@@ -23,7 +23,7 @@ layer {
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     label_num: 28
-    batch_size: 4
+    batch_size: 2
     always_max_size: true
     is_scale_image: true
     shuffle: true
@@ -123,11 +123,11 @@ layer {
   bottom: "data_b1"
   top: "conv1_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -171,11 +171,11 @@ layer {
   bottom: "pool1_b1"
   top: "conv2_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -219,11 +219,11 @@ layer {
   bottom: "pool2_b1"
   top: "conv3_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -255,11 +255,11 @@ layer {
   bottom: "conv3_b1"
   top: "conv4_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -291,11 +291,11 @@ layer {
   bottom: "data_b2"
   top: "conv1_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -339,11 +339,11 @@ layer {
   bottom: "pool1_b2"
   top: "conv2_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -387,11 +387,11 @@ layer {
   bottom: "pool2_b2"
   top: "conv3_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -423,11 +423,11 @@ layer {
   bottom: "conv3_b2"
   top: "conv4_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -489,11 +489,11 @@ layer {
   bottom: "conv4"
   top: "conv5"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -525,11 +525,11 @@ layer {
   bottom: "conv5"
   top: "conv6"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -560,11 +560,11 @@ layer {
   bottom: "conv6"
   top: "conv7"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -595,11 +595,11 @@ layer {
   bottom: "conv7"
   top: "conv8"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -616,40 +616,40 @@ layer {
   }
 }
 
-# # ########### loss 1
-# layer {
-#   name: "gt_conv8"
-#   type: "Resize"
-#   bottom: "heat_maps"
-#   bottom: "conv8"
-#   top: "gt_conv8"
-#   include {
-#     phase: TRAIN
-#   }
-# }
+# ########### loss 1
+layer {
+  name: "gt_conv8"
+  type: "Resize"
+  bottom: "heat_maps"
+  bottom: "conv8"
+  top: "gt_conv8"
+  include {
+    phase: TRAIN
+  }
+}
 
-# layer {
-#   name: "loss1"
-#   type: "PoseHeatMapLoss"
-#   bottom: "conv8"
-#   bottom: "gt_conv8"
-#   bottom: "heat_maps_masks"
-#   top: "loss1"
-#   include {
-#     phase: TRAIN
-#   }
-#   loss_weight: 1
-#   pose_heat_map_loss_param {
-#     loss_emphase_type: 3
-#     fg_eof: 3
-#     bg_eof: 1
-#     ratio: 0.005
-#     prob_num: 11
-#     heat_score_thres: 0.273
-#     parts_err_num_thres: 3
-#     hard_negative_filepath: "NotImplemented."
-#   }
-# }
+layer {
+  name: "loss1"
+  type: "PoseHeatMapLoss"
+  bottom: "conv8"
+  bottom: "gt_conv8"
+  bottom: "heat_maps_masks"
+  top: "loss1"
+  include {
+    phase: TRAIN
+  }
+  loss_weight: 1
+  pose_heat_map_loss_param {
+    loss_emphase_type: 3
+    fg_eof: 3
+    bg_eof: 1
+    ratio: 0.005
+    prob_num: 11
+    heat_score_thres: 0.273
+    parts_err_num_thres: 3
+    hard_negative_filepath: "NotImplemented."
+  }
+}
 
 # ########### concat_fusion
 layer {
@@ -679,11 +679,11 @@ layer {
   bottom: "concat_fusion"
   top: "conv1_fusion"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -713,11 +713,11 @@ layer {
   bottom: "conv1_fusion"
   top: "conv2_fusion"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -747,11 +747,11 @@ layer {
   bottom: "conv2_fusion"
   top: "conv3_fusion"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -781,11 +781,11 @@ layer {
   bottom: "conv3_fusion"
   top: "conv4_fusion"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -814,11 +814,11 @@ layer {
   bottom: "conv4_fusion"
   top: "conv5_fusion"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -834,40 +834,40 @@ layer {
   }
 }
 
-# # ########### loss 2
-# layer {
-#   name: "gt_conv5_fusion"
-#   type: "Resize"
-#   bottom: "heat_maps"
-#   bottom: "conv5_fusion"
-#   top: "gt_conv5_fusion"
-#   include {
-#     phase: TRAIN
-#   }
-# }
+# ########### loss 2
+layer {
+  name: "gt_conv5_fusion"
+  type: "Resize"
+  bottom: "heat_maps"
+  bottom: "conv5_fusion"
+  top: "gt_conv5_fusion"
+  include {
+    phase: TRAIN
+  }
+}
 
-# layer {
-#   name: "loss2"
-#   type: "PoseHeatMapLoss"
-#   bottom: "conv5_fusion"
-#   bottom: "gt_conv5_fusion"
-#   bottom: "heat_maps_masks"
-#   top: "loss2"
-#   include {
-#     phase: TRAIN
-#   }
-#   loss_weight: 3
-#   pose_heat_map_loss_param {
-#     loss_emphase_type: 3
-#     fg_eof: 3
-#     bg_eof: 1
-#     ratio: 0.005
-#     prob_num: 11
-#     heat_score_thres: 0.273
-#     parts_err_num_thres: 3
-#     hard_negative_filepath: "NotImplemented."
-#   }
-# }
+layer {
+  name: "loss2"
+  type: "PoseHeatMapLoss"
+  bottom: "conv5_fusion"
+  bottom: "gt_conv5_fusion"
+  bottom: "heat_maps_masks"
+  top: "loss2"
+  include {
+    phase: TRAIN
+  }
+  loss_weight: 1
+  pose_heat_map_loss_param {
+    loss_emphase_type: 3
+    fg_eof: 3
+    bg_eof: 1
+    ratio: 0.005
+    prob_num: 11
+    heat_score_thres: 0.273
+    parts_err_num_thres: 3
+    hard_negative_filepath: "NotImplemented."
+  }
+}
 
 # ########### refined model -> crop data
 layer {
@@ -1227,7 +1227,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/test_heat_maps2_2_ft/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -1250,7 +1250,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/poses_coords_ft/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -1279,7 +1279,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/test_acc_ft/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

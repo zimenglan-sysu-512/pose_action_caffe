@@ -23,7 +23,7 @@ layer {
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     label_num: 28
-    batch_size: 12
+    batch_size: 4
     always_max_size: true
     is_scale_image: true
     shuffle: true
@@ -871,6 +871,33 @@ layer {
 
 # ########### refined model -> crop data
 layer {
+  name: "merge_conv9"
+  type: "Eltwise"
+  bottom: "conv8"
+  bottom: "conv5_fusion"
+  top: "conv9"
+  eltwise_param {
+    operation: SUM
+    coeff: 1
+    coeff: 1
+  }
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "conv9"
+  type: "Resize"
+  bottom: "conv9"
+  bottom: "heat_maps"
+  top: "conv9r"
+  include {
+    phase: TEST
+  }
+}
+
+layer {
   name: "conv1_b2r"
   type: "Resize"
   bottom: "conv1_b2"
@@ -912,7 +939,7 @@ layer {
 
   ## this is for getting mapping relationship
   bottom: "concat_refine"
-  bottom: "conv8"
+  bottom: "conv9r"
 
   bottom: "concat_refine"
   top: "crop_data"
@@ -921,7 +948,7 @@ layer {
   top: "crop_heat_maps"
 
   crop_patch_from_max_feature_position_param {
-    crop_factor: 0.5
+    crop_factor: 0.4
     match_channel: false
     match_channel: true
   }
@@ -1050,7 +1077,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 3584  # 256
+    num_output: 1792  # 128
     kernel_size: 1
     group: 14
     weight_filler {
@@ -1133,33 +1160,6 @@ layer {
   bottom: "crop_conv5"
   top: "crop_conv5r"
 
-  include {
-    phase: TEST
-  }
-}
-
-layer {
-  name: "merge_conv9"
-  type: "Eltwise"
-  bottom: "conv8"
-  bottom: "conv5_fusion"
-  top: "conv9"
-  eltwise_param {
-    operation: SUM
-    coeff: 1
-    coeff: 1
-  }
-  include {
-    phase: TEST
-  }
-}
-
-layer {
-  name: "conv9"
-  type: "Resize"
-  bottom: "conv9"
-  bottom: "heat_maps"
-  top: "conv9r"
   include {
     phase: TEST
   }

@@ -887,7 +887,7 @@ layer {
 }
 
 layer {
-  name: "conv9"
+  name: "conv9r"
   type: "Resize"
   bottom: "conv9"
   bottom: "heat_maps"

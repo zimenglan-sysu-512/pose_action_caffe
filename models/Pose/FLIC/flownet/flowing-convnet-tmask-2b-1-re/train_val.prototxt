@@ -881,9 +881,6 @@ layer {
     coeff: 1
     coeff: 1
   }
-  include {
-    phase: TEST
-  }
 }
 
 layer {
@@ -892,9 +889,6 @@ layer {
   bottom: "conv9"
   bottom: "heat_maps"
   top: "conv9r"
-  include {
-    phase: TEST
-  }
 }
 
 layer {

@@ -1,7 +1,7 @@
 # Solver prototxt
 net: "models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/train_val.prototxt"
 # Snapshot
-snapshot: 1000
+snapshot: 500
 # Snapshot prefix
 snapshot_prefix: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/models/FLIC"
 
@@ -10,9 +10,9 @@ snapshot_prefix: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1
 # Test images num(where is 1016) = test_iter(127) * test_batch(where is 8)
 test_iter: 1016
 # Test when reaching the test_interval
-test_interval: 1000
+test_interval: 500
 # 
-test_initialization: true
+test_initialization: false
 
 # 0.00001 fast convergence
 base_lr: 0.00001 # 0.00000001

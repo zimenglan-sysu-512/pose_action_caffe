@@ -1148,7 +1148,6 @@ layer {
     operation: SUM
     coeff: 1
     coeff: 1
-    coeff: 1
   }
   include {
     phase: TEST
@@ -1174,7 +1173,6 @@ layer {
   top: "pred_heat_maps"
   eltwise_param {
     operation: SUM
-    coeff: 1
     coeff: 1
     coeff: 1
   }

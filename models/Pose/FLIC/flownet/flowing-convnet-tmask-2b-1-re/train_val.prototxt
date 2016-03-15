@@ -51,7 +51,7 @@ layer {
     source: "../dataset/FLIC/labels/crop_test_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/test/"
     label_num: 28
-    batch_size: 8
+    batch_size: 1
     always_max_size: true
     is_scale_image: true
     shuffle: false
@@ -1131,7 +1131,7 @@ layer {
   include {
     phase: TRAIN
   }
-  loss_weight: 3
+  loss_weight: 1
   pose_heat_map_loss_param {
     loss_emphase_type: 3
     fg_eof: 3

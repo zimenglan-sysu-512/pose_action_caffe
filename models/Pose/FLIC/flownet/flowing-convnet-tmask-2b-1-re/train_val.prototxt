@@ -1128,7 +1128,7 @@ layer {
   name: "crop_conv5r"
   type: "ResizeWithMap"
   bottom: "crop_conv5"
-  bottom: "crop_data"
+  bottom: "concat_refine"
 
   bottom: "crop_conv5"
   top: "crop_conv5r"

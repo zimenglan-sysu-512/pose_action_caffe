@@ -23,7 +23,7 @@ layer {
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     label_num: 28
-    batch_size: 4
+    batch_size: 1
     always_max_size: true
     is_scale_image: true
     shuffle: true

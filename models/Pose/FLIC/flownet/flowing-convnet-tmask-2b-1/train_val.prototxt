@@ -604,7 +604,6 @@ layer {
   convolution_param {
     num_output: 14
     kernel_size: 1
-    stride: 1
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -689,7 +688,6 @@ layer {
   convolution_param {
     num_output: 64
     kernel_size: 7
-    stride: 1
     pad: 3
     weight_filler {
       type: "gaussian"
@@ -724,7 +722,6 @@ layer {
   convolution_param {
     num_output: 64
     kernel_size: 13
-    stride: 1
     pad: 6
     weight_filler {
       type: "gaussian"
@@ -759,7 +756,6 @@ layer {
   convolution_param {
     num_output: 128
     kernel_size: 13
-    stride: 1
     pad: 6
     weight_filler {
       type: "gaussian"
@@ -794,8 +790,6 @@ layer {
   convolution_param {
     num_output: 256
     kernel_size: 1
-    stride: 1
-    pad: 0
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -829,8 +823,6 @@ layer {
   convolution_param {
     num_output: 14
     kernel_size: 1
-    stride: 1
-    pad: 0
     weight_filler {
       type: "gaussian"
       std: 0.01
@@ -885,6 +877,8 @@ layer {
   top: "conv9"
   eltwise_param {
     operation: SUM
+    coeff: 1
+    coeff: 1
   }
   include {
     phase: TEST

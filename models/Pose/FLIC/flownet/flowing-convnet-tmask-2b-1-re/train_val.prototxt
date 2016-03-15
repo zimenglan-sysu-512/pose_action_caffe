@@ -2,7 +2,7 @@
 # @proto: train_val.prototxt
 # @author: ddk
 # @method: heat map
-# @time: 16.03.10
+# @time: 16.03.15
 # ###########
 name: "HumanPoseEstimation"
 
@@ -64,6 +64,43 @@ layer {
 }
 
 layer {
+  name: "tmasks"
+  type: "CoordsToBboxesMasks"
+  bottom: "gt_pose_coords"
+  bottom: "aux_info"
+  top: "tmasks"
+  coord_to_bbox_masks_param {
+    top_id: 6
+    bottom_id: 10
+    top_id2: 6
+    bottom_id2: 10
+    value: 255
+  }
+}
+
+layer {
+  name: "data_b1"
+  type: "Concat"
+  bottom: "data"
+  bottom: "tmasks"
+  top: "data_b1"
+  concat_param {
+    concat_dim: 1
+  }
+}
+
+layer {
+  name: "data_b2"
+  type: "Resize"
+  bottom: "data_b1"
+  top: "data_b2"
+  resize_param {
+    height_fac: 0.707
+    width_fac: 0.707
+  }
+}
+
+layer {
   name: "heat_maps_from_coords"
   type: "HeatMapsFromCoordsOrigin"
   bottom: "gt_pose_coords"
@@ -74,22 +111,23 @@ layer {
     is_binary: true
     gau_mean: 0
     gau_stds: 1.5
-    radius_str: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
+    radius_str: "2,2,2,5,5,3,5,5,3,5,5,5,5,5"
+    # radius_str: "3,3,3,8,8,6,8,8,6,8,8,8,8,8"
   }
 }
 
-# ########### conv1
+# ########### conv1_b1
 layer {
-  name: "conv1"
+  name: "conv1_b1"
   type: "Convolution"
-  bottom: "data"
-  top: "conv1"
+  bottom: "data_b1"
+  top: "conv1_b1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -108,17 +146,17 @@ layer {
 }
 
 layer {
-  name: "relu1"
+  name: "relu1_b1"
   type: "ReLU"
-  bottom: "conv1"
-  top: "conv1"
+  bottom: "conv1_b1"
+  top: "conv1_b1"
 }
 
 layer {
-  name: "pool1"
+  name: "pool1_b1"
   type: "Pooling"
-  bottom: "conv1"
-  top: "pool1"
+  bottom: "conv1_b1"
+  top: "pool1_b1"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -126,18 +164,18 @@ layer {
   }
 }
 
-# ########### conv2
+# ########### conv2_b1
 layer {
-  name: "conv2"
+  name: "conv2_b1"
   type: "Convolution"
-  bottom: "pool1"
-  top: "conv2"
+  bottom: "pool1_b1"
+  top: "conv2_b1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -156,17 +194,17 @@ layer {
 }
 
 layer {
-  name: "relu2"
+  name: "relu2_b1"
   type: "ReLU"
-  bottom: "conv2"
-  top: "conv2"
+  bottom: "conv2_b1"
+  top: "conv2_b1"
 }
 
 layer {
-  name: "pool2"
+  name: "pool2_b1"
   type: "Pooling"
-  bottom: "conv2"
-  top: "pool2"
+  bottom: "conv2_b1"
+  top: "pool2_b1"
   pooling_param {
     pool: MAX
     kernel_size: 2
@@ -174,18 +212,18 @@ layer {
   }
 }
 
-# ########### conv3
+# ########### conv3_b1
 layer {
-  name: "conv3"
+  name: "conv3_b1"
   type: "Convolution"
-  bottom: "pool2"
-  top: "conv3"
+  bottom: "pool2_b1"
+  top: "conv3_b1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -204,24 +242,24 @@ layer {
 }
 
 layer {
-  name: "relu3"
+  name: "relu3_b1"
   type: "ReLU"
-  bottom: "conv3"
-  top: "conv3"
+  bottom: "conv3_b1"
+  top: "conv3_b1"
 }
 
-# ########### conv4
+# ########### conv4_b1
 layer {
-  name: "conv4"
+  name: "conv4_b1"
   type: "Convolution"
-  bottom: "conv3"
-  top: "conv4"
+  bottom: "conv3_b1"
+  top: "conv4_b1"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -240,36 +278,222 @@ layer {
 }
 
 layer {
-  name: "relu4"
+  name: "relu4_b1"
   type: "ReLU"
-  bottom: "conv4"
-  top: "conv4"
+  bottom: "conv4_b1"
+  top: "conv4_b1"
 }
 
-# ########### spatial_drop
+# ########### conv1_b2
+layer {
+  name: "conv1_b2"
+  type: "Convolution"
+  bottom: "data_b2"
+  top: "conv1_b2"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu1_b2"
+  type: "ReLU"
+  bottom: "conv1_b2"
+  top: "conv1_b2"
+}
+
+layer {
+  name: "pool1_b2"
+  type: "Pooling"
+  bottom: "conv1_b2"
+  top: "pool1_b2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv2_b2
+layer {
+  name: "conv2_b2"
+  type: "Convolution"
+  bottom: "pool1_b2"
+  top: "conv2_b2"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu2_b2"
+  type: "ReLU"
+  bottom: "conv2_b2"
+  top: "conv2_b2"
+}
+
+layer {
+  name: "pool2_b2"
+  type: "Pooling"
+  bottom: "conv2_b2"
+  top: "pool2_b2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv3_b2
+layer {
+  name: "conv3_b2"
+  type: "Convolution"
+  bottom: "pool2_b2"
+  top: "conv3_b2"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu3_b2"
+  type: "ReLU"
+  bottom: "conv3_b2"
+  top: "conv3_b2"
+}
+
+# ########### conv4_b2
+layer {
+  name: "conv4_b2"
+  type: "Convolution"
+  bottom: "conv3_b2"
+  top: "conv4_b2"
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  param {
+    lr_mult: 0
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu4_b2"
+  type: "ReLU"
+  bottom: "conv4_b2"
+  top: "conv4_b2"
+}
+
+# ########### resize && merge && spatial-dropout
+layer {
+  name: "conv4_b2r"
+  type: "Resize"
+  bottom: "conv4_b2"
+  bottom: "conv4_b1"
+  top: "conv4_b2r"
+}
+
+layer {
+  name: "merge_banks"
+  type: "Eltwise"
+  bottom: "conv4_b1"
+  bottom: "conv4_b2r"
+  top: "conv4"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
 layer {
   name: "spatial_drop"
   type: "SpatialDropout"
   bottom: "conv4"
-  top: "conv4_s"
+  top: "conv4"
   spatial_dropout_param {
     dropout_ratio: 0.5
   }
 }
 
-
 # ########### conv5
 layer {
   name: "conv5"
   type: "Convolution"
-  bottom: "conv4_s"
+  bottom: "conv4"
   top: "conv5"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -301,11 +525,11 @@ layer {
   bottom: "conv5"
   top: "conv6"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -336,11 +560,11 @@ layer {
   bottom: "conv6"
   top: "conv7"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -371,11 +595,11 @@ layer {
   bottom: "conv7"
   top: "conv8"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -392,47 +616,55 @@ layer {
   }
 }
 
-# ########### loss 1
-layer {
-  name: "gt_conv8"
-  type: "Resize"
-  bottom: "heat_maps"
-  bottom: "conv8"
-  top: "gt_conv8"
-  include {
-    phase: TRAIN
-  }
-}
+# # ########### loss 1
+# layer {
+#   name: "gt_conv8"
+#   type: "Resize"
+#   bottom: "heat_maps"
+#   bottom: "conv8"
+#   top: "gt_conv8"
+#   include {
+#     phase: TRAIN
+#   }
+# }
 
-layer {
-  name: "loss1"
-  type: "PoseHeatMapLoss"
-  bottom: "conv8"
-  bottom: "gt_conv8"
-  bottom: "heat_maps_masks"
-  top: "loss1"
-  include {
-    phase: TRAIN
-  }
-  loss_weight: 1
-  pose_heat_map_loss_param {
-    loss_emphase_type: 3
-    fg_eof: 3
-    bg_eof: 1
-    ratio: 0.005
-    prob_num: 11
-    heat_score_thres: 0.273
-    parts_err_num_thres: 3
-    hard_negative_filepath: "NotImplemented."
-  }
-}
+# layer {
+#   name: "loss1"
+#   type: "PoseHeatMapLoss"
+#   bottom: "conv8"
+#   bottom: "gt_conv8"
+#   bottom: "heat_maps_masks"
+#   top: "loss1"
+#   include {
+#     phase: TRAIN
+#   }
+#   loss_weight: 1
+#   pose_heat_map_loss_param {
+#     loss_emphase_type: 3
+#     fg_eof: 3
+#     bg_eof: 1
+#     ratio: 0.005
+#     prob_num: 11
+#     heat_score_thres: 0.273
+#     parts_err_num_thres: 3
+#     hard_negative_filepath: "NotImplemented."
+#   }
+# }
 
 # ########### concat_fusion
-# fusion
+layer {
+  name: "conv3_b2r"
+  type: "Resize"
+  bottom: "conv3_b2"
+  bottom: "conv3_b1"
+  top: "conv3_b2r"
+}
+
 layer {
   name: "concat_fusion"
   type: "Concat"
-  bottom: "conv3"
+  bottom: "conv3_b1"
+  bottom: "conv3_b2r"
   bottom: "conv7"
   top: "concat_fusion"
   concat_param {
@@ -447,11 +679,11 @@ layer {
   bottom: "concat_fusion"
   top: "conv1_fusion"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -481,11 +713,11 @@ layer {
   bottom: "conv1_fusion"
   top: "conv2_fusion"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -515,11 +747,11 @@ layer {
   bottom: "conv2_fusion"
   top: "conv3_fusion"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -549,11 +781,11 @@ layer {
   bottom: "conv3_fusion"
   top: "conv4_fusion"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -582,11 +814,11 @@ layer {
   bottom: "conv4_fusion"
   top: "conv5_fusion"
   param {
-    lr_mult: 1
-    decay_mult: 1
+    lr_mult: 0
+    decay_mult: 0
   }
   param {
-    lr_mult: 2
+    lr_mult: 0
     decay_mult: 0
   }
   convolution_param {
@@ -602,25 +834,279 @@ layer {
   }
 }
 
-# ########### loss 2
+# # ########### loss 2
+# layer {
+#   name: "gt_conv5_fusion"
+#   type: "Resize"
+#   bottom: "heat_maps"
+#   bottom: "conv5_fusion"
+#   top: "gt_conv5_fusion"
+#   include {
+#     phase: TRAIN
+#   }
+# }
+
+# layer {
+#   name: "loss2"
+#   type: "PoseHeatMapLoss"
+#   bottom: "conv5_fusion"
+#   bottom: "gt_conv5_fusion"
+#   bottom: "heat_maps_masks"
+#   top: "loss2"
+#   include {
+#     phase: TRAIN
+#   }
+#   loss_weight: 3
+#   pose_heat_map_loss_param {
+#     loss_emphase_type: 3
+#     fg_eof: 3
+#     bg_eof: 1
+#     ratio: 0.005
+#     prob_num: 11
+#     heat_score_thres: 0.273
+#     parts_err_num_thres: 3
+#     hard_negative_filepath: "NotImplemented."
+#   }
+# }
+
+# ########### refined model -> crop data
 layer {
-  name: "gt_conv5_fusion"
+  name: "conv2_b2r"
+  type: "Resize"
+  bottom: "conv2_b2"
+  bottom: "conv2_b1"
+  top: "conv2_b2r"
+}
+
+layer {
+  name: "concat_fusionr"
+  type: "Resize"
+  bottom: "concat_fusion"
+  bottom: "conv2_b1"
+  top: "concat_fusionr"
+}
+
+layer {
+  name: "heat_mapsr"
   type: "Resize"
   bottom: "heat_maps"
-  bottom: "conv5_fusion"
-  top: "gt_conv5_fusion"
-  include {
-    phase: TRAIN
+  bottom: "conv2_b1"
+  top: "heat_mapsr"
+}
+
+layer {
+  name: "concat_refine"
+  type: "Concat"
+  bottom: "conv2_b1"
+  bottom: "conv2_b2r"
+  bottom: "concat_fusionr"
+  top: "concat_refine"
+  concat_param {
+    concat_dim: 1
   }
 }
 
 layer {
-  name: "loss2"
+  name: "crop_data"
+  type: "CropPatchFromMaxFeaturePosition"
+
+  ## this is for getting mapping relationship
+  bottom: "concat_refine"
+  bottom: "conv8"
+
+  bottom: "concat_refine"
+  top: "crop_data"
+
+  bottom: "heat_mapsr"
+  top: "crop_heat_maps"
+
+  crop_patch_from_max_feature_position_param {
+    crop_factor: 0.5
+    match_channel: false
+    match_channel: true
+  }
+}
+
+# ########### crop_conv1
+layer {
+  name: "crop_conv1"
+  type: "Convolution"
+  bottom: "crop_data"
+  top: "crop_conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 896  # 64
+    pad: 3
+    group: 14
+    kernel_size: 7
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "crop_relu1"
+  type: "ReLU"
+  bottom: "crop_conv1"
+  top: "crop_conv1"
+}
+
+# ########### crop_conv2
+layer {
+  name: "crop_conv2"
+  type: "Convolution"
+  bottom: "crop_conv1"
+  top: "crop_conv2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 896  # 64
+    pad: 6
+    group: 14
+    kernel_size: 13
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "crop_relu2"
+  type: "ReLU"
+  bottom: "crop_conv2"
+  top: "crop_conv2"
+}
+
+# ########### crop_conv3
+layer {
+  name: "crop_conv3"
+  type: "Convolution"
+  bottom: "crop_conv2"
+  top: "crop_conv3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 1792  # 128
+    pad: 6
+    group: 14
+    kernel_size: 13
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+layer {
+  name: "crop_relu3"
+  type: "ReLU"
+  bottom: "crop_conv3"
+  top: "crop_conv3"
+}
+
+# ########### crop_conv4
+layer {
+  name: "crop_conv4"
+  type: "Convolution"
+  bottom: "crop_conv3"
+  top: "crop_conv4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 3584  # 256
+    kernel_size: 1
+    group: 14
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+layer {
+  name: "crop_relu4"
+  type: "ReLU"
+  bottom: "crop_conv4"
+  top: "crop_conv4"
+}
+
+# ########### crop_conv5
+layer {
+  name: "crop_conv5"
+  type: "Convolution" 
+  bottom: "crop_conv4"
+  top: "crop_conv5"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 14
+    kernel_size: 1
+    group: 14
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.
+    }
+  }
+}
+
+# ########### loss layer
+layer {
+  name: "pose_heap_map_loss"
   type: "PoseHeatMapLoss"
-  bottom: "conv5_fusion"
-  bottom: "gt_conv5_fusion"
+  bottom: "crop_conv5"
+  bottom: "crop_heat_maps"
   bottom: "heat_maps_masks"
-  top: "loss2"
+  top: "pose_heap_map_loss"
   include {
     phase: TRAIN
   }
@@ -629,8 +1115,8 @@ layer {
     loss_emphase_type: 3
     fg_eof: 3
     bg_eof: 1
-    ratio: 0.005
     prob_num: 11
+    ratio: 0.001
     heat_score_thres: 0.273
     parts_err_num_thres: 3
     hard_negative_filepath: "NotImplemented."
@@ -639,13 +1125,29 @@ layer {
 
 # ########### merge
 layer {
-  name: "merge_banks"
+  name: "crop_conv5r"
+  type: "ResizeWithMap"
+  bottom: "crop_conv5"
+  bottom: "crop_data"
+
+  bottom: "crop_conv5"
+  top: "crop_conv5r"
+
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "merge_conv9"
   type: "Eltwise"
   bottom: "conv8"
   bottom: "conv5_fusion"
+  bottom: "crop_conv5r"
   top: "conv9"
   eltwise_param {
     operation: SUM
+    coeff: 1
     coeff: 1
     coeff: 1
   }
@@ -717,7 +1219,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-1/test_heat_maps2_2/"
+    heat_map_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/test_heat_maps2_2/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -740,7 +1242,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-1/poses_coords/"
+    coords_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/poses_coords/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -769,7 +1271,7 @@ layer {
     images_num: 1016
     acc_name: "pose_pdj_acc.log"
     log_name: "pose_pdj_log.log"
-    acc_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-1/test_acc/"
+    acc_path: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1-re/test_acc/"
     # 0: leye, 1: reye, 2: nose, 
     # 3: lsho, 4: lelb, 5: lwri, 
     # 6: rsho, 7: relb, 8: rwri, 

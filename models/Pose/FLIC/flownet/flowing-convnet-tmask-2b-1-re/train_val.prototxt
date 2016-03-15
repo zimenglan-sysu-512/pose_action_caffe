@@ -23,7 +23,7 @@ layer {
     source: "../dataset/FLIC/labels/crop_train_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/train/"
     label_num: 28
-    batch_size: 1
+    batch_size: 4
     always_max_size: true
     is_scale_image: true
     shuffle: true
@@ -942,7 +942,7 @@ layer {
   top: "crop_heat_maps"
 
   crop_patch_from_max_feature_position_param {
-    crop_factor: 0.4
+    crop_factor: 0.5
     match_channel: false
     match_channel: true
   }

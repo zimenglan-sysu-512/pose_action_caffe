@@ -8,7 +8,7 @@ snapshot_prefix: "../asserts/models/Pose/FLIC/flownet/flowing-convnet-tmask-2b-1
 # # Train images num(where is 3987) = test_iter(443) * test_batch(where is 9)
 # test_iter: 443
 # Test images num(where is 1016) = test_iter(127) * test_batch(where is 8)
-test_iter: 10
+test_iter: 1016
 # Test when reaching the test_interval
 test_interval: 1000
 # 

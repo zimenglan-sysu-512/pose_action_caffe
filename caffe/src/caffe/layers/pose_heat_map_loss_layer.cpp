@@ -72,6 +72,7 @@ void PoseHeatMapLossLayer<Dtype>::LayerSetUp(
   LOG(INFO) << "bg_eof: " << this->bg_eof_;
   LOG(INFO) << "ratio: " << this->ratio_;
   LOG(INFO) << "prob_num: " << this->prob_num_;
+   LOG(INFO) << "uint_thres: " << this->uint_thres_;
   LOG(INFO) << "parts_err_num_thres: " << this->parts_err_num_thres_;
   LOG(INFO) << "heat_score_thres: " << this->heat_score_thres_;
   LOG(INFO) << "hard_negative_filepath: " << this->hard_negative_filepath_;
@@ -225,7 +226,8 @@ void PoseHeatMapLossLayer<Dtype>::ComputesHeatMapLoss(
         }
       }
     }
-    CHECK_EQ(hm_off, count) << "does not match the size of each blob in bottom";
+    CHECK_EQ(hm_off, count) 
+        << "does not match the size of each blob in bottom";
   
   /* Consider a littel bit of  backgrounds and ground truths(but scale them) */
   } else if(this->loss_emphase_type_ == 5) {
@@ -294,8 +296,8 @@ void PoseHeatMapLossLayer<Dtype>::ComputesHeatMapLoss(
 
       } // end kpn
     } // end np
-    CHECK_EQ(hm_off, count) << "does not match the size of each blob in bottom";
-  
+    CHECK_EQ(hm_off, count) 
+        << "does not match the size of each blob in bottom";
   } else {
     if(this->loss_emphase_type_) {
       LOG(INFO) << "loss_emphase_type_: " << this->loss_emphase_type_;
@@ -322,6 +324,8 @@ Dtype PoseHeatMapLossLayer<Dtype>::PrintLoss()
   LOG(INFO) << "euclidean loss (frame): " << per_frame_loss;
   LOG(INFO) << "euclidean loss (joint): " << per_heat_map_loss;
   LOG(INFO) << "loss_emphase_type: " << loss_emphase_type_;
+  LOG(INFO) << "ratio: " << this->ratio_;
+   LOG(INFO) << "uint_thres: " << this->uint_thres_;
   LOG(INFO) << "heat_score_thres: " << heat_score_thres_;
   LOG(INFO) << "prob_num: " << this->prob_num_;
   LOG(INFO);

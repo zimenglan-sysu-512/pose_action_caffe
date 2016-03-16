@@ -40,6 +40,8 @@ Dtype PoseHeatMapLossLayer<Dtype>::PrintLoss_gpu()
   LOG(INFO) << "euclidean loss (frame): " << per_frame_loss;
   LOG(INFO) << "euclidean loss (joint): " << per_heat_map_loss;
   LOG(INFO) << "heat_map_loss_emphase_type: " << loss_emphase_type_;
+  LOG(INFO) << "ratio: " << this->ratio_;
+  LOG(INFO) << "uint_thres: " << this->uint_thres_;
   LOG(INFO) << "heat_score_thres: " << heat_score_thres_;
   LOG(INFO) << "prob_num: " << this->prob_num_;
   LOG(INFO);
@@ -241,7 +243,8 @@ void PoseHeatMapLossLayer<Dtype>::ComputesHeatMapLoss_gpu(
       }
     }
 
-    CHECK_EQ(hm_offset, count) << "does not match the size of each blob in bottom";
+    CHECK_EQ(hm_offset, count) 
+        << "does not match the size of each blob in bottom";
   } else {
     if(this->loss_emphase_type_) {
       LOG(INFO) << "loss_emphase_type_: " << this->loss_emphase_type_;

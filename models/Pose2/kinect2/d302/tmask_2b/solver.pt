@@ -8,7 +8,7 @@ snapshot: 1000
 snapshot_prefix: "../asserts/models/Pose2/kinect2/d302/tmask_2b/models/kinect2"
 
 # n_images (13707) = test_iter(1714) * batchsize(8)
-test_iter: 13707
+test_iter: 1714
 
 # test when reaching the test_interval
 test_interval: 1000

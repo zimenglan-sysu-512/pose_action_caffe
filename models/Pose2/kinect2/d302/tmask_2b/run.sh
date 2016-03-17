@@ -8,36 +8,36 @@ caffe_dire="caffe/"
 tools_dire="build/tools/"
 tools_dire=$caffe_dire$tools_dire
 
-# models/Pose2/flic/d302/fusnet_tmask_2b/
+# models/Pose2/kinect2/d302/tmask_2b/
 pt_dire="models/Pose2/"
-sub_pt_dire="flic/d302/"
-exper_name="fusnet_tmask_2b/"
+sub_pt_dire="kinect2/d302/"
+exper_name="tmask_2b/"
 exper_path=$pt_dire$sub_pt_dire$exper_name
 mkdir -p $exper_path
 
-# models/Pose2/flic/d302/fusnet_tmask_2b/solver.pt
+# models/Pose2/kinect2/d302/tmask_2b/solver.pt
 solver_pt="solver.pt"
 solver_pt=$exper_path$solver_pt
 echo "\n" $solver_pt "\n"
 
-# ../asserts/models/Pose2/flic/d302/fusnet_tmask_2b/
+# ../asserts/models/Pose2/kinect2/d302/tmask_2b/
 model_dire="../asserts/"
 model_dire=$model_dire$exper_path
 mkdir -p $model_dire
 
-# ../asserts/models/Pose2/flic/d302/fusnet_tmask_2b/models/
+# ../asserts/models/Pose2/kinect2/d302/tmask_2b/models/
 model_path="models/"
 model_path=$model_dire$model_path
 mkdir -p $model_path
 echo $model_path
 
-# ../asserts/models/Pose2/flic/d302/fusnet_tmask_2b/log/
+# ../asserts/models/Pose2/kinect2/d302/tmask_2b/log/
 log_path="log/"
 log_path=$model_dire$log_path
 mkdir -p $log_path
 
 # prefix -- log file
-file_prefix="flic_"
+file_prefix="kinect2_"
 log_file=$(date -d "today" +"%Y-%m-%d-%H-%M-%S")
 log_file=$log_path$file_prefix$log_file".log"
 
@@ -62,7 +62,7 @@ if [ ! -n "$1" ] ;then
 	$caffe_bin train --solver=$solver_pt 2>&1 | tee -a $log_file
 else
 	re_iter=$1
-	resume_model_file="flic_iter_"$re_iter".solverstate"
+	resume_model_file="kinect2_iter_"$re_iter".solverstate"
 	resume_model_file=$model_path$resume_model_file
 	echo
 	echo "re_iter:" $re_iter

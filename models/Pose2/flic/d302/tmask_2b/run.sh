@@ -2,7 +2,6 @@
 
 ProjectDir="../../../../../"
 cd $ProjectDir
-export LD_LIBRARY_PATH=../tool/cuddn/v2/lib/:$LD_LIBRARY_PATH
 
 caffe_dire="caffe/"
 # build/tools_dire/

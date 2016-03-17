@@ -22,6 +22,8 @@ liliang
 	ssh d302@172.18.181.229
 	scp d302@172.18.181.229:/
 
+	scp crfasrnn.tar.gz d302@172.18.181.229:/home/d302/dongdk/
+
 git
 	git clone --recursive -b ddk ddk@172.18.180.86:/home/ddk/git-server/pose-caffe.git
 

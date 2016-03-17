@@ -77,7 +77,7 @@ def get_layer_label(layer, rankdir):
     if layer.type == 'Convolution':
         # Outer double quotes needed or else colon characters don't parse
         # properly
-        node_label = '"%s%s(%s)%skernel size: %d%sstride: %d%spad: %d"' %\
+        node_label = '"%s%s(%s)%skernel size: %d%sstride: %d%sgroup: %d%spad: %d"' %\
                      (layer.name,
                       separator,
                       layer.type,
@@ -85,6 +85,8 @@ def get_layer_label(layer, rankdir):
                       layer.convolution_param.kernel_size,
                       separator,
                       layer.convolution_param.stride,
+                      separator,
+                      layer.convolution_param.group,
                       separator,
                       layer.convolution_param.pad)
     elif layer.type == 'Pooling':

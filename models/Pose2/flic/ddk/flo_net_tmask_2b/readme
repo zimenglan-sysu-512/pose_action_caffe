@@ -1,0 +1,12 @@
+
+Note:
+	1 hard negatives, use top k
+	2 2 bank,
+	3 thres: 0.273
+	4 prob_num: 11
+	5 torso mask
+	6 fusion_net
+
+cmds:
+	cd ../../../../../caffe/ && make -j8 && cd - && sh train.sh
+	cd ../../../../../caffe/ && make -j8 && cd - && sh test.sh

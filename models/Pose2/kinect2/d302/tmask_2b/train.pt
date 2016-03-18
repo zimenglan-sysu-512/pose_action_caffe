@@ -46,7 +46,7 @@ layer {
     source: "../dataset/Kinect2/labels/up.crop.color2_test_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     label_num: 38
-    batch_size: 8
+    batch_size: 1
     always_max_size: true
     is_scale_image: true
     shuffle: false

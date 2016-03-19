@@ -116,11 +116,11 @@ layer {
   bottom: "data_b1"
   top: "conv1_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -164,11 +164,11 @@ layer {
   bottom: "pool1_b1"
   top: "conv2_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -212,11 +212,11 @@ layer {
   bottom: "pool2_b1"
   top: "conv3_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -248,11 +248,11 @@ layer {
   bottom: "conv3_b1"
   top: "conv4_b1"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -284,11 +284,11 @@ layer {
   bottom: "data_b2"
   top: "conv1_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -332,11 +332,11 @@ layer {
   bottom: "pool1_b2"
   top: "conv2_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -380,11 +380,11 @@ layer {
   bottom: "pool2_b2"
   top: "conv3_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -416,11 +416,11 @@ layer {
   bottom: "conv3_b2"
   top: "conv4_b2"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -482,11 +482,11 @@ layer {
   bottom: "conv4"
   top: "conv5"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -518,11 +518,11 @@ layer {
   bottom: "conv5"
   top: "conv6"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -553,11 +553,11 @@ layer {
   bottom: "conv6"
   top: "conv7"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -588,11 +588,11 @@ layer {
   bottom: "conv7"
   top: "conv8"
   param {
-    lr_mult: 0
-    decay_mult: 0
+    lr_mult: 1
+    decay_mult: 1
   }
   param {
-    lr_mult: 0
+    lr_mult: 2
     decay_mult: 0
   }
   convolution_param {
@@ -621,28 +621,28 @@ layer {
   }
 }
 
-# layer {
-#   name: "loss1"
-#   type: "PoseHeatMapLoss"
-#   bottom: "conv8"
-#   bottom: "gt_conv8"
-#   bottom: "heat_maps_masks"
-#   top: "loss1"
-#   include {
-#     phase: TRAIN
-#   }
-#   loss_weight: 1
-#   pose_heat_map_loss_param {
-#     loss_emphase_type: 3
-#     fg_eof: 3
-#     bg_eof: 1
-#     ratio: 0.005
-#     prob_num: 11
-#     heat_score_thres: 0.273
-#     parts_err_num_thres: 3
-#     hard_negative_filepath: "NotImplemented."
-#   }
-# }
+layer {
+  name: "loss1"
+  type: "PoseHeatMapLoss"
+  bottom: "conv8"
+  bottom: "gt_conv8"
+  bottom: "heat_maps_masks"
+  top: "loss1"
+  include {
+    phase: TRAIN
+  }
+  loss_weight: 1
+  pose_heat_map_loss_param {
+    loss_emphase_type: 3
+    fg_eof: 3
+    bg_eof: 1
+    ratio: 0.005
+    prob_num: 11
+    heat_score_thres: 0.273
+    parts_err_num_thres: 3
+    hard_negative_filepath: "NotImplemented."
+  }
+}
 
 # ########### concat to fusion net as input
 layer {
@@ -1055,7 +1055,7 @@ layer {
   }
 }
 
-# ########### predict coordinates
+# ########### predict coordinates && visulization && accuracy
 layer {
   name: "pred_heat_maps3"
   type: "Resize"

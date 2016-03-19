@@ -52,7 +52,8 @@ echo "  sh train_val_.sh [re_iter]"
 echo
 echo "######################################"
 echo
-sleep_time=1
+
+sleep_time=2
 sleep $sleep_time
 
 # resume model file

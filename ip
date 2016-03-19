@@ -1,5 +1,6 @@
 ddk: ddk 172.18.180.86
 	ssh ddk@172.18.180.86
+	scp ddk@172.18.180.86:/home/ddk/dongdk/dataset/Kinect2/
 
 shenji: d302 172.18.181.229
 	ssh d302@172.18.181.229
@@ -12,6 +13,16 @@ liangdp: liangdp 172.18.181.186
 	ssh liangdp@172.18.181.186
 
 lauware: lauware 172.18
+
+wangkeze:
+	wangkeze@172.18.183.5
+	ssh -p 2024 wangkeze@172.18.183.5
+	mark
+
+mude:
+	geek@172.18.183.107
+		627116
+	ssh geek@172.18.183.107
 
 xieyuan
 	black@172.18.183.61

@@ -8,30 +8,30 @@ caffe_dire="caffe/"
 tools_dire="build/tools/"
 tools_dire=$caffe_dire$tools_dire
 
-# models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/
+# models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/
 pt_dire="models/Pose2/"
 sub_pt_dire="flic/d302/"
-exper_name="fusnet_tmask_2b_1_ft/"
+exper_name="refnet_fusnet_tmask_2b_1/"
 exper_path=$pt_dire$sub_pt_dire$exper_name
 mkdir -p $exper_path
 
-# models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/solver.pt
+# models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/solver.pt
 solver_pt="solver.pt"
 solver_pt=$exper_path$solver_pt
 echo "\n" $solver_pt "\n"
 
-# ../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/
+# ../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/
 model_dire="../asserts/"
 model_dire=$model_dire$exper_path
 mkdir -p $model_dire
 
-# ../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/models/
+# ../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/models/
 model_path="models/"
 model_path=$model_dire$model_path
 mkdir -p $model_path
 echo $model_path
 
-# ../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/log/
+# ../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/log/
 log_path="log/"
 log_path=$model_dire$log_path
 mkdir -p $log_path

@@ -1,14 +1,14 @@
 # net pt
-net: "models/Pose2/kinect2/d302/tmask_2b/train.pt"
+net: "models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/train.pt"
 
 # snapshot
 snapshot: 1000
 
 # snapshot prefix
-snapshot_prefix: "../asserts/models/Pose2/kinect2/d302/tmask_2b/models/kinect2"
+snapshot_prefix: "../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/models/flic"
 
-# n_images (13707) = test_iter(1714) * batchsize(8)
-test_iter: 1714
+# n_images (1016) = test_iter(127) * batchsize(8)
+test_iter: 127
 
 # test when reaching the test_interval
 test_interval: 1000

@@ -48,7 +48,7 @@ echo
 echo "######################################"
 echo
 echo "Usage: "
-echo "  sh train_val_.sh [re_iter]"
+echo "  sh run.sh [re_iter]"
 echo
 echo "######################################"
 echo

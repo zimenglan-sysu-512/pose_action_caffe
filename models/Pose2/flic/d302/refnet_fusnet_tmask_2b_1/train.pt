@@ -1186,7 +1186,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/heat_maps/"
+    heat_map_path: "../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/heat_maps/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -1209,7 +1209,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/poses/"
+    coords_path: "../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/poses/"
     skel_path: "../dataset/FLIC/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -1238,7 +1238,7 @@ layer {
     images_num: 1016
     acc_name: "accuracy.log"
     log_name: "log.log"
-    acc_path: "../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/accuracy/"
+    acc_path: "../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/accuracy/"
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10
@@ -1299,7 +1299,7 @@ layer {
     images_num: 1016
     acc_name: "accuracy.log"
     log_name: "log.log"
-    acc_path: "../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/accuracy2/"
+    acc_path: "../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/accuracy2/"
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10
@@ -1360,7 +1360,7 @@ layer {
     images_num: 1016
     acc_name: "accuracy.log"
     log_name: "log.log"
-    acc_path: "../asserts/models/Pose2/flic/d302/fusnet_tmask_2b_1_ft/accuracy3/"
+    acc_path: "../asserts/models/Pose2/flic/d302/refnet_fusnet_tmask_2b_1/accuracy3/"
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10

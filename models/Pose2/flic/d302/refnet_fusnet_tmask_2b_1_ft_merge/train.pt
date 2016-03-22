@@ -1370,6 +1370,9 @@ layer {
   bottom: "conv8"
   bottom: "conv5_f"
   top: "coarse_heat_maps"
+  include {
+    phase: TEST
+  }
   eltwise_param {
     operation: SUM
     coeff: 1

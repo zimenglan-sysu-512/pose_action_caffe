@@ -13,7 +13,7 @@ test_iter: 127
 # test when reaching the test_interval
 test_interval: 500
 
-test_initialization: false
+test_initialization: true
 
 # 0.000001 fast convergence
 base_lr: 0.000001 # 0.00000001

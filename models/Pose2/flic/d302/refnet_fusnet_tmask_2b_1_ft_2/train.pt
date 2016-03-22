@@ -1236,6 +1236,7 @@ layer {
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10
+    zero_iter_test: true
   }
 }
 
@@ -1297,6 +1298,7 @@ layer {
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10
+    zero_iter_test: true
   }
 }
 
@@ -1358,6 +1360,7 @@ layer {
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10
+    zero_iter_test: true
   }
 }
 
@@ -1419,6 +1422,7 @@ layer {
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10
+    zero_iter_test: true
   }
 }
 
@@ -1480,5 +1484,6 @@ layer {
     # here use (rsho, lhip) -> 6: rsho, 10: lhip
     shoulder_id: 6
     hip_id: 10
+    zero_iter_test: true
   }
 }

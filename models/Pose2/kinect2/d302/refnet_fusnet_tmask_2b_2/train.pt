@@ -17,7 +17,7 @@ layer {
     source: "../dataset/Kinect2/labels/up.crop.color2_train_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     label_num: 38
-    batch_size: 8
+    batch_size: 6
     always_max_size: true
     is_scale_image: true
     shuffle: true
@@ -868,7 +868,7 @@ layer {
 layer {
   name: "conv1_ref"
   type: "Convolution"
-  bottom: "conv1_f"
+  bottom: "concat_f"
   top: "conv1_ref"
   param {
     lr_mult: 1

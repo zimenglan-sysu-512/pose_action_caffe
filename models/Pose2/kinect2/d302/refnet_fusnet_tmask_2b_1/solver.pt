@@ -2,7 +2,7 @@
 net: "models/Pose2/kinect2/d302/refnet_fusnet_tmask_2b_1/train.pt"
 
 # snapshot
-snapshot: 1000
+snapshot: 500
 
 # snapshot prefix
 snapshot_prefix: "../asserts/models/Pose2/kinect2/d302/refnet_fusnet_tmask_2b_1/models/kinect2"
@@ -11,7 +11,7 @@ snapshot_prefix: "../asserts/models/Pose2/kinect2/d302/refnet_fusnet_tmask_2b_1/
 test_iter: 1714
 
 # test when reaching the test_interval
-test_interval: 1000
+test_interval: 500
 
 test_initialization: true
 

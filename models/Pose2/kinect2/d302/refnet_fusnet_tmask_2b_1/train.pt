@@ -834,14 +834,249 @@ layer {
   }
 }
 
-# ########### loss 2
 layer {
-  name: "loss2"
-  type: "PoseHeatMapLoss"
+  name: "sl_conv5_f"
+  type: "Silence"
   bottom: "conv5_f"
+}
+
+# ########### loss 2
+# layer {
+#   name: "loss2"
+#   type: "PoseHeatMapLoss"
+#   bottom: "conv5_f"
+#   bottom: "gt_conv8"
+#   bottom: "heat_maps_masks"
+#   top: "loss2"
+#   include {
+#     phase: TRAIN
+#   }
+#   loss_weight: 3
+#   pose_heat_map_loss_param {
+#     loss_emphase_type: 3
+#     fg_eof: 3
+#     bg_eof: 1
+#     ratio: 0.005
+#     prob_num: 11
+#     heat_score_thres: 0.273
+#     parts_err_num_thres: 3
+#     hard_negative_filepath: "NotImplemented."
+#   }
+# }
+
+# ########### conv1_ref
+layer {
+  name: "conv1_ref"
+  type: "Convolution"
+  bottom: "conv1_f"
+  top: "conv1_ref"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 1216   # 19 * 64
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layer {
+  name: "relu1_ref"
+  type: "ReLU"
+  bottom: "conv1_ref"
+  top: "conv1_ref"
+}
+
+# ########### conv2_ref
+layer {
+  name: "conv2_ref"
+  type: "Convolution"
+  bottom: "conv1_ref"
+  top: "conv2_ref"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 1216   # 19 * 64
+    group: 19
+    kernel_size: 7
+    pad: 3
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layer {
+  name: "relu2_ref"
+  type: "ReLU"
+  bottom: "conv2_ref"
+  top: "conv2_ref"
+}
+
+# ########### conv3_ref
+layer {
+  name: "conv3_ref"
+  type: "Convolution"
+  bottom: "conv2_ref"
+  top: "conv3_ref"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 1216   # 19 * 64
+    group: 19
+    kernel_size: 13
+    pad: 6
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layer {
+  name: "relu3_ref"
+  type: "ReLU"
+  bottom: "conv3_ref"
+  top: "conv3_ref"
+}
+
+# ########### conv4_ref
+layer {
+  name: "conv4_ref"
+  type: "Convolution"
+  bottom: "conv3_ref"
+  top: "conv4_ref"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 1216   # 19 * 64
+    group: 19
+    kernel_size: 13
+    pad: 6
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layer {
+  name: "relu4_ref"
+  type: "ReLU"
+  bottom: "conv4_ref"
+  top: "conv4_ref"
+}
+
+# ########### conv4_ref
+layer {
+  name: "conv5_ref"
+  type: "Convolution"
+  bottom: "conv4_ref"
+  top: "conv5_ref"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 4864   # 19 * 256
+    group: 19
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+layer {
+  name: "relu5_ref"
+  type: "ReLU"
+  bottom: "conv5_ref"
+  top: "conv5_ref"
+}
+
+# ########### conv5_ref
+layer {
+  name: "conv6_ref"
+  type: "Convolution"
+  bottom: "conv5_ref"
+  top: "conv6_ref"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 19
+    group: 19
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+
+# ########### loss 3
+layer {
+  name: "loss3"
+  type: "PoseHeatMapLoss"
+  bottom: "conv6_ref"
   bottom: "gt_conv8"
   bottom: "heat_maps_masks"
-  top: "loss2"
+  top: "loss3"
   include {
     phase: TRAIN
   }
@@ -858,24 +1093,13 @@ layer {
   }
 }
 
-# ########### conv9
+# ########### coarse_heat_maps && refined_heat_maps
 layer {
-  name: "gt_coordsr"
-  type: "RescaledPoseCoords"
-  bottom: "gt_coords"
-  bottom: "aux_info"
-  top: "gt_coordsr"
-  include {
-    phase: TEST
-  }
-}
-
-layer {
-  name: "conv9"
+  name: "coarse_heat_maps"
   type: "Eltwise"
   bottom: "conv8"
   bottom: "conv5_f"
-  top: "conv9"
+  top: "coarse_heat_maps"
   eltwise_param {
     operation: SUM
     coeff: 1
@@ -887,9 +1111,27 @@ layer {
 }
 
 layer {
+  name: "refined_heat_maps"
+  type: "Eltwise"
+  bottom: "conv8"
+  bottom: "conv5_f"
+  bottom: "conv6_ref"
+  top: "refined_heat_maps"
+  eltwise_param {
+    operation: SUM
+    coeff: 1
+    coeff: 1
+    coeff: 1
+  }
+  include {
+    phase: TEST
+  }
+}
+
+layer {
   name: "pred_heat_maps"
   type: "Resize"
-  bottom: "conv9"
+  bottom: "refined_heat_maps"
   bottom: "heat_maps"
   top: "pred_heat_maps"
   include {
@@ -898,7 +1140,6 @@ layer {
 }
 
 # ########### predict coordinates
-
 layer {
   name: "pred_coords"
   type: "CoordsFromHeatMaps"
@@ -921,6 +1162,17 @@ layer {
   bottom: "pred_coords"
   bottom: "aux_info"
   top: "pred_coordsr"
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "gt_coordsr"
+  type: "RescaledPoseCoords"
+  bottom: "gt_coords"
+  bottom: "aux_info"
+  top: "gt_coordsr"
   include {
     phase: TEST
   }
@@ -1003,7 +1255,7 @@ layer {
 layer {
   name: "pred_heat_maps2"
   type: "Resize"
-  bottom: "conv5_f"
+  bottom: "conv6_ref"
   bottom: "heat_maps"
   top: "pred_heat_maps2"
   include {
@@ -1064,7 +1316,7 @@ layer {
 layer {
   name: "pred_heat_maps3"
   type: "Resize"
-  bottom: "conv8"
+  bottom: "coarse_heat_maps"
   bottom: "heat_maps"
   top: "pred_heat_maps3"
   include {

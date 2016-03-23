@@ -389,6 +389,7 @@ message LayerParameter {
   
   optional LoadBboxFromFileParameter load_bbox_from_file_param = 408;
   optional ArgMaxCParameter arg_max_c_param = 410;
+  optional MultiSourcesImagesDataParameter multi_sources_images_data_param = 411;
 }
 
 // #################################################################################
@@ -581,6 +582,46 @@ message RandomImageData2Parameter {
   // record the order of joints/parts
   optional string parts_orders_path = 22;
 }
+
+// Message that stores parameters used by RandomImageDataLayer
+message MultiSourcesImagesDataParameter {
+  // Specify the data source -- annotation file.
+  repeated string source      = 1;
+  // Specify the batch size.
+  optional uint32 batch_size  = 4;
+  // The rand_skip variable is for the data layer to skip a few data points
+  // to avoid all asynchronous sgd clients to start at the same point. The skip
+  // point would be set as rand_skip * rand(0,1). Note that rand_skip should not
+  // be larger than the number of keys in the database.
+  optional uint32 rand_skip   = 7 [default = 0];
+  // Whether or not ImageLayer should shuffle the list of files at every epoch.
+  optional bool shuffle       = 8 [default = false];
+  // Specify if the images are color or gray
+  optional bool is_color      = 11 [default = true];
+  repeated string root_folder = 2;
+  // 
+  optional int32 max_size       = 9 [default = 1000];
+  repeated int32 min_size       = 10;
+  optional bool is_scale_image  = 6 [default = false];
+  optional bool always_max_size = 5 [default = false];
+  optional int32 label_num      = 3 [default = 0];
+  // the image path
+  optional string visual_path          = 12;
+  optional string skel_points_path     = 13;
+  optional string visual_images_path   = 15 [default = "images/"];
+  optional string visual_labels_path   = 16 [default = "labels/"];
+  optional string visual_aux_info_path = 17 [default = "aux_info/"];
+  repeated string im_exts = 14;
+  // 
+  optional bool is_perturb_coords      = 18 [default = false];
+  optional float min_plb               = 19 [default = 1.5];
+  optional float max_plb = 20 [default = 1.5];
+  // visualize the receptive field of each joint/part for the whole network
+  optional int32 receptive_field_size  = 21;
+  // record the order of joints/parts
+  optional string parts_orders_path    = 22;
+}
+
 
 // Message that stores parameters used by RandomImageDataLayer
 message LoadDataImageParameter { 

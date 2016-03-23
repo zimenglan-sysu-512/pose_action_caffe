@@ -70,6 +70,21 @@ void ImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image,
 		const std::vector<Dtype> mean_values);
 
 template <typename Dtype>
+cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n, const int sc);
+
+template <typename Dtype>
+cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n, const int sc,
+		const std::vector<Dtype> mean_values);
+
+template <typename Dtype>
+void ImageDataToBlob(Blob<Dtype>* blob, const int n, const int sc, 
+										 const cv::Mat& image);
+
+template <typename Dtype>
+void ImageDataToBlob(Blob<Dtype>* blob, const int n, const int sc, 
+		const cv::Mat& image, const std::vector<Dtype> mean_values);
+
+template <typename Dtype>
 void ResizeBlob_cpu(
 		const Blob<Dtype>* src, 
 		const int src_n, 

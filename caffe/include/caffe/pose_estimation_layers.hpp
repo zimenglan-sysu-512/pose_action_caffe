@@ -1257,6 +1257,85 @@ class VisualizedPoseCoords2Layer : public Layer<Dtype>{
   std::vector<std::string> images_paths_;
 };
 
+// data/images: multi-sources for per image, 
+//  like <color, optical flow, ...> or <color, depth, ...>
+// by using the same `imgidx`
+// labels/coords
+// aux info (img_ind, width, height, im_scale)
+// support multi-source and multi-scale
+template <typename Dtype>
+class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
+ public:
+  explicit MultiSourcesImagesDataLayer(
+    const LayerParameter& param)
+      : BasePrefetchingDataLayer<Dtype>(param) {}
+  virtual ~MultiSourcesImagesDataLayer();
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void DataLayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const { 
+    return "MultiSourcesImagesData"; 
+  }
+  virtual inline int ExactNumBottomBlobs() const { return 0; }
+  virtual inline int MinTopBlobs() const { return 1; }
+  virtual inline int MaxTopBlobs() const { return 3; }
+
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Forward_gpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+ protected:
+  shared_ptr<Caffe::RNG> prefetch_rng_;
+  void PerturbedCoordsBias();
+  virtual void ShuffleImages();
+  virtual void InternalThreadEntry();
+
+  bool shuffle_;
+  bool is_color_;
+  bool is_scale_image_;
+  bool always_max_size_;
+  bool has_mean_values_;
+  bool is_perturb_coords_;
+
+  int lines_id_;
+  int max_size_;
+  int label_num_;
+  int crop_size_;
+  int batch_size_;
+  int key_points_num_;
+  int receptive_field_size_;
+  std::vector<int> min_sizes_;
+  std::vector<int> origin_parts_orders_;
+  std::vector<int> flippable_parts_orders_;
+
+  float min_plb_;
+  float max_plb_;
+
+  std::vector<string> im_exts_;
+  std::string parts_orders_path_;
+  std::vector<std::string> sources_;
+  std::vector<std::string> root_folders_;
+
+  // variables -- global
+  std::vector<std::string> objidxs_;
+  std::vector<std::string> imgidxs_;
+  std::vector<std::string> images_paths_;
+
+  std::vector<int> inds_;
+  vector<Dtype> mean_values_;
+  // [[<imgidx, <objidx, coords>>, ...], ...]
+  vector<vector<std::pair<std::string, std::pair<std::string, 
+                   std::vector<float> > > > > lines_;
+  
+  Blob<Dtype> aux_info_;
+  // default for coordinates
+  shared_ptr<Blob<Dtype> > perturbed_labels_bias_;  
+};
+
+
 }  // namespace caffe
 
 #endif  // CAFFE_POSE_ESTIMATION_LAYERS_HPP_

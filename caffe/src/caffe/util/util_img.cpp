@@ -676,7 +676,6 @@ void ImageDataToBlob(Blob<Dtype>* blob, const int n, const int sc /*start*/,
   CHECK_LE(img_width,  width);
   CHECK_LE(img_height, height);
   CHECK_EQ(channels,   img_channels);
-  CHECK(mean_values.size() == 3);
 
 	int offset;  	
   Dtype* data = blob->mutable_cpu_data();

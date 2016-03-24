@@ -1,6 +1,7 @@
 ddk: ddk 172.18.180.86
 	ssh ddk@172.18.180.86
 	scp ddk@172.18.180.86:/home/ddk/dongdk/dataset/Kinect2/
+	scp -r refnet_fusnet_tmask_2b_1/ ddk@172.18.180.86:/home/ddk/dongdk/asserts/models/Pose2/kinect2/d302/
 
 shenji: d302 172.18.181.229
 	ssh d302@172.18.181.229

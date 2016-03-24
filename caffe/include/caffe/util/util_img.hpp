@@ -37,9 +37,7 @@ void mAffineWarp(const Mat_<Dtype>& M, const Mat& srcImg,
 	  Mat& dstImg, const bool fill_type = true, 
 	  const uchar value = 0);
 
-template <typename Dtype>
-cv::Mat BlobToGreyImage(const Blob<Dtype>* blob, const int n, const int c, 
-		const Dtype scale = Dtype(1.0));
+// ##########################################################################
 
 template <typename Dtype>
 cv::Mat BlobToGrayImage(const Blob<Dtype>* blob, const int n);
@@ -55,6 +53,26 @@ template <typename Dtype>
 void GrayImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image,
 		const std::vector<Dtype> mean_values);
 
+// ##########################################################################
+
+template <typename Dtype>
+cv::Mat BlobToGrayImage(const Blob<Dtype>* blob, const int n, const int sc);
+
+template <typename Dtype>
+cv::Mat BlobToGrayImage(const Blob<Dtype>* blob, const int n, const int sc,
+												const std::vector<Dtype> mean_values);
+
+template <typename Dtype>
+void GrayImageDataToBlob(Blob<Dtype>* blob, const int n, const int sc, 
+											   const cv::Mat& image);
+
+template <typename Dtype>
+void GrayImageDataToBlob(Blob<Dtype>* blob, const int n, const int sc, 
+												 const cv::Mat& image, 
+												 const std::vector<Dtype> mean_values);
+
+// ##########################################################################
+
 template <typename Dtype>
 cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n);
 
@@ -68,6 +86,8 @@ void ImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image);
 template <typename Dtype>
 void ImageDataToBlob(Blob<Dtype>* blob, const int n, const cv::Mat& image,
 		const std::vector<Dtype> mean_values);
+
+// ##########################################################################
 
 template <typename Dtype>
 cv::Mat BlobToColorImage(const Blob<Dtype>* blob, const int n, const int sc);
@@ -83,6 +103,8 @@ void ImageDataToBlob(Blob<Dtype>* blob, const int n, const int sc,
 template <typename Dtype>
 void ImageDataToBlob(Blob<Dtype>* blob, const int n, const int sc, 
 		const cv::Mat& image, const std::vector<Dtype> mean_values);
+
+// ##########################################################################
 
 template <typename Dtype>
 void ResizeBlob_cpu(

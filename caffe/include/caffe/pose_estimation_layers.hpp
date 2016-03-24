@@ -1294,7 +1294,6 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual void InternalThreadEntry();
 
   bool shuffle_;
-  bool is_color_;
   bool is_scale_image_;
   bool always_max_size_;
   bool has_mean_values_;
@@ -1304,18 +1303,23 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
   int max_size_;
   int label_num_;
   int crop_size_;
+  int n_sources_;
   int batch_size_;
   int key_points_num_;
   int receptive_field_size_;
+  
+  float min_plb_;
+  float max_plb_;
+  
+  vector<bool> is_colors_;
   std::vector<int> min_sizes_;
   std::vector<int> origin_parts_orders_;
   std::vector<int> flippable_parts_orders_;
 
-  float min_plb_;
-  float max_plb_;
+
+  std::string parts_orders_path_;
 
   std::vector<string> im_exts_;
-  std::string parts_orders_path_;
   std::vector<std::string> sources_;
   std::vector<std::string> root_folders_;
 
@@ -1325,10 +1329,12 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
   std::vector<std::string> images_paths_;
 
   std::vector<int> inds_;
+  std::vector<int> channels_inds_;
   vector<Dtype> mean_values_;
-  // [[<imgidx, <objidx, coords>>, ...], ...]
-  vector<vector<std::pair<std::string, std::pair<std::string, 
-                   std::vector<float> > > > > lines_;
+  // <imgidx, <objidx, coords>>
+  vector<std::pair<int, std::pair<std::string, std::pair<std::string, 
+                        std::vector<float> > > > >lines_;
+  
   
   Blob<Dtype> aux_info_;
   // default for coordinates

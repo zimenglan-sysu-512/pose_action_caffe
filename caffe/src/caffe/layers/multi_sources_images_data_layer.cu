@@ -10,6 +10,7 @@ void MultiSourcesImagesDataLayer<Dtype>::Forward_gpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) 
 {
   // First, join the thread
+  DLOG(INFO) << "\nThread joined\n";
   this->JoinPrefetchThread();
 
   // Used for Accuracy and Visualization layers
@@ -20,20 +21,27 @@ void MultiSourcesImagesDataLayer<Dtype>::Forward_gpu(
   GlobalVars::set_images_paths(this->images_paths_);
 
   // Reshape to loaded data.
-  top[0]->Reshape(this->prefetch_data_.num(), this->prefetch_data_.channels(),
-      this->prefetch_data_.height(), this->prefetch_data_.width());
+  top[0]->Reshape(this->prefetch_data_.num(), 
+                  this->prefetch_data_.channels(),
+                  this->prefetch_data_.height(), 
+                  this->prefetch_data_.width());
   // Copy the data
-  caffe_copy(this->prefetch_data_.count(), this->prefetch_data_.cpu_data(),
-      top[0]->mutable_gpu_data());
+  caffe_copy(this->prefetch_data_.count(), 
+             this->prefetch_data_.cpu_data(),
+             top[0]->mutable_gpu_data());
   
+  DLOG(INFO) << "\nPrefetch copied\n";
   if (this->output_labels_) {
-    caffe_copy(this->prefetch_label_.count(), this->prefetch_label_.cpu_data(),
-        top[1]->mutable_gpu_data());
-    caffe_copy(this->aux_info_.count(), this->aux_info_.cpu_data(),
-        top[2]->mutable_gpu_data());
+    caffe_copy(this->prefetch_label_.count(), 
+               this->prefetch_label_.cpu_data(),
+               top[1]->mutable_gpu_data());
+    caffe_copy(this->aux_info_.count(), 
+               this->aux_info_.cpu_data(),
+               top[2]->mutable_gpu_data());
   }
   
   // Start a new prefetch thread
+  DLOG(INFO) << "\nCreatePrefetchThread\n";
   this->CreatePrefetchThread();
 }
 

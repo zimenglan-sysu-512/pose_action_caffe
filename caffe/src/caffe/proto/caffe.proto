@@ -597,7 +597,7 @@ message MultiSourcesImagesDataParameter {
   // Whether or not ImageLayer should shuffle the list of files at every epoch.
   optional bool shuffle       = 8 [default = false];
   // Specify if the images are color or gray
-  optional bool is_color      = 11 [default = true];
+  repeated bool is_colors     = 11;
   repeated string root_folder = 2;
   // 
   optional int32 max_size       = 9 [default = 1000];

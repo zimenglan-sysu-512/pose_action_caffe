@@ -25,6 +25,13 @@ void MultiSourcesImagesDataLayer<Dtype>::Forward_gpu(
                   this->prefetch_data_.channels(),
                   this->prefetch_data_.height(), 
                   this->prefetch_data_.width());
+  if(this->layer_param_.is_disp_info()) {
+    LOG(INFO);
+    LOG(INFO) << "top blob shape (data): " 
+              << top[0]->shape_string();
+    LOG(INFO);
+  }
+  
   // Copy the data
   caffe_copy(this->prefetch_data_.count(), 
              this->prefetch_data_.cpu_data(),
@@ -38,6 +45,14 @@ void MultiSourcesImagesDataLayer<Dtype>::Forward_gpu(
     caffe_copy(this->aux_info_.count(), 
                this->aux_info_.cpu_data(),
                top[2]->mutable_gpu_data());
+    if(this->layer_param_.is_disp_info()) {
+      LOG(INFO);
+      LOG(INFO) << "top blob shape (labels): " 
+                << top[1]->shape_string();
+      LOG(INFO) << "top blob shape (labels info): " 
+                << top[2]->shape_string();
+      LOG(INFO);
+    }
   }
   
   // Start a new prefetch thread

@@ -17,12 +17,107 @@
 namespace caffe {
 
 cv::Mat ImageRead(const string& filename, const bool is_color) {
-  int cv_read_flag = (is_color ? CV_LOAD_IMAGE_COLOR : CV_LOAD_IMAGE_GRAYSCALE);
-  cv::Mat cv_img = cv::imread(filename, cv_read_flag);
-  if (!cv_img.data) {
+  int flag   = is_color ? CV_LOAD_IMAGE_COLOR 
+  										  : CV_LOAD_IMAGE_GRAYSCALE;
+  cv::Mat im = cv::imread(filename, flag);
+  if (!im.data) {
     LOG(ERROR) << "Could not open or find file " << filename;
   }
-  return cv_img;
+  return im;
+}
+
+cv::Mat ResizeImage(const cv::Mat im, const float& scale) {
+	cv::Mat im2;
+	if (!im.data) {
+    LOG(ERROR) << "\nEmpty image...\n";
+    return im2;
+  }
+
+  const int w = im.cols;	// w
+  const int h = im.rows;	// h
+  // const int c = im.channels();
+
+  const int w2 = int(w * scale);
+  const int h2 = int(h * scale);
+
+  // resize
+  cv::resize(im, im2, cv::Size(w2, h2));
+
+  if(!im2.data) {
+  	LOG(ERROR) << "\nEmpty resized image...\n";
+  }
+  return im2;
+}
+
+cv::Mat ResizeImage(const std::string& im_path, const int& ow, const int& oh, 
+										const float& scale, const bool is_color) 
+{
+	int flag   = is_color ? CV_LOAD_IMAGE_COLOR 
+											  : CV_LOAD_IMAGE_GRAYSCALE;
+	// imread											  
+	cv::Mat im = cv::imread(im_path, flag);
+
+	cv::Mat im2;
+	if (!im.data) {
+    LOG(ERROR) << "\nEmpty image...\n";
+    return im2;
+  }
+
+  const int w = im.cols;	// w
+  const int h = im.rows;	// h
+  // const int c = im.channels();
+
+  if(ow <= 0 || oh <= 0) {
+  	CHECK_EQ(w, ow) << "does not match the w to ow from " << im_path;
+  	CHECK_EQ(h, oh) << "does not match the h to ow from " << im_path;
+  }
+
+  const int w2 = int(w * scale);
+  const int h2 = int(h * scale);
+
+  // resize
+  cv::resize(im, im2, cv::Size(w2, h2));
+
+  if(!im2.data) {
+  	LOG(ERROR) << "\nEmpty resized image...\n";
+  }
+  return im2;
+}
+
+bool ResizeImage(const std::string& im_path, cv::Mat& im2, const int& ow, 
+								 const int& oh, const float& scale, const bool is_color) 
+{
+	int flag   = is_color ? CV_LOAD_IMAGE_COLOR 
+											  : CV_LOAD_IMAGE_GRAYSCALE;
+	// imread											  
+	cv::Mat im = cv::imread(im_path, flag);
+
+	if (!im.data) {
+    LOG(INFO) << "\nEmpty image...\n";
+    return false;
+  }
+
+  const int w = im.cols;	// w
+  const int h = im.rows;	// h
+  // const int c = im.channels();
+
+  if(ow <= 0 || oh <= 0) {
+  	CHECK_EQ(w, ow) << "does not match the w to ow from " << im_path;
+  	CHECK_EQ(h, oh) << "does not match the h to ow from " << im_path;
+  }
+
+  const int w2 = int(w * scale);
+  const int h2 = int(h * scale);
+
+  // resize
+  cv::resize(im, im2, cv::Size(w2, h2));
+
+  if(!im2.data) {
+  	LOG(INFO) << "\nEmpty resized image...\n";
+  	return false;
+  }
+
+  return true;
 }
 
 }  // namespace caffe

@@ -71,12 +71,13 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
   const MultiSourcesImagesDataParameter msidp = 
       this->layer_param_.multi_sources_images_data_param();
 
-  CHECK(msidp.source_size()      > 0);
+  CHECK(msidp.source_size()     == 1) 
+        << "Only one input label file availble.";
   CHECK(msidp.root_folder_size() > 0);
   CHECK(msidp.im_exts_size()     > 0);
   CHECK(msidp.is_colors_size()   > 0);
 
-  this->n_sources_ = msidp.source_size();
+  this->n_sources_ = msidp.root_folder_size();
   CHECK_EQ( this->n_sources_,  msidp.root_folder_size());
   CHECK_EQ( this->n_sources_,  msidp.im_exts_size());
   CHECK_EQ( this->n_sources_,  msidp.is_colors_size());
@@ -181,15 +182,31 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
 
   // Read the file with imgidxs and labels
   for(int s = 0; s < msidp.source_size(); s++) {
-    const std::string source      = msidp.source(s);
+    const std::string source  = msidp.source(s);
+    LOG(INFO) << "\n\n" 
+              << "s: " << s << " " 
+              << "source: " << source << " "
+              << "\n\n";
+    this->sources_.push_back(source);
+  }
+
+  LOG(INFO) << "\n\nn_sources: " << this->n_sources_ << "\n\n";
+  for(int s = 0; s < this->n_sources_; s++) {
     const std::string im_ext      = msidp.im_exts(s);
     const bool is_color           = msidp.is_colors(s);
     const std::string root_folder = msidp.root_folder(s);
 
     this->im_exts_.push_back(im_ext);
-    this->sources_.push_back(source);
+    
     this->is_colors_.push_back(is_color);
     this->root_folders_.push_back(root_folder);
+
+    LOG(INFO) << "\n\n" 
+              << "s: " << s << " " 
+              << "im_ext: " << im_ext << " "
+              << "is_color: " << is_color << " "
+              << "root_folder: " << root_folder
+              << "\n\n";
   }
 
   for(int s = 0; s < msidp.source_size(); s++) {
@@ -245,7 +262,7 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
     // shuffle
     ShuffleImages();
   }
-  LOG(INFO) << "A total of " << lines_.size() << " images.";
+  LOG(INFO) << "\n\nA total of " << lines_.size() << " images.\n\n";
 
   // Check if we would need to randomly skip a few data points
   lines_id_ = 0;
@@ -279,11 +296,14 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
     this->channels_inds_.clear();
   }
   int t_channels = 0;
+  LOG(INFO) << "n_sources: " << this->n_sources_;
   for(int j2 = 0; j2 < this->n_sources_; j2++) {
+    LOG(INFO) << "t_channels: " << t_channels;
     this->channels_inds_.push_back(t_channels);
     t_channels = this->is_colors_[j2] ? (t_channels + 3) 
                                       : (t_channels + 1);
   }
+  LOG(INFO) << "t_channels: " << t_channels;
   this->channels_inds_.push_back(t_channels);
 
   // data/images
@@ -292,11 +312,11 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
                                height, width);
   this->transformed_data_.Reshape(1, t_channels, height, width);
   
-  LOG(INFO) << "\noutput data size: " 
+  LOG(INFO) << "\n\noutput data size: " 
             << top[0]->num()      << ","
             << top[0]->channels() << "," 
             << top[0]->height()   << ","
-            << top[0]->width()    << "\n";
+            << top[0]->width()    << "\n\n";
 
   // labels & aux info
   if(top.size() > 1) {
@@ -306,13 +326,14 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
     top[1]->Reshape(this->batch_size_, this->label_num_, 1, 1);
     this->prefetch_label_.Reshape(this->batch_size_, 
                                   this->label_num_, 1, 1);
-
+    LOG(INFO);
     LOG(INFO) << this->label_num_ << ", " 
               << this->batch_size_;
     LOG(INFO) << "output prefetch_label_ size: " 
               << top[1]->count();
     LOG(INFO) << "output prefetch_label_ shape_string: " 
               << top[1]->shape_string();
+    LOG(INFO);
     
     // (img_ind, width, height, im_scale, flippable)
     top[2]->Reshape(this->batch_size_, 5, 1, 1);
@@ -321,6 +342,7 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
     LOG(INFO) << "output aux_info_ size: " << top[2]->count();
     LOG(INFO) << "output aux_info_ shape_string: " 
               << top[2]->shape_string();
+    LOG(INFO);
 
     // first initialize for create heat maps from coordinates
     // see `heat_maps_from_coords_layer.cpp`
@@ -393,6 +415,10 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
   }
   CHECK_EQ(this->images_paths_.size(), 0);
 
+  if(this->layer_param_.is_disp_info()) {
+    LOG(INFO) << "\nStart calculating size and scale -- 0...\n";
+  }
+
   // get size and scale
   timer.Start();
   const int lines_size = lines_.size();
@@ -444,6 +470,10 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
   }
   read_time += timer.MicroSeconds();
 
+  if(this->layer_param_.is_disp_info()) {
+    LOG(INFO) << "\nStart calculating size and scale -- 1...\n";
+  }
+
   // image scale
   timer.Start();
   if(this->is_scale_image_) {
@@ -483,6 +513,10 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
                                           im_scales[item_id]));
   }
 
+  if(this->layer_param_.is_disp_info()) {
+    LOG(INFO) << "\nStart reshape top blobs...\n";
+  }
+
   // reshape & reset
   CHECK_EQ(this->n_sources_ + 1, this->channels_inds_.size());
   const int t_channels = this->channels_inds_[this->n_sources_];
@@ -502,23 +536,44 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
   const TransformationParameter transform_param = 
       this->layer_param_.transform_param();
       
+  if(this->layer_param_.is_disp_info()) {
+    LOG(INFO) << "Start fetching images & labels...";
+  }
+
   // images & labels (rescale)
   for (int item_id = 0; item_id < this->batch_size_; ++item_id) {
     timer.Start();
-    const int width              = widths[item_id]  * 
-                                   im_scales[item_id];
-    const int height             = heights[item_id] * 
-                                   im_scales[item_id];
+    // const int width              = widths[item_id]  * 
+    //                                im_scales[item_id];
+    // const int height             = heights[item_id] * 
+    //                                im_scales[item_id];
     const bool do_mirror         = transform_param.mirror() && 
                                    this->data_transformer_->Rand(2);
+
+    if(this->layer_param_.is_disp_info()) {
+      LOG(INFO) << "Start fetching images & labels -- " 
+                << item_id << "...";
+    }
 
     // images from multi-sources                               
     for(int j2 = 0; j2 < this->n_sources_; j2++) {
       const std::string image_path = this->root_folders_[j2] +
                                      this->imgidxs_[item_id] + 
                                      this->im_exts_[j2];
-      cv::Mat im = ReadImageToCVMat(image_path, height, width, 
-                                    this->is_colors_[j2]);
+      // cv::Mat im = ReadImageToCVMat(image_path, height, width, 
+      //                               this->is_colors_[j2]);
+      cv::Mat im;                                     
+      bool flag = ResizeImage(image_path, im, widths[item_id], 
+                              heights[item_id], im_scales[item_id], 
+                              this->is_colors_[j2]);
+      if(!flag) {
+        if(this->layer_param_.is_disp_info()) {
+          LOG(INFO) << "\n\nimage_path does not exist or invalid: " 
+                    << image_path << "\n\n"; 
+        }
+        continue;
+      }
+
       // ####################################################### 
       // need to check <width, height> for all sources???
       // here do not check!!!
@@ -552,6 +607,10 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
       }
     }                           
     
+    if(this->layer_param_.is_disp_info()) {
+      LOG(INFO) << "Start fetching images -- mid...";
+    }
+
     // timer
     read_time += timer.MicroSeconds();
 
@@ -601,6 +660,10 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
              << " ms.";
   DLOG(INFO) << "     Read time: " << read_time / 1000 << " ms.";
   DLOG(INFO) << "finishing fetching images...";
+
+  if(this->layer_param_.is_disp_info()) {
+    LOG(INFO) << "\nEnd fetching images & labels...\n";
+  }
 
   // visualization of input data
   #ifdef __MULTI_SOURCES_IMAGES_DATA_LAYER_VISUAL__
@@ -669,6 +732,7 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
                                         + this->objidxs_[item_id] + "_ms_"
                                         + to_string(j2)
                                         + this->im_exts_[j2];
+            LOG(INFO) << "img_path3: " << img_path3;                                        
             cv::imwrite(img_path3, img);                                       
             continue;
           }

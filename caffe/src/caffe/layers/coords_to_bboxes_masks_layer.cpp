@@ -31,8 +31,12 @@ void CoordsToBboxesMasksLayer<Dtype>::LayerSetUp(
   this->bottom_id_      = coord_to_bbox_masks_param.bottom_id();
   this->bottom_id2_     = coord_to_bbox_masks_param.bottom_id2();
   this->value_ = Dtype(coord_to_bbox_masks_param.value());
-  this->perturb_num_    = coord_to_bbox_masks_param.perturb_num();
-  this->is_perturb_num_ = this->perturb_num_ > 0;
+
+  this->perb_num_    = 0;
+  if(coord_to_bbox_masks_param.has_perturb_num()) {
+    this->perb_num_  = coord_to_bbox_masks_param.perturb_num();
+  }
+  this->is_perturb_     = this->perb_num_ > 0;
 
   this->has_visual_path_ = coord_to_bbox_masks_param.has_visual_path();
   if(this->has_visual_path_) {
@@ -168,6 +172,8 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
   Dtype* bbox_masks        = top[0]->mutable_cpu_data();
   caffe_set(top[0]->count(), Zero, bbox_masks);
 
+  const Dtype perb_num = this->perb_num_ * 2 + 1;
+
   for(int n = 0; n < this->num_; n++) {
     pco = bottom[0]->offset(n);
     if(this->whole_) {
@@ -201,6 +207,61 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
         && x2 >= this->width_ && y2 >= this->height_) {
       continue;
     }
+
+    // pertube
+    if(this->is_perturb_) {
+      const int ind   = this->Rand(20);
+      const Dtype pn  = Dtype(this->Rand(perb_num) - this->perb_num_);
+      const Dtype pn2 = Dtype(this->Rand(perb_num) - this->perb_num_);
+      const Dtype pn3 = Dtype(this->Rand(perb_num) - this->perb_num_);
+      const Dtype pn4 = Dtype(this->Rand(perb_num) - this->perb_num_);
+      switch(ind) {
+        // single 
+        case 1: x1 += pn;
+          break;
+        case 2: x1 += pn;
+          break;
+        case 3: y1 += pn;
+          break;
+        case 4: y1 += pn;
+          break;
+        case 5: x2 += pn;
+          break;
+        case 6: x2 += pn;
+          break;
+        case 7: y2 += pn;
+          break;
+        case 8: y2 += pn;
+          break;
+        // both && all
+        case 11: x1 += pn;  y1 += pn;
+          break;
+        case 12: x1 += pn;  y1 += pn;
+          break;
+        case 13: x2 += pn;  y2 += pn;
+          break;
+        case 14: x2 += pn;  y2 += pn;
+          break;
+        case 15: x1 += pn;  y1 += pn;  x2 += pn2; y2 += pn2;
+          break;
+        case 16: x1 += pn;  y1 += pn;  x2 += pn2; y2 += pn2;
+          break;
+        case 17: x1 += pn;  y1 += pn2; x2 += pn3; y2 += pn4;
+          break;
+        case 18: x1 += pn;  y1 += pn2; x2 += pn3; y2 += pn4;
+          break;
+        default:
+          break;
+      }
+      if(this->layer_param_.is_disp_info()) {
+        LOG(INFO) << "ind: "     << ind << " " 
+                  << "perb_n: "  << pn  << " "
+                  << "perb_n2: " << pn2 << " "
+                  << "perb_n3: " << pn3 << " "
+                  << "perb_n4: " << pn4;
+      }
+    }
+
     // check bound
     if(x1 > x2) std::swap(x1, x2);
     if(y1 > y2) std::swap(y1, y2);

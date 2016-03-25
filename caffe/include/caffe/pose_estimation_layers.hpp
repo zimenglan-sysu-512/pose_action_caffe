@@ -811,7 +811,7 @@ class CoordsToBboxesMasksLayer : public Layer<Dtype>{
  
  protected:
   bool whole_;
-  bool is_perturb_num_;
+  bool is_perturb_;
   bool has_visual_path_;
   int top_id_;
   int top_id2_;
@@ -826,7 +826,7 @@ class CoordsToBboxesMasksLayer : public Layer<Dtype>{
   int n_channels_;
   int height_;
   int width_;
-  int perturb_num_;
+  int perb_num_;
   Dtype value_;
   std::string img_ext_;
   std::string visual_path_;

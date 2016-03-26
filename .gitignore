@@ -10,3 +10,4 @@ data/Actions/
 .pydevproject
 face-detection/
 *.avi
+demo/*.log

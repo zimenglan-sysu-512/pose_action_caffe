@@ -689,10 +689,6 @@ int _pose_estimate() {
 
       int pw = bbox.p_x2 - bbox.p_x1 + 1;
       int ph = bbox.p_y2 - bbox.p_y1 + 1;
-      pw = min(pw, ims_vec[bchidx].cols - bbox.p_x1 - 2);
-      pw = max(1, pw);
-      ph = min(pw, ims_vec[bchidx].rows - bbox.p_y1 - 2);
-      ph = max(1, ph);
       if(_disp_info) {
         LOG(INFO) << "p_x1: " << bbox.p_x1 << " p_y1: " << bbox.p_y1;                         
         LOG(INFO) << "p_x2: " << bbox.p_x2 << " p_y2: " << bbox.p_y2;                         

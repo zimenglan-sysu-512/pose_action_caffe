@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # command 
-# 	 cd ../../../caffe/ && make -j8 && cd - && sh deploy.sh
+# 	 cd ../../../caffe/ && make -j8 && cd - && sh demo.sh
 
 # ########################################
 gpu=0					# set params
@@ -20,9 +20,12 @@ g_height=100
 min_size=256
 max_size=320
 batch_size=1	# set params
+data_layer_name="data"
+aux_info_layer_name="aux_info"
+gt_cooords_layer_name="gt_coords"
 # ########################################
 
-caffe_dire="/home/ddk/dongdk/pose-caffe/caffe/"
+caffe_dire="/home/ddk/dongdk/pose-caffe/"
 
 im_dire="/home/ddk/dongdk/dataset/demo/pose/mude.images1/"
 
@@ -42,7 +45,7 @@ def="deploy.pt"
 
 log_path="deploy.log"
 
-caffe_bin="${caffe_dire}build/tools/static_pose_v2"
+caffe_bin="${caffe_dire}caffe/build/tools/static_pose_v2"
 
 s_time=2
 sleep $s_time
@@ -69,4 +72,7 @@ $caffe_bin static_pose_v2 \
 		--disp_info=$disp_info \
 		--batch_size=$batch_size \
 		--caffemodel=$caffemodel \
+		--data_layer_name $data_layer_name \
+		--aux_info_layer_name $aux_info_layer_name \
+		--gt_cooords_layer_name $gt_cooords_layer_name \
 		2>&1 | tee -a $log_path

@@ -16,24 +16,21 @@ input_shape {
   dim: 1
 }
 
-input: "gt_pose_coords"
+input: "gt_coords"
 input_shape {
   dim: 5
-  dim: 28
+  dim: 38
   dim: 1
   dim: 1
 }
 
 layer {
-  name: "torso_masks"
+  name: "tmasks"
   type: "CoordsToBboxesMasks"
-  bottom: "gt_pose_coords"
+  bottom: "gt_coords"
   bottom: "aux_info"
-  top: "torso_masks"
+  top: "tmasks"
   coord_to_bbox_masks_param {
-    # id:  (lsho: 9,rhip: 13)
-    # id2: (rsho: 5,lhip: 16)
-    # index starts from zero
     top_id: 9
     bottom_id: 13
     top_id2: 9

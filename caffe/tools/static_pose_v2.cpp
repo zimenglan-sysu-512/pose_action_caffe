@@ -55,6 +55,9 @@ std::string _in_dire;
 std::string _pt_file;
 std::string _out_dire;
 std::string _skel_path;
+std::string _data_layer_name;
+std::string _aux_info_layer_name;
+std::string _gt_coords_layer_name;
 std::vector<int> _s_skel_idxs;
 std::vector<int> _e_skel_idxs;
 const float zero         = 0;
@@ -96,6 +99,9 @@ DEFINE_string(in_dire, "",  "The input of the images.");
 DEFINE_string(skel_path, "",  "orders of parts to draw a stickmen.");
 DEFINE_string(pt_file, "",  "The input of label file specifying the input image and its corresponding label information, like torso/person bbox");
 DEFINE_string(out_dire, "", "The output of the results, like files or visualized images.");
+DEFINE_string(data_layer_name, "", "input data layer name.");
+DEFINE_string(aux_info_layer_name, "", "aux info laye name.");
+DEFINE_string(gt_coords_layer_name, "", "gt coords layer name.");
 
 // A simple registry for caffe commands.
 typedef int (*BrewFunction)();
@@ -270,9 +276,13 @@ void _init() {
   _out_dire      = FLAGS_out_dire;
   _g_width       = FLAGS_g_width;
   _g_height      = FLAGS_g_height;
-  _draw_text  = FLAGS_draw_text != 0;
-  _disp_info  = FLAGS_disp_info != 0; 
-  _skel_path  = FLAGS_skel_path;
+  _draw_text     = FLAGS_draw_text != 0;
+  _disp_info     = FLAGS_disp_info != 0; 
+  _skel_path     = FLAGS_skel_path;
+
+  _data_layer_name      = FLAGS_data_layer_name;
+  _aux_info_layer_name  = FLAGS_aux_info_layer_name;
+  _gt_coords_layer_name = FLAGS_gt_coords_layer_name;
 
   if(!_s_skel_idxs.empty()) _s_skel_idxs.clear();
   if(!_e_skel_idxs.empty()) _e_skel_idxs.clear();
@@ -574,14 +584,14 @@ int _pose_estimate() {
     
     // reshape
     const shared_ptr<Blob<float> > data_in           = 
-              caffe_net.blob_by_name("data");
+              caffe_net.blob_by_name(_data_layer_name);
     data_in->ReshapeLike(*data_blob);
     const shared_ptr<Blob<float> > aux_info_in       = 
-              caffe_net.blob_by_name("aux_info");
+              caffe_net.blob_by_name(_aux_info_layer_name);
     aux_info_in->ReshapeLike(*aux_info_blob);
-    const shared_ptr<Blob<float> > gt_pose_coords_in = 
-              caffe_net.blob_by_name("gt_pose_coords");
-    gt_pose_coords_in->ReshapeLike(*torso_info_blob);
+    const shared_ptr<Blob<float> > gt_coords_in = 
+              caffe_net.blob_by_name(_gt_coords_layer_name);
+    gt_coords_in->ReshapeLike(*torso_info_blob);
     
     // set global info
     caffe::GlobalVars::set_objidxs(objidxs);       

@@ -341,6 +341,9 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos,
 
     tp_info.im_path = info[0];
     boost::trim(tp_info.im_path);
+    cv::Mat im  = cv::imread(tp_info.im_path);
+    const int h = im.rows;
+    const int w = im.cols;
 
     int n_obj2 = n_info2 / n_obj;
     for(int j = 0; j < n_obj2; j++) {
@@ -361,9 +364,13 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos,
       bbox.t_y2 = std::atoi(info[j2 + 8].c_str());
       // expand person bbox
       bbox.p_x1 -= _p_dxy;
+      bbox.p_x1  = max(bbox.p_x1, 1);
       bbox.p_y1 -= _p_dxy;
+      bbox.p_y1  = max(bbox.p_y1, 1);
       bbox.p_x2 += _p_dxy;
+      bbox.p_x2  = min(bbox.p_x2, w - 2);
       bbox.p_y2 += _p_dxy;
+      bbox.p_y2  = min(bbox.p_y2, h - 2);
       tp_info.bboxes.push_back(bbox);
     } // end for
 
@@ -438,9 +445,10 @@ int _pose_estimate() {
       TP_Info& tp_info          = tp_infos[s];    
       std::vector<BBox>& bboxes = tp_info.bboxes;
 
-      if(_disp_info) {
-        LOG(INFO) << tp_info.im_path;
-      }
+      LOG(INFO);
+      LOG(INFO) << "im_i: " << s 
+                << " im_path:" << tp_info.im_path;
+                
       cv::Mat im = cv::imread(tp_info.im_path);
       ims_vec.push_back(im);
 
@@ -449,8 +457,8 @@ int _pose_estimate() {
       im_names.push_back(im_name);
       info.clear();
 
-      tp_info.im_name = im_name.substr(
-                            im_name.find_last_of(".") + 1);
+      tp_info.im_name = im_name.substr(0,
+                            im_name.find_last_of("."));
       
       for(int j = 0; j < bboxes.size(); j++) {
         // person bbox's height and width
@@ -642,7 +650,7 @@ int _pose_estimate() {
         y += bbox.p_y1;
 
         cv::Point p(x, y);
-        cv::circle(ims_vec[bchidx], p, _radius, _color1, 
+        cv::circle(ims_vec[bchidx], p, _radius, _color6, 
                    _thickness);
 
         if(_draw_text) {
@@ -668,26 +676,39 @@ int _pose_estimate() {
           const int s_idx2 = s_idx * 2;
           const int e_idx2 = e_idx * 2;
           // get point
-          const int sx = int(coord[o + s_idx2 + 0]);
-          const int sy = int(coord[o + s_idx2 + 1]);
+          const int sx = int(coord[o + s_idx2 + 0] + bbox.p_x1);
+          const int sy = int(coord[o + s_idx2 + 1] + bbox.p_y1);
           const cv::Point sp(sx, sy);
-          const int ex = int(coord[o + e_idx2 + 0]);
-          const int ey = int(coord[o + e_idx2 + 1]);
+          const int ex = int(coord[o + e_idx2 + 0] + bbox.p_x1);
+          const int ey = int(coord[o + e_idx2 + 1] + bbox.p_y1);
           const cv::Point ep(ex, ey);
           // 
-          cv::line(ims_vec[bchidx], sp, ep, _color7, _thickness);
+          cv::line(ims_vec[bchidx], sp, ep, _color5, _thickness);
         } // end s_idx
       }
 
-      const int pw = bbox.p_x2 - bbox.p_x1 + 1;
-      const int ph = bbox.p_y2 - bbox.p_y1 + 1;
-
+      int pw = bbox.p_x2 - bbox.p_x1 + 1;
+      int ph = bbox.p_y2 - bbox.p_y1 + 1;
+      pw = min(pw, ims_vec[bchidx].cols - bbox.p_x1 - 2);
+      pw = max(1, pw);
+      ph = min(pw, ims_vec[bchidx].rows - bbox.p_y1 - 2);
+      ph = max(1, ph);
+      if(_disp_info) {
+        LOG(INFO) << "p_x1: " << bbox.p_x1 << " p_y1: " << bbox.p_y1;                         
+        LOG(INFO) << "p_x2: " << bbox.p_x2 << " p_y2: " << bbox.p_y2;                         
+        LOG(INFO) << "pw: " << pw << " ph: " << ph;                         
+        LOG(INFO) << "pw: " << ims_vec[bchidx].cols << " ph: " 
+                  << ims_vec[bchidx].rows;                         
+      }
       // top_left.x, top_left.y, width, height
       cv::Rect rect(bbox.p_x1, bbox.p_y1, pw, ph);
       cv::Mat im_crop = ims_vec[bchidx](rect);
       const std::string out_path2 = _out_dire 
                                   + tp_infos[imgidx].im_name + " _"
                                   + boost::to_string(objidx) + _im_ext;
+      if(_disp_info) {
+        LOG(INFO) << "out_path2:" << out_path2;                          
+      }
       cv::imwrite(out_path2, im_crop);
 
       // draw person bbox

@@ -976,7 +976,7 @@ layer {
   name: "pred_heat_maps"
   type: "Resize"
   bottom: "refined_heat_maps"
-  bottom: "heat_maps"
+  bottom: "data_b1"
   top: "pred_heat_maps"
   include {
     phase: TEST

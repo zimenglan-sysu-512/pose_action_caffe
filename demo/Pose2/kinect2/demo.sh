@@ -13,7 +13,7 @@ sho_id2=9
 hip_id2=13
 part_num=19
 has_torso=1
-draw_text=1
+draw_text=0
 disp_info=1
 g_width=100
 g_height=100
@@ -22,7 +22,7 @@ max_size=320
 batch_size=1	# set params
 data_layer_name="data"
 aux_info_layer_name="aux_info"
-gt_cooords_layer_name="gt_coords"
+gt_coords_layer_name="gt_coords"
 # ########################################
 
 caffe_dire="/home/ddk/dongdk/pose-caffe/"
@@ -36,9 +36,9 @@ pt_file="${im_dire}tp.result/pt.bbox.txt"
 
 skel_path="${caffe_dire}demo/skel_paths/kinect2_19.txt"
 
-model_dire="/home/ddk/dongdk/asserts/models/Pose/Kinect2/d302/"
-exper_name="lecun-8x-2b-sd5_5-tmarks/models/"
-model_name="Kinect2_iter_13000.caffemodel"
+model_dire="/home/ddk/dongdk/asserts/models/Pose2/kinect2/d302/"
+exper_name="refnet_fusnet_tmask_2b_2/models/"
+model_name="kinect2_iter_13000.caffemodel"
 caffemodel="${model_dire}${exper_name}${model_name}"
 
 def="deploy.pt"
@@ -74,5 +74,5 @@ $caffe_bin static_pose_v2 \
 		--caffemodel=$caffemodel \
 		--data_layer_name $data_layer_name \
 		--aux_info_layer_name $aux_info_layer_name \
-		--gt_cooords_layer_name $gt_cooords_layer_name \
+		--gt_coords_layer_name $gt_coords_layer_name \
 		2>&1 | tee -a $log_path

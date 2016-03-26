@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 # command 
-# 	 cd ../../../../../caffe/ && make -j8 && cd - && sh deploy.sh
+# 	 cd ../../../caffe/ && make -j8 && cd - && sh deploy.sh
 
 # ########################################
 gpu=0					# set params
@@ -22,25 +22,32 @@ max_size=320
 batch_size=1	# set params
 # ########################################
 
-# in_dire=""	# no need so far
+caffe_dire="/home/ddk/dongdk/pose-caffe/caffe/"
 
-out_dire="/home/ddk/malong/dataset/person.torso/demo/vision/mude.images.pose1/"
+im_dire="/home/ddk/dongdk/dataset/demo/pose/mude.images1/"
+
+out_dire="${im_dire}pose.vision/"
 mkdir -p $out_dire
 
-pt_file="/home/ddk/malong/dataset/person.torso/demo/vision/files/mude.images.per.tor.bbox.txt"
+pt_file="${im_dire}tp.result/pt.bbox.txt"
 
-caffemodel="/home/ddk/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks/models/Kinect2_iter_13000.caffemodel"
+skel_path="${caffe_dire}demo/skel_paths/kinect2_19.txt"
+
+model_dire="/home/ddk/dongdk/asserts/models/Pose/Kinect2/d302/"
+exper_name="lecun-8x-2b-sd5_5-tmarks/models/"
+model_name="Kinect2_iter_13000.caffemodel"
+caffemodel="${model_dire}${exper_name}${model_name}"
 
 def="deploy.pt"
 
 log_path="deploy.log"
 
-caffe_bin="/home/ddk/dongdk/pose-caffe/caffe/build/tools/static_pose_v2"
+caffe_bin="${caffe_dire}build/tools/static_pose_v2"
 
-s_time=3
+s_time=2
 sleep $s_time
 
-$caffe_bin static_pose_v3 \
+$caffe_bin static_pose_v2 \
 		--gpu=$gpu \
 		--def=$def \
 		--p_dxy=$p_dxy \
@@ -56,6 +63,7 @@ $caffe_bin static_pose_v3 \
 		--max_size=$max_size \
 		--part_num=$part_num \
 		--out_dire=$out_dire \
+		--skel_path $skel_path \
 		--draw_text=$draw_text \
 		--has_torso=$has_torso \
 		--disp_info=$disp_info \

@@ -48,15 +48,10 @@ double _ratio;
 int _has_torso;
 int _batch_size;
 bool _draw_text;
-bool _draw_skel;
 bool _disp_info;
-std::string _im_ext;
-std::string _in_dire;
 std::string _pt_file;
+std::string _in_dire;
 std::string _out_dire;
-std::string _skel_path;
-std::vector<int> _s_skel_idxs;
-std::vector<int> _e_skel_idxs;
 const float zero         = 0;
 const int _radius        = 2;
 const int _thickness     = 2;
@@ -91,9 +86,7 @@ DEFINE_int32(min_size, 240, "The height of frame/image.");
 DEFINE_int32(p_dxy,      0, "expand the person bbox.");
 DEFINE_int32(g_width,  100, "The width  of frame/image (for initialization).");
 DEFINE_int32(g_height, 100, "The height of frame/image (for initialization).");
-DEFINE_string(im_ext, ".jpg",  "image extesion.");
 DEFINE_string(in_dire, "",  "The input of the images.");
-DEFINE_string(skel_path, "",  "orders of parts to draw a stickmen.");
 DEFINE_string(pt_file, "",  "The input of label file specifying the input image and its corresponding label information, like torso/person bbox");
 DEFINE_string(out_dire, "", "The output of the results, like files or visualized images.");
 
@@ -211,36 +204,9 @@ struct Ind {
   int objidx; // the index of the objidx in the `imgidx-th` image
 };
 
-void get_skeleton_idxs(const std::string source,
-                       std::vector<int>& start_skel_idxs, 
-                       std::vector<int>& end_skel_idxs) 
-{
-  std::ifstream filer(source.c_str());
-  CHECK(filer);
-  LOG(INFO) << "skeleton filepath: " << source;
-
-  int n_skel;
-  int s_idx, e_idx;
-
-  filer >> n_skel;
-  LOG(INFO);
-  LOG(INFO) << "number of skeleton: " << n_skel;
-
-  for(int idx = 0; idx < n_skel; idx++) {
-    filer >> s_idx >> e_idx;
-    start_skel_idxs.push_back(s_idx);
-    end_skel_idxs.push_back(e_idx);
-    LOG(INFO) << "idx: " << idx << ", s_idx: " 
-              << s_idx << ", e_idx: " << e_idx;
-  }
-  LOG(INFO);
-}
-
 void _init() {
-  CHECK_GT(FLAGS_def.size(), 0) 
-      << "Need a deploy prototxt to test...";      // check
-  CHECK_GT(FLAGS_caffemodel.size(), 0)   
-      << "Need trained model to test...";
+  CHECK_GT(FLAGS_def.size(), 0) << "Need a deploy prototxt to test...";      // check
+  CHECK_GT(FLAGS_caffemodel.size(), 0)   << "Need trained model to test...";
  
   vector<int> gpus; // set device id and mode
   get_gpus(&gpus);
@@ -253,8 +219,7 @@ void _init() {
     Caffe::set_mode(Caffe::CPU);
   }
   
-  // FLAGS args
-  _p_dxy         = FLAGS_p_dxy;       
+  _p_dxy         = FLAGS_p_dxy;       // FLAGS args
   _sho_id        = FLAGS_sho_id;       
   _hip_id        = FLAGS_hip_id;
   _sho_id2       = FLAGS_sho_id2;
@@ -265,24 +230,12 @@ void _init() {
   _max_size      = FLAGS_max_size;
   _has_torso     = FLAGS_has_torso;
   _batch_size    = FLAGS_batch_size;
-  _im_ext        = FLAGS_im_ext;
-  _in_dire       = FLAGS_in_dire;
-  _out_dire      = FLAGS_out_dire;
+  _in_dire  = FLAGS_in_dire;
+  _out_dire = FLAGS_out_dire;
   _g_width       = FLAGS_g_width;
   _g_height      = FLAGS_g_height;
   _draw_text  = FLAGS_draw_text != 0;
-  _disp_info  = FLAGS_disp_info != 0; 
-  _skel_path  = FLAGS_skel_path;
-
-  if(!_s_skel_idxs.empty()) _s_skel_idxs.clear();
-  if(!_e_skel_idxs.empty()) _e_skel_idxs.clear();
-  if(_skel_path.length() > 0) {
-    get_skeleton_idxs(_skel_path, _s_skel_idxs, _e_skel_idxs);
-  }
-  _draw_skel = !_s_skel_idxs.empty() && !_e_skel_idxs.empty();
-  if(_draw_skel) {
-    CHECK_EQ(_s_skel_idxs.size(), _e_skel_idxs.size());
-  }
+  _disp_info  = FLAGS_disp_info != 0; // FLAGS args
 
   caffe::GlobalVars::set_g_width( _g_width);
   caffe::GlobalVars::set_g_height(_g_height);
@@ -290,8 +243,7 @@ void _init() {
   CHECK_GE(_ratio, 0.);
   CHECK_LE(_ratio, 1.);
 
-  // display info
-  if(_disp_info) {                              
+  if(_disp_info) {                              // display info
     LOG(INFO) << "ratio: "      << _ratio;
     LOG(INFO) << "sho id: "     << _sho_id;
     LOG(INFO) << "hip id: "     << _hip_id;
@@ -304,10 +256,7 @@ void _init() {
   }
 }
 
-void _read_tp_info(std::vector<TP_Info>& tp_infos, 
-                   const std::string tp_file, 
-                   const int n_obj = 9) 
-{
+void _read_tp_info(std::vector<TP_Info>& tp_infos, const std::string tp_file, const int n_obj = 9) {
   LOG(INFO) << "Opening file " << tp_file;
   std::ifstream filer(tp_file.c_str());
   CHECK(filer);
@@ -326,8 +275,7 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos,
     int n_info2 = n_info - 1;
     
     CHECK_GE(n_info, 1);
-    CHECK_EQ(n_info2 % n_obj, 0) << "error format: " 
-                                 << line << "\n";
+    CHECK_EQ(n_info2 % n_obj, 0) << "error format: " << line << "\n";
 
     tp_info.im_path = info[0];
     boost::trim(tp_info.im_path);
@@ -339,13 +287,11 @@ void _read_tp_info(std::vector<TP_Info>& tp_infos,
       int j2     = 1 + j * n_obj;
       // bounding boxes for torso and person
       // ignore `ind`
-      // person bbox
-      bbox.p_x1 = std::atoi(info[j2 + 1].c_str());  
+      bbox.p_x1 = std::atoi(info[j2 + 1].c_str());  // person
       bbox.p_y1 = std::atoi(info[j2 + 2].c_str());
       bbox.p_x2 = std::atoi(info[j2 + 3].c_str());
       bbox.p_y2 = std::atoi(info[j2 + 4].c_str());
-      // torso bbox
-      bbox.t_x1 = std::atoi(info[j2 + 5].c_str());  
+      bbox.t_x1 = std::atoi(info[j2 + 5].c_str());  // torso
       bbox.t_y1 = std::atoi(info[j2 + 6].c_str());
       bbox.t_x2 = std::atoi(info[j2 + 7].c_str());
       bbox.t_y2 = std::atoi(info[j2 + 8].c_str());
@@ -368,22 +314,15 @@ int _pose_estimate() {
   std::vector<TP_Info> tp_infos;
   _read_tp_info(tp_infos, _pt_file);  // get labels
   
-  // instantiate the caffe net.
-  Net<float> caffe_net(FLAGS_def, caffe::TEST);  
-  // copy the trained model
-  caffe_net.CopyTrainedLayersFrom(FLAGS_caffemodel);      
+  Net<float> caffe_net(FLAGS_def, caffe::TEST);  // instantiate the caffe net.
+  caffe_net.CopyTrainedLayersFrom(FLAGS_caffemodel);      // copy the trained model
   
-  // bottom input
-  vector<Blob<float>* > bottom_vec;                 
-  // input image
-  Blob<float> *data_blob       = new Blob<float>(); 
-  // aux info
-  Blob<float> *aux_info_blob   = new Blob<float>(); 
-  // set torso info
-  Blob<float> *torso_info_blob = NULL;              
+  vector<Blob<float>* > bottom_vec;                 // bottom input
+  Blob<float> *data_blob       = new Blob<float>(); // input image
+  Blob<float> *aux_info_blob   = new Blob<float>(); // aux info
+  Blob<float> *torso_info_blob = NULL;              // set torso info
 
-  // variables 
-  std::vector<Ind>     ids;       
+  std::vector<Ind>     ids;       // variables 
   std::vector<string>  imgidxs;
   std::vector<string>  objidxs;
   std::vector<string>  im_names;
@@ -411,8 +350,7 @@ int _pose_estimate() {
     int max_width  = -1;
     int max_height = -1;
     
-    // indices of joints/parts forming a torso mask
-    const int s_idx    = _sho_id   * 2;  
+    const int s_idx    = _sho_id   * 2;  // indices of joints/parts forming a torso mask
     const int h_idx    = _hip_id   * 2;
     const int s_idx2   = _sho_id2  * 2;
     const int h_idx2   = _hip_id2  * 2;
@@ -424,8 +362,7 @@ int _pose_estimate() {
 
     // each batch - preprocess data - 1
     while(bs < _batch_size && s < tp_infos.size()){
-      // Pointer Reference
-      TP_Info& tp_info          = tp_infos[s];    
+      TP_Info& tp_info          = tp_infos[s];    // Pointer Reference
       std::vector<BBox>& bboxes = tp_info.bboxes;
 
       if(_disp_info) {
@@ -438,18 +375,13 @@ int _pose_estimate() {
       im_name = info[info.size() - 1];
       im_names.push_back(im_name);
       info.clear();
-
-      tp_info.im_name = im_name.substr(
-                            im_name.find_last_of(".") + 1);
       
       for(int j = 0; j < bboxes.size(); j++) {
-        // person bbox's height and width
-        int pw = bboxes[j].p_x2 - bboxes[j].p_x1 + 1;
+        int pw = bboxes[j].p_x2 - bboxes[j].p_x1 + 1; // person bbox's height and width
         int ph = bboxes[j].p_y2 - bboxes[j].p_y1 + 1;
         int min_size = std::min(pw, ph);
         int max_size = std::max(pw, ph);
-        float scale = float(std::max(min_size, _min_size)) 
-                    / float(std::min(min_size, _min_size));
+        float scale = float(std::max(min_size, _min_size)) / float(std::min(min_size, _min_size));
         if(scale * max_size > _max_size) {
           scale = float(_max_size) / float(max_size);
         }
@@ -464,16 +396,14 @@ int _pose_estimate() {
         max_width       = std::max(max_width,  int(pw * scale));
         max_height      = std::max(max_height, int(ph * scale));
         
-        // here just for convinience
-        imgidxs.push_back(tp_info.im_name);     
+        imgidxs.push_back(tp_info.im_name);     // here just for convinience
         objidxs.push_back(boost::to_string(j));
         im_paths.push_back(tp_info.im_path);
         
-        // <bchidx, imgidx, objidx>
-        Ind ind;            
-        ind.imgidx = s;  // index of all input images
-        ind.objidx = j;  // index of person in one image
-        ind.bchidx = bs; // index in present batchize
+        Ind ind;            // <bchidx, imgidx, objidx>
+        ind.imgidx = s;
+        ind.objidx = j;
+        ind.bchidx = bs;
         ids.push_back(ind); 
         
         is++; // self-increase
@@ -512,15 +442,13 @@ int _pose_estimate() {
 
       cv::Mat im_crop;
       cv::Size S(w, h);
-      caffe::CropAndResizePatch(ims_vec[bchidx], im_crop, 
-                                coords, S);
+      caffe::CropAndResizePatch(ims_vec[bchidx], im_crop, coords, S);
       caffe::ImageDataToBlob(data_blob, j, im_crop);
     } // end for
 
-    // fullfill
     aux_info_blob->Reshape(n_batch_size, 5, 1, 1);
     float *aux_data = aux_info_blob->mutable_cpu_data();
-    caffe::caffe_set(aux_info_blob->count(), zero, aux_data); 
+    caffe::caffe_set(aux_info_blob->count(), zero, aux_data); // fullfill
 
     // each batch - preprocess data - 3
     for(int j = 0; j < n_batch_size; j++) {
@@ -529,8 +457,7 @@ int _pose_estimate() {
       const BBox& bbox = tp_infos[imgidx].bboxes[objidx];
 
       // origin width & height and matched scale
-      // imgidx, width, height, scale, flippable
-      int o = aux_info_blob->offset(j);  
+      int o = aux_info_blob->offset(j);   // imgidx, width, height, scale, flippable
       aux_data[o + 0] = j;
       aux_data[o + 1] = bbox.p_x2 - bbox.p_x1 + 1;
       aux_data[o + 2] = bbox.p_y2 - bbox.p_y1 + 1;
@@ -542,13 +469,11 @@ int _pose_estimate() {
     if(_has_torso) {
       torso_info_blob->Reshape(n_batch_size, _part_num * 2, 1, 1);
       float *torso_info = torso_info_blob->mutable_cpu_data();
-      // fullfill
-      caffe::caffe_set(torso_info_blob->count(), zero, torso_info); 
+      caffe::caffe_set(torso_info_blob->count(), zero, torso_info); // fullfill
 
       // each batch - preprocess data - 4
       // don't use `whole` mode -> maybe error
-      // see src/caffe/layers/coords_to_bboxes_masks_layer.cpp 
-      // for more details
+      // see src/caffe/layers/coords_to_bboxes_masks_layer.cpp for more details
       for(int j = 0; j < n_batch_size; j++) {
         const int imgidx = ids[j].imgidx;
         const int objidx = ids[j].objidx;
@@ -573,129 +498,76 @@ int _pose_estimate() {
     } // end if
     
     // reshape
-    const shared_ptr<Blob<float> > data_in           = 
-              caffe_net.blob_by_name("data");
+    const shared_ptr<Blob<float> > data_in           = caffe_net.blob_by_name("data");
     data_in->ReshapeLike(*data_blob);
-    const shared_ptr<Blob<float> > aux_info_in       = 
-              caffe_net.blob_by_name("aux_info");
+    const shared_ptr<Blob<float> > aux_info_in       = caffe_net.blob_by_name("aux_info");
     aux_info_in->ReshapeLike(*aux_info_blob);
-    const shared_ptr<Blob<float> > gt_pose_coords_in = 
-              caffe_net.blob_by_name("gt_pose_coords");
+    const shared_ptr<Blob<float> > gt_pose_coords_in = caffe_net.blob_by_name("gt_pose_coords");
     gt_pose_coords_in->ReshapeLike(*torso_info_blob);
     
-    // set global info
-    caffe::GlobalVars::set_objidxs(objidxs);       
+    caffe::GlobalVars::set_objidxs(objidxs);       // set global info
     caffe::GlobalVars::set_imgidxs(imgidxs);
     caffe::GlobalVars::set_images_paths(im_paths);
     
-    // forward
-    float loss;                              
+    float loss;                              // forward
     bottom_vec.push_back(data_blob);
     bottom_vec.push_back(aux_info_blob);
     if(_has_torso) {
       bottom_vec.push_back(torso_info_blob);
     }
-    // forward  
-    caffe_net.Forward(bottom_vec, &loss);    
+    caffe_net.Forward(bottom_vec, &loss);    // forward  
 
-    // predicted coordinates
-    const vector<vector<Blob<float>*> > &top_vecs = 
-              caffe_net.top_vecs(); 
+    const vector<vector<Blob<float>*> > &top_vecs = caffe_net.top_vecs(); // predicted coordinates
     const int t_id = top_vecs.size() - 1; 
     const Blob<float> *coord_blob = top_vecs[t_id][0];
     const float *coord = coord_blob->cpu_data();
     CHECK_EQ(coord_blob->num(), n_batch_size);                            // predicted coordinates
-    CHECK_EQ(channels, coord_blob->channels()) 
-            << "Does not match the channels: " << channels;  
+    CHECK_EQ(channels, coord_blob->channels()) << "Does not match the channels: " << channels;  
 
-    // visualize
-    for(int j = 0; j < n_batch_size; j++) {  
-      // get offset
-      int o = coord_blob->offset(j);         
+    for(int j = 0; j < n_batch_size; j++) {  // visualize
+      int o = coord_blob->offset(j);         // get offset
       const int bchidx = ids[j].bchidx;
       const int imgidx = ids[j].imgidx;
       const int objidx = ids[j].objidx;
       BBox& bbox = tp_infos[imgidx].bboxes[objidx];
 
-      // recover torso bbox
+      cv::Point p1(bbox.p_x1, bbox.p_y1);   // person bbox
+      cv::Point p2(bbox.p_x2, bbox.p_y2);
+      cv::rectangle(ims_vec[bchidx], p1, p2, cv::Scalar(145, 33, 216), 2);
+
       { /// in general, we set ratio to be 0.
         int tw     = bbox.t_x2 - bbox.t_x1 + 1;
         bbox.t_x1 -= int(tw * _ratio);
         // bbox.t_x2 += int(tw * _ratio);
       }
-
-      // draw joints
-      for(int c = 0; c < channels; c += 2) {  
+      cv::Point p3(bbox.t_x1, bbox.t_y1);   // torso bbox
+      cv::Point p4(bbox.t_x2, bbox.t_y2);
+      cv::rectangle(ims_vec[bchidx], p3, p4, cv::Scalar(36, 213, 115), 2);
+      
+      for(int c = 0; c < channels; c += 2) {  // one person and corresponding torso
         int x = int(coord[o + c + 0]);
         int y = int(coord[o + c + 1]);
         x += bbox.p_x1;
         y += bbox.p_y1;
 
         cv::Point p(x, y);
-        cv::circle(ims_vec[bchidx], p, _radius, _color1, 
-                   _thickness);
+        cv::circle(ims_vec[bchidx], p, _radius, _color1, _thickness);
 
         if(_draw_text) {
           const int idx = c / 2;
           const std::string text = boost::to_string(idx);
           if(idx % 2) {
             const cv::Point text_point(x - 5, y - 5);
-            cv::putText(ims_vec[bchidx], text, text_point, 
-                        _fontFace, _fontScale, _color2);
+            cv::putText(ims_vec[bchidx], text, text_point, _fontFace, _fontScale, _color2);
           } else {
             const cv::Point text_point(x + 5, y + 5);
-            cv::putText(ims_vec[bchidx], text, text_point, 
-                        _fontFace, _fontScale, _color2);
+            cv::putText(ims_vec[bchidx], text, text_point, _fontFace, _fontScale, _color2);
           }
         } // end if
       } // end inner fori
-
-      // draw lines
-      if(_draw_skel) { // index starts from zero
-        for(int idx = 0; idx < _s_skel_idxs.size(); idx++) {
-          const int s_idx  = _s_skel_idxs[idx];
-          const int e_idx  = _e_skel_idxs[idx];
-          const int s_idx2 = s_idx * 2;
-          const int e_idx2 = e_idx * 2;
-          // get point
-          const int sx = int(coord[o + s_idx2 + 0]);
-          const int sy = int(coord[o + s_idx2 + 1]);
-          const cv::Point sp(sx, sy);
-          const int ex = int(coord[o + e_idx2 + 0]);
-          const int ey = int(coord[o + e_idx2 + 1]);
-          const cv::Point ep(ex, ey);
-          // 
-          cv::line(ims_vec[bchidx], sp, ep, _color7, _thickness);
-        } // end s_idx
-      }
-
-      const int pw = bbox.p_x2 - bbox.p_x1 + 1;
-      const int ph = bbox.p_y2 - bbox.p_y1 + 1;
-
-      // top_left.x, top_left.y, width, height
-      cv::Rect rect(bbox.p_x1, bbox.p_y1, pw, ph);
-      cv::Mat im_crop = ims_vec[bchidx](rect);
-      const std::string out_path2 = _out_dire 
-                                  + tp_infos[imgidx].im_name + " _"
-                                  + boost::to_string(objidx) + _im_ext;
-      cv::imwrite(out_path2, im_crop);
-
-      // draw person bbox
-      cv::Point p1(bbox.p_x1, bbox.p_y1);   
-      cv::Point p2(bbox.p_x2, bbox.p_y2);
-      cv::rectangle(ims_vec[bchidx], p1, p2, 
-                    cv::Scalar(145, 33, 216), 2);
-
-      // draw torso bbox
-      cv::Point p3(bbox.t_x1, bbox.t_y1);   
-      cv::Point p4(bbox.t_x2, bbox.t_y2);
-      cv::rectangle(ims_vec[bchidx], p3, p4, 
-                    cv::Scalar(36, 213, 115), 2);
-
     } // end outer for
 
-    // write into images for visualization
-    for(int j = 0; j < ims_vec.size(); j++) { 
+    for(int j = 0; j < ims_vec.size(); j++) { // write into images for visualization
       out_path = _out_dire + im_names[j];
       cv::imwrite(out_path, ims_vec[j]);
     }
@@ -707,11 +579,11 @@ int _pose_estimate() {
   return 0;
 }
 
-int static_pose_v2() {
+int static_pose_v3() {
   _pose_estimate();
   return 0;
 } 
-RegisterBrewFunction(static_pose_v2);
+RegisterBrewFunction(static_pose_v3);
 
 // ####################################################################
 // #####                            Main                          #####
@@ -728,7 +600,7 @@ int main(int argc, char** argv) {
   gflags::SetUsageMessage("command line brew\n"
       "usage: caffe <command> <args>\n\n"
       "commands:\n"
-      "  static_pose_v2    show result timely from camera");
+      "  static_pose_v3    show result timely from camera");
   
   // Run tool or show usage.
   caffe::GlobalInit(&argc, &argv);
@@ -744,8 +616,7 @@ int main(int argc, char** argv) {
   }
 #endif
   } else {
-    gflags::ShowUsageWithFlagsRestrict(argv[0], 
-        "tools/static_pose_v2");
+    gflags::ShowUsageWithFlagsRestrict(argv[0], "tools/static_pose_v3");
   }
   // exit cleanly on interrupt
   if (quit_signal) exit(0); 

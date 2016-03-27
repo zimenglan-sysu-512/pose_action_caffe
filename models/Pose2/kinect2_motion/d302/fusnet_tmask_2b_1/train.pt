@@ -995,6 +995,7 @@ layer {
   include {
     phase: TEST
   }
+  zero_iter_test: true
   pose_pdj_accuracy_param {
     acc_factor: 0.05
     acc_factor_num: 10

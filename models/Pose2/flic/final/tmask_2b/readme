@@ -13,5 +13,5 @@ alias
 	ft:			finetune
 
 cmds:
-	cd ../../../../../caffe/ && make -j8 && cd - && sh train.sh
+	cd ../../../../../caffe/ && make -j8 && cd - && sh run.sh
 	cd ../../../../../caffe/ && make -j8 && cd - && sh test.sh

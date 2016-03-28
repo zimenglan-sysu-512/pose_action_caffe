@@ -186,6 +186,8 @@ void PoseEuDistAccuracyLayer<Dtype>::CalAccPerImage(
     // distance between prediction and ground truth
     const Dtype dx      = (pred_x - gt_x) / two;
     const Dtype dy      = (pred_y - gt_y) / two;
+    // const Dtype dx      = (pred_x - gt_x);
+    // const Dtype dy      = (pred_y - gt_y);
     pred_dist[index++]  = std::sqrt(dx * dx + dy * dy);
   }
   CHECK_EQ(index, this->key_point_num_);
@@ -193,6 +195,7 @@ void PoseEuDistAccuracyLayer<Dtype>::CalAccPerImage(
   // Count the correct ones
   for (int afn = 0; afn < this->acc_factor_num_; afn++) {
     const Dtype threshold = this->acc_factors_[afn];
+    // LOG(INFO) << "afn: " << afn << ", threshold: " << threshold;
     for (int idx = 0; idx < this->key_point_num_; idx++) {
       if (pred_dist[idx] <= threshold) {
         this->accuracies_[afn][idx]++;

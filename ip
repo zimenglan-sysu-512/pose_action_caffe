@@ -10,6 +10,11 @@ d302: d302 172.18.183.41
 	ssh d302@172.18.183.41
 		using with lingbo
 
+surge: surge 172.18.180.111
+	ssh surge@172.18.180.111
+		A3bcDO2
+	scp surge@172.18.180.111:/home/surge/dongdk
+
 liangdp: liangdp 172.18.181.186
 	ssh liangdp@172.18.181.186
 

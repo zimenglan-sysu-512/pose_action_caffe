@@ -678,31 +678,31 @@ layer {
   }
 }
 
-# # ########### visulization && accuracy
-# layer {
-#   name: "viz_heat_maps"
-#   type: "VisualizedHeatMaps2"
-#   bottom: "pred_heat_maps"
-#   bottom: "heat_maps"
-#   bottom: "aux_info"
-#   include {
-#     phase: TEST
-#   }
-#   visual_heat_maps_param {
-#     # 0: files; 1: images, 2: both
-#     visual_type: 1
-#     heat_map_path: "../asserts/models/Pose2/flic/final/tmask_2b/heat_maps/"
-#     heat_map_files_name: "files/"
-#     heat_map_images_name: "images/"
-#     # if bottom.size() is 1, then only one phase_name
-#     # if bottom.size() is 3, then use three phase_name(s)
-#     # ohters, errors
-#     # phase_name: "pred/"
-#     # phase_name: "gt/"
-#     phase_name: "fusion/"
-#     threshold: 0.273
-#   }
-# }
+# ########### visulization && accuracy
+layer {
+  name: "viz_heat_maps"
+  type: "VisualizedHeatMaps2"
+  bottom: "pred_heat_maps"
+  bottom: "heat_maps"
+  bottom: "aux_info"
+  include {
+    phase: TEST
+  }
+  visual_heat_maps_param {
+    # 0: files; 1: images, 2: both
+    visual_type: 1
+    heat_map_path: "../asserts/models/Pose2/flic/final/tmask_2b/heat_maps/"
+    heat_map_files_name: "files/"
+    heat_map_images_name: "images/"
+    # if bottom.size() is 1, then only one phase_name
+    # if bottom.size() is 3, then use three phase_name(s)
+    # ohters, errors
+    # phase_name: "pred/"
+    # phase_name: "gt/"
+    phase_name: "fusion/"
+    threshold: 0.273
+  }
+}
 
 # layer {
 #   name: "viz_coordsr"

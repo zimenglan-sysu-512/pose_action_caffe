@@ -390,6 +390,7 @@ message LayerParameter {
   optional LoadBboxFromFileParameter load_bbox_from_file_param = 408;
   optional ArgMaxCParameter arg_max_c_param = 410;
   optional MultiSourcesImagesDataParameter multi_sources_images_data_param = 411;
+  optional PoseEuDistAccuracyParameter pose_eudist_accuracy_param = 412;
 }
 
 // #################################################################################
@@ -853,6 +854,18 @@ message PosePDJAccuracyParameter {
   optional int32 hip_id = 6;
   // optional int32 label_num = 9;
   optional bool zero_iter_test = 10 [default = false];
+}
+
+// message that stores parameters used by
+message PoseEuDistAccuracyParameter {
+  optional float acc_factor = 1 [default = 1];
+  optional int32 acc_factor_num = 2 [default = 20];
+  optional int32 images_num = 3;
+  // store the accuracy as a log
+  optional string acc_path = 4;
+  optional string acc_name = 5 [default = "accuracy.log"];
+  optional string log_name = 6 [default = "log.log"];
+  optional bool zero_iter_test = 7 [default = false];
 }
 
 // Message that stores parameters used by AccuracyLayer

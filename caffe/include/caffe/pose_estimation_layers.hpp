@@ -119,6 +119,79 @@ class PosePDJAccuracyLayer : public Layer<Dtype> {
 };
 
 /**
+ * @brief Computes the accuracy for human pose/joint estimation
+ * Using Percentage of Detected Joints (using euclidean distance)
+ * We restrict that the coordinates are in this interval [0, width - 1] 
+ * and [0, height - 1].
+ * So if use regression and in the beginning normalize coordinates, 
+ * you must re-normalize them,
+ * before use this layer, be calling 
+ * `revert_normalized_pose_coords_layer` layer.
+ *
+ * Please refer to  `Flowing ConvNets for Human Pose Estimation in Video, ICCV 2015.`
+ */
+template <typename Dtype>
+class PoseEuDistAccuracyLayer : public Layer<Dtype> {
+ public:
+  
+  explicit PoseEuDistAccuracyLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const { return "PoseEuDistAccuracy"; }
+  virtual inline int ExactNumBottomBlobs() const { return 2; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
+ protected:
+ virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  /// @brief Not implemented -- 
+  /// PoseEuDistAccuracyLayer cannot be used as a loss.
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, 
+      const vector<Blob<Dtype>*>& bottom) {
+    for (int i = 0; i < propagate_down.size(); ++i) {
+      if (propagate_down[i]) { NOT_IMPLEMENTED; }
+    }
+  }
+
+  void initAccFactors();
+  void InitQuantization();
+  void CalAccPerImage(const Dtype* pred_coords_ptr, 
+                      const Dtype* gt_coords_ptr);
+  void WriteResults(const float total_accuracies[]);
+  void QuanFinalResults();
+  void Quantization(const Dtype* pred_coords, 
+                    const Dtype* gt_coords, 
+                    const int num);
+
+ protected:
+  bool zero_iter_test_;
+  int label_num_;
+  int images_num_;
+  int key_point_num_;
+  int images_itemid_;
+  int acc_factor_;
+  int acc_factor_num_;
+  
+  std::string acc_path_;
+  std::string acc_name_;
+  std::string acc_file_;
+  std::string log_name_;
+  std::string log_file_;
+
+  std::vector<float> acc_factors_;
+  std::vector< std::vector<float> > accuracies_;
+
+  Blob<Dtype> diff_;
+  std::vector<Dtype> max_score_;
+  std::vector<Dtype> max_score_iter_;
+};
+
+/**
  * @brief Computes the Euclidean (L2) loss @f$
  * bottom[0]: predicted heat maps
  * bottom[1]: ground truth heat maps

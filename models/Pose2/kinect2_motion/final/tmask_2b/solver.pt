@@ -1,0 +1,43 @@
+# net pt
+net: "models/Pose2/kinect2_motion/final/tmask_2b/train.pt"
+
+# snapshot
+snapshot: 1000
+
+# snapshot prefix
+snapshot_prefix: "../asserts/models/Pose2/kinect2_motion/final/tmask_2b/models/kinect2_motion"
+
+# n_images (13707) = test_iter(1714) * batchsize(8)
+test_iter: 1714
+
+# test when reaching the test_interval
+test_interval: 1000
+
+test_initialization: false
+
+# 0.0001 fast convergence
+base_lr: 0.0001 # 0.00000001
+
+# Learning rate
+lr_policy: "step"
+
+# SGD
+gamma: 0.0001
+power: 0.75
+momentum: 0.9
+weight_decay: 0.0005
+
+# Change learning rate
+stepsize: 80000
+
+# Iterations
+max_iter: 80000
+
+# Display
+display: 200
+
+# CPU or GPU
+solver_mode: GPU
+
+# GPU ID
+device_id: 0

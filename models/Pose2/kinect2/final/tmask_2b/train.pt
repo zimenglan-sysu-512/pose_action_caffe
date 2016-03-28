@@ -1,0 +1,753 @@
+name: "HumanPoseEstimation"
+
+# ########### data && mask && heat map
+layer {
+  name: "data"
+  type: "MultiSourcesImagesData"
+  top: "data"
+  top: "gt_coords"
+  top: "aux_info"
+  include {
+    phase: TRAIN
+  }
+  transform_param { # opencv: B, G, R
+    mirror: true
+  }
+  is_disp_info: false
+  multi_sources_images_data_param {
+    source: "../dataset/Kinect2/labels/up.crop.color2_train_l7.log"
+    root_folder: "../dataset/Kinect2/up.crop.color/"
+    root_folder: "../dataset/Kinect2/torso_masks/masks/"
+    label_num: 38
+    batch_size: 12
+    always_max_size: true
+    is_scale_image: true
+    shuffle: true
+    max_size: 320
+    min_size: 256
+    is_colors: true
+    is_colors: false
+    im_exts: ".png"
+    im_exts: ".png"
+    parts_orders_path: "../dataset/Kinect2/labels/parts_orders_path.log"
+    skel_points_path: "../dataset/Kinect2/labels/skel_path.log"
+    # visual_path: "../dataset/Kinect2/vision/d.train/"
+  }
+}
+
+layer {
+  name: "data"
+  type: "MultiSourcesImagesData"
+  top: "data"
+  top: "gt_coords"
+  top: "aux_info"
+  include {
+    phase: TEST
+  }
+  transform_param { # opencv: B, G, R
+    mirror: false
+  }
+  multi_sources_images_data_param {
+    source: "../dataset/Kinect2/labels/up.crop.color2_test_l7.log"
+    root_folder: "../dataset/Kinect2/up.crop.color/"
+    root_folder: "../dataset/Kinect2/torso_masks/masks/"
+    label_num: 38
+    batch_size: 8
+    always_max_size: true
+    is_scale_image: true
+    shuffle: false
+    max_size: 320
+    min_size: 256
+    is_colors: true
+    is_colors: false
+    im_exts: ".png"
+    im_exts: ".png"
+    parts_orders_path: "../dataset/Kinect2/labels/parts_orders_path.log"
+    skel_points_path: "../dataset/Kinect2/labels/skel_path.log"
+    # visual_path: "../dataset/Kinect2/vision/d.test/"
+  }
+}
+
+layer {
+  name: "data_b2"
+  type: "Resize"
+  bottom: "data"
+  top: "data_b2"
+  resize_param {
+    height_fac: 0.707
+    width_fac: 0.707
+  }
+}
+
+layer {
+  name: "heat_maps_from_coords"
+  type: "HeatMapsFromCoordsOrigin"
+  bottom: "gt_coords"
+  bottom: "aux_info"
+  top: "heat_maps"
+  top: "heat_maps_masks"
+  heat_maps_from_coords_origin_param {
+    is_binary: true
+    gau_mean: 0
+    gau_stds: 1.5
+    radius_str: "3,5,5,5,5,5,5,3,3,5,5,3,3,5,5,5,5,5,5"
+  }
+}
+
+# ########### conv1_b1
+layer {
+  name: "conv1_b1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1_b1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu1_b1"
+  type: "ReLU"
+  bottom: "conv1_b1"
+  top: "conv1_b1"
+}
+
+layer {
+  name: "pool1_b1"
+  type: "Pooling"
+  bottom: "conv1_b1"
+  top: "pool1_b1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv2_b1
+layer {
+  name: "conv2_b1"
+  type: "Convolution"
+  bottom: "pool1_b1"
+  top: "conv2_b1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu2_b1"
+  type: "ReLU"
+  bottom: "conv2_b1"
+  top: "conv2_b1"
+}
+
+layer {
+  name: "pool2_b1"
+  type: "Pooling"
+  bottom: "conv2_b1"
+  top: "pool2_b1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv3_b1
+layer {
+  name: "conv3_b1"
+  type: "Convolution"
+  bottom: "pool2_b1"
+  top: "conv3_b1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu3_b1"
+  type: "ReLU"
+  bottom: "conv3_b1"
+  top: "conv3_b1"
+}
+
+# ########### conv4_b1
+layer {
+  name: "conv4_b1"
+  type: "Convolution"
+  bottom: "conv3_b1"
+  top: "conv4_b1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu4_b1"
+  type: "ReLU"
+  bottom: "conv4_b1"
+  top: "conv4_b1"
+}
+
+# ########### conv1_b2
+layer {
+  name: "conv1_b2"
+  type: "Convolution"
+  bottom: "data_b2"
+  top: "conv1_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu1_b2"
+  type: "ReLU"
+  bottom: "conv1_b2"
+  top: "conv1_b2"
+}
+
+layer {
+  name: "pool1_b2"
+  type: "Pooling"
+  bottom: "conv1_b2"
+  top: "pool1_b2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv2_b2
+layer {
+  name: "conv2_b2"
+  type: "Convolution"
+  bottom: "pool1_b2"
+  top: "conv2_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu2_b2"
+  type: "ReLU"
+  bottom: "conv2_b2"
+  top: "conv2_b2"
+}
+
+layer {
+  name: "pool2_b2"
+  type: "Pooling"
+  bottom: "conv2_b2"
+  top: "pool2_b2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv3_b2
+layer {
+  name: "conv3_b2"
+  type: "Convolution"
+  bottom: "pool2_b2"
+  top: "conv3_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu3_b2"
+  type: "ReLU"
+  bottom: "conv3_b2"
+  top: "conv3_b2"
+}
+
+# ########### conv4_b2
+layer {
+  name: "conv4_b2"
+  type: "Convolution"
+  bottom: "conv3_b2"
+  top: "conv4_b2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu4_b2"
+  type: "ReLU"
+  bottom: "conv4_b2"
+  top: "conv4_b2"
+}
+
+# ########### resize && merge && spatial-dropout
+layer {
+  name: "conv4_b2r"
+  type: "Resize"
+  bottom: "conv4_b2"
+  bottom: "conv4_b1"
+  top: "conv4_b2r"
+}
+
+layer {
+  name: "merge_banks"
+  type: "Eltwise"
+  bottom: "conv4_b1"
+  bottom: "conv4_b2r"
+  top: "conv4"
+  eltwise_param {
+    operation: SUM
+  }
+}
+
+layer {
+  name: "spatial_drop"
+  type: "SpatialDropout"
+  bottom: "conv4"
+  top: "conv4"
+  spatial_dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+# ########### conv5
+layer {
+  name: "conv5"
+  type: "Convolution"
+  bottom: "conv4"
+  top: "conv5"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 512
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "conv5"
+  top: "conv5"
+}
+
+# ########### conv6
+layer {
+  name: "conv6"
+  type: "Convolution"
+  bottom: "conv5"
+  top: "conv6"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "conv6"
+  top: "conv6"
+}
+
+# ########### conv7
+layer {
+  name: "conv7"
+  type: "Convolution"
+  bottom: "conv6"
+  top: "conv7"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "conv7"
+  top: "conv7"
+}
+
+# ########### conv8
+layer {
+  name: "conv8"
+  type: "Convolution"
+  bottom: "conv7"
+  top: "conv8"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 19
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+# ########### loss 1
+layer {
+  name: "gt_conv8"
+  type: "Resize"
+  bottom: "heat_maps"
+  bottom: "conv8"
+  top: "gt_conv8"
+  include {
+    phase: TRAIN
+  }
+}
+
+layer {
+  name: "loss"
+  type: "PoseHeatMapLoss"
+  bottom: "conv8"
+  bottom: "gt_conv8"
+  bottom: "heat_maps_masks"
+  top: "loss"
+  include {
+    phase: TRAIN
+  }
+  loss_weight: 1
+  pose_heat_map_loss_param {
+    loss_emphase_type: 3
+    fg_eof: 3
+    bg_eof: 1
+    ratio: 0.005
+    prob_num: 11
+    heat_score_thres: 0.273
+    parts_err_num_thres: 3
+    hard_negative_filepath: "NotImplemented."
+  }
+}
+
+
+# ########### predict coordinates
+layer {
+  name: "pred_heat_maps"
+  type: "Resize"
+  bottom: "conv8"
+  bottom: "heat_maps"
+  top: "pred_heat_maps"
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "pred_coords"
+  type: "CoordsFromHeatMaps"
+  bottom: "pred_heat_maps"
+  top: "pred_coords"
+  include {
+    phase: TEST
+  }
+  is_disp_info: true
+  pose_coords_from_heat_maps_param {
+    top_k: 30
+    heat_map_a: 1
+    heat_map_b: 0
+  }
+}
+
+layer {
+  name: "pred_coordsr"
+  type: "RescaledPoseCoords"
+  bottom: "pred_coords"
+  bottom: "aux_info"
+  top: "pred_coordsr"
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "gt_coordsr"
+  type: "RescaledPoseCoords"
+  bottom: "gt_coords"
+  bottom: "aux_info"
+  top: "gt_coordsr"
+  include {
+    phase: TEST
+  }
+}
+
+# ########### visulization && accuracy
+# layer {
+#   name: "viz_heat_maps"
+#   type: "VisualizedHeatMaps2"
+#   bottom: "pred_heat_maps"
+#   bottom: "heat_maps"
+#   bottom: "aux_info"
+#   include {
+#     phase: TEST
+#   }
+#   visual_heat_maps_param {
+#     # 0: files; 1: images, 2: both
+#     visual_type: 1
+#     heat_map_path: "../asserts/models/Pose2/kinect2/final/tmask_2b/heat_maps/"
+#     heat_map_files_name: "files/"
+#     heat_map_images_name: "images/"
+#     # if bottom.size() is 1, then only one phase_name
+#     # if bottom.size() is 3, then use three phase_name(s)
+#     # ohters, errors
+#     # phase_name: "pred/"
+#     # phase_name: "gt/"
+#     phase_name: "fusion/"
+#     threshold: 0.273
+#   }
+# }
+
+# layer {
+#   name: "viz_coordsr"
+#   type: "VisualizedPoseCoords"
+#   bottom: "pred_coordsr"
+#   bottom: "gt_coordsr"
+#   bottom: "aux_info"
+#   include {
+#     phase: TEST
+#   }
+#   visual_pose_coords_param {
+#     coords_path: "../asserts/models/Pose2/kinect2/final/tmask_2b/poses/"
+#     skel_path: "../dataset/Kinect2/labels/skel_path.log"
+#     coords_files_name: "files/"
+#     coords_images_name: "images/"
+#     # if bottom.size() == 1, only one of them, either `train/test` or `train, test, fusion` 
+#     # if bottom.size() == 3, then phase_name_size must be 3
+#     # else phase_name_size must be 1
+#     phase_name: "pred/"
+#     phase_name: "gt/"
+#     phase_name: "fusion/"
+#     is_draw_text: true
+#   }
+# }
+
+layer {
+  name: "accuracy"
+  type: "PosePDJAccuracy"
+  bottom: "pred_coordsr"
+  bottom: "gt_coordsr"
+  top: "accuracy"
+  include {
+    phase: TEST
+  }
+  pose_pdj_accuracy_param {
+    acc_factor: 0.05
+    acc_factor_num: 10
+    images_num: 13707
+    acc_name: "accuracy.log"
+    log_name: "log.log"
+    acc_path: "../asserts/models/Pose2/kinect2/final/tmask_2b/accuracy/"
+    # here use (rsho, lhip) -> 5: rsho, 16: lhip
+    shoulder_id: 5
+    hip_id: 16
+  }
+}

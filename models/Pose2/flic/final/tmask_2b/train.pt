@@ -750,3 +750,23 @@ layer {
     zero_iter_test: true
   }
 }
+
+layer {
+  name: "accuracy2"
+  type: "PoseEuDistAccuracy"
+  bottom: "pred_coordsr"
+  bottom: "gt_coordsr"
+  top: "accuracy2"
+  include {
+    phase: TEST
+  }
+  pose_eudist_accuracy_param {
+    acc_factor: 1
+    acc_factor_num: 24
+    images_num: 1016
+    acc_name: "accuracy2.log"
+    log_name: "log2.log"
+    acc_path: "../asserts/models/Pose2/flic/final/tmask_2b/accuracy/"
+    zero_iter_test: true
+  }
+}

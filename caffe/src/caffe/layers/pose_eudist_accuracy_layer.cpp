@@ -39,7 +39,6 @@ void PoseEuDistAccuracyLayer<Dtype>::LayerSetUp(
   this->images_itemid_   = 0;
   this->images_num_      = pudap.images_num();
   this->acc_factor_      = 1; // pudap.acc_factor();
-  this->acc_factor_      = acc_factor;
   this->acc_factor_num_  = pudap.acc_factor_num();
   this->acc_path_        = pudap.acc_path();
   this->acc_name_        = pudap.acc_name();

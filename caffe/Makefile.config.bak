@@ -22,7 +22,6 @@ CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
 
 # cuDNN acceleration switch (uncomment to build with cuDNN).
 USE_CUDNN := 1
-CUDNN_PATH := /home/liangdp/dongdk/tool/cuddn.env/v2
 
 # BLAS choice:
 # atlas for ATLAS (default)
@@ -61,9 +60,7 @@ WITH_PYTHON_LAYER := 1
 
 # Whatever else you find you need goes here.
 INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include \
-		$(CUDNN_PATH)/include
 LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib \
-		$(CUDNN_PATH)/lib
 
 # Uncomment to use `pkg-config` to specify OpenCV library paths.
 # (Usually not necessary -- OpenCV libraries are normally installed in one of the above $LIBRARY_DIRS.)

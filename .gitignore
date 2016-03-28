@@ -8,6 +8,6 @@ data/Actions/
 *.tar
 .project
 .pydevproject
-face-detection/
 *.avi
 demo/*.log
+ip

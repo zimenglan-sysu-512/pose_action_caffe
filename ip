@@ -62,3 +62,19 @@ d302: (d302)
 
 	scp -r d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/log .
 	scp -r d302@172.18.183.41:/home/d302/dongdk/asserts/models/Pose/Kinect2/d302/lecun-8x-2b-sd5_5-tmarks-refine/models .
+
+
+	1 git clone --recursive liangdp@172.18.181.186:/home/liangdp/dongdk/pose-rgb.git
+  or
+  git clone --recursive ~/home/../pathTo/pose-rgb.git
+
+2 git checkout -b ddk origin/master (create a branch named ddk, based on origin/master)
+
+
+ssh
+  ssh lawrence@172.18.18/2.27
+  627116
+
+watch -n nvidia-smi
+
+

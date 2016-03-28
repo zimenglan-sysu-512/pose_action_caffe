@@ -749,5 +749,6 @@ layer {
     # here use (rsho, lhip) -> 5: rsho, 16: lhip
     shoulder_id: 5
     hip_id: 16
+    zero_iter_test: true
   }
 }

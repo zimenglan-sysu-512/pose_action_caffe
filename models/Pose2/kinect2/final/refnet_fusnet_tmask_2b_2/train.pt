@@ -1233,6 +1233,26 @@ layer {
   }
 }
 
+layer {
+  name: "accuracy_eudist"
+  type: "PoseEuDistAccuracy"
+  bottom: "pred_coordsr"
+  bottom: "gt_coordsr"
+  top: "accuracy_eudist"
+  include {
+    phase: TEST
+  }
+  pose_eudist_accuracy_param {
+    acc_factor: 1
+    acc_factor_num: 24
+    images_num: 13707
+    acc_name: "accuracy2.log"
+    log_name: "log2.log"
+    acc_path: "../asserts/models/Pose2/kinect2/final/refnet_fusnet_tmask_2b_2/accuracy/"
+    zero_iter_test: true
+  }
+}
+
 # ########### predict coordinates && visulization && accuracy
 layer {
   name: "pred_heat_maps2"

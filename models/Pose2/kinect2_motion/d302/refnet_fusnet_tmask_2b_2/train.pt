@@ -19,7 +19,7 @@ layer {
     root_folder: "../dataset/Kinect2/up.crop.color/"
     root_folder: "../dataset/Kinect2/optical.flow/up.crop.color/"
     label_num: 38
-    batch_size: 12
+    batch_size: 8
     always_max_size: true
     is_scale_image: true
     shuffle: true

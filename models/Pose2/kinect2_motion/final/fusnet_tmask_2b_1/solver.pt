@@ -1,11 +1,11 @@
 # net pt
-net: "models/Pose2/kinect2_motion/d302/fusnet_tmask_2b_1/train.pt"
+net: "models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/train.pt"
 
 # snapshot
 snapshot: 1000
 
 # snapshot prefix
-snapshot_prefix: "../asserts/models/Pose2/kinect2_motion/d302/fusnet_tmask_2b_1/models/kinect2_motion"
+snapshot_prefix: "../asserts/models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/models/kinect2_motion"
 
 # n_images (13707) = test_iter(1714) * batchsize(8)
 test_iter: 1714

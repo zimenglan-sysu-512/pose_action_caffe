@@ -8,30 +8,30 @@ caffe_dire="caffe/"
 tools_dire="build/tools/"
 tools_dire=$caffe_dire$tools_dire
 
-# models/Pose2/kinect2_motion/d302/refnet_fusnet_tmask_2b_2/
+# models/Pose2/kinect2_motion/final/refnet_fusnet_tmask_2b_2/
 pt_dire="models/Pose2/"
-sub_pt_dire="kinect2_motion/d302/"
+sub_pt_dire="kinect2_motion/final/"
 exper_name="refnet_fusnet_tmask_2b_2/"
 exper_path=$pt_dire$sub_pt_dire$exper_name
 mkdir -p $exper_path
 
-# models/Pose2/kinect2_motion/d302/refnet_fusnet_tmask_2b_2/solver.pt
+# models/Pose2/kinect2_motion/final/refnet_fusnet_tmask_2b_2/solver.pt
 solver_pt="solver.pt"
 solver_pt=$exper_path$solver_pt
 echo "\n" $solver_pt "\n"
 
-# ../asserts/models/Pose2/kinect2_motion/d302/refnet_fusnet_tmask_2b_2/
+# ../asserts/models/Pose2/kinect2_motion/final/refnet_fusnet_tmask_2b_2/
 model_dire="../asserts/"
 model_dire=$model_dire$exper_path
 mkdir -p $model_dire
 
-# ../asserts/models/Pose2/kinect2_motion/d302/refnet_fusnet_tmask_2b_2/models/
+# ../asserts/models/Pose2/kinect2_motion/final/refnet_fusnet_tmask_2b_2/models/
 model_path="models/"
 model_path=$model_dire$model_path
 mkdir -p $model_path
 echo $model_path
 
-# ../asserts/models/Pose2/kinect2_motion/d302/refnet_fusnet_tmask_2b_2/log/
+# ../asserts/models/Pose2/kinect2_motion/final/refnet_fusnet_tmask_2b_2/log/
 log_path="log/"
 log_path=$model_dire$log_path
 mkdir -p $log_path

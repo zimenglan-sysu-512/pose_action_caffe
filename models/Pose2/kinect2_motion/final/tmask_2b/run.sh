@@ -52,24 +52,31 @@ echo "  sh run.sh [re_iter]"
 echo
 echo "######################################"
 echo
-sleep_time=1
-sleep $sleep_time
 
 # resume model file
 if [ ! -n "$1" ] ;then
 	re_iter=0
-	# run & log command
-	$caffe_bin train --solver=$solver_pt 2>&1 | tee -a $log_file
+	resume_model_file="kinect2_motion_iter_"$re_iter".caffemodel"
 else
 	re_iter=$1
 	resume_model_file="kinect2_motion_iter_"$re_iter".solverstate"
-	resume_model_file=$model_path$resume_model_file
-	echo
-	echo "re_iter:" $re_iter
-	echo "snapshot path:" $resume_model_file
-	echo
-	# run & log command
+fi
+resume_model_file=$model_path$resume_model_file
+echo
+echo "re_iter:" $re_iter
+echo "snapshot path:" $resume_model_file
+echo
+
+sleep_time=3
+sleep $sleep_time
+
+# run & log command
+if [ ! -n "$1" ] ;then
+	$caffe_bin train --solver=$solver_pt --weights=$resume_model_file 2>&1 | tee -a $log_file
+else
 	$caffe_bin train --solver=$solver_pt --snapshot=$resume_model_file 2>&1 | tee -a $log_file
 fi
-
 echo "Done!"
+
+sleep_time=1
+sleep $sleep_time

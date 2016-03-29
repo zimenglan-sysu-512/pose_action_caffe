@@ -18,6 +18,7 @@ layer {
     source: "../dataset/Kinect2/labels/up.crop.color2_train_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     root_folder: "../dataset/Kinect2/optical.flow/up.crop.color/"
+    root_folder: "../dataset/Kinect2/torso_masks/masks/"
     label_num: 38
     batch_size: 12
     always_max_size: true
@@ -27,6 +28,8 @@ layer {
     min_size: 256
     is_colors: true
     is_colors: true
+    is_colors: false
+    im_exts: ".png"
     im_exts: ".png"
     im_exts: ".png"
     parts_orders_path: "../dataset/Kinect2/labels/parts_orders_path.log"
@@ -52,6 +55,7 @@ layer {
     source: "../dataset/Kinect2/labels/up.crop.color2_test_l7.log"
     root_folder: "../dataset/Kinect2/up.crop.color/"
     root_folder: "../dataset/Kinect2/optical.flow/up.crop.color/"
+    root_folder: "../dataset/Kinect2/torso_masks/masks/"
     label_num: 38
     batch_size: 8
     always_max_size: true
@@ -61,6 +65,8 @@ layer {
     min_size: 256
     is_colors: true
     is_colors: true
+    is_colors: false
+    im_exts: ".png"
     im_exts: ".png"
     im_exts: ".png"
     parts_orders_path: "../dataset/Kinect2/labels/parts_orders_path.log"
@@ -70,35 +76,9 @@ layer {
 }
 
 layer {
-  name: "tmasks"
-  type: "CoordsToBboxesMasks"
-  bottom: "gt_coords"
-  bottom: "aux_info"
-  top: "tmasks"
-  coord_to_bbox_masks_param {
-    top_id: 9
-    bottom_id: 13
-    top_id2: 9
-    bottom_id2: 13
-    value: 255
-  }
-}
-
-layer {
-  name: "data_b1"
-  type: "Concat"
-  bottom: "data"
-  bottom: "tmasks"
-  top: "data_b1"
-  concat_param {
-    concat_dim: 1
-  }
-}
-
-layer {
   name: "data_b2"
   type: "Resize"
-  bottom: "data_b1"
+  bottom: "data"
   top: "data_b2"
   resize_param {
     height_fac: 0.707
@@ -126,7 +106,7 @@ layer {
 layer {
   name: "conv1_b1"
   type: "Convolution"
-  bottom: "data_b1"
+  bottom: "data"
   top: "conv1_b1"
   param {
     lr_mult: 0
@@ -948,7 +928,7 @@ layer {
 #   visual_heat_maps_param {
 #     # 0: files; 1: images, 2: both
 #     visual_type: 1
-#     heat_map_path: "../asserts/models/Pose2/kinect2_motion/d302/fusnet_tmask_2b_1/heat_maps/"
+#     heat_map_path: "../asserts/models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/heat_maps/"
 #     heat_map_files_name: "files/"
 #     heat_map_images_name: "images/"
 #     # if bottom.size() is 1, then only one phase_name
@@ -971,7 +951,7 @@ layer {
 #     phase: TEST
 #   }
 #   visual_pose_coords_param {
-#     coords_path: "../asserts/models/Pose2/kinect2_motion/d302/fusnet_tmask_2b_1/poses/"
+#     coords_path: "../asserts/models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/poses/"
 #     skel_path: "../dataset/Kinect2/labels/skel_path.log"
 #     coords_files_name: "files/"
 #     coords_images_name: "images/"
@@ -1000,7 +980,7 @@ layer {
     images_num: 13707
     acc_name: "accuracy.log"
     log_name: "log.log"
-    acc_path: "../asserts/models/Pose2/kinect2_motion/d302/fusnet_tmask_2b_1/accuracy/"
+    acc_path: "../asserts/models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/accuracy/"
     # here use (rsho, lhip) -> 5: rsho, 16: lhip
     shoulder_id: 5
     hip_id: 16
@@ -1008,6 +988,25 @@ layer {
   }
 }
 
+layer {
+  name: "accuracy_eudist"
+  type: "PoseEuDistAccuracy"
+  bottom: "pred_coordsr"
+  bottom: "gt_coordsr"
+  top: "accuracy_eudist"
+  include {
+    phase: TEST
+  }
+  pose_eudist_accuracy_param {
+    acc_factor: 1
+    acc_factor_num: 24
+    images_num: 13707
+    acc_name: "accuracy2.log"
+    log_name: "log2.log"
+    acc_path: "../asserts/models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/accuracy/"
+    zero_iter_test: true
+  }
+}
 
 # ########### predict coordinates && visulization && accuracy
 layer {
@@ -1063,7 +1062,7 @@ layer {
     images_num: 13707
     acc_name: "accuracy.log"
     log_name: "log.log"
-    acc_path: "../asserts/models/Pose2/kinect2_motion/d302/fusnet_tmask_2b_1/accuracy2/"    # here use (rsho, lhip) -> 5: rsho, 16: lhip
+    acc_path: "../asserts/models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/accuracy2/"    # here use (rsho, lhip) -> 5: rsho, 16: lhip
     shoulder_id: 5
     hip_id: 16
     zero_iter_test: true
@@ -1124,7 +1123,7 @@ layer {
     images_num: 13707
     acc_name: "accuracy.log"
     log_name: "log.log"
-    acc_path: "../asserts/models/Pose2/kinect2_motion/d302/fusnet_tmask_2b_1/accuracy3/"
+    acc_path: "../asserts/models/Pose2/kinect2_motion/final/fusnet_tmask_2b_1/accuracy3/"
     # here use (rsho, lhip) -> 5: rsho, 16: lhip
     shoulder_id: 5
     hip_id: 16

@@ -15,7 +15,7 @@
 using cv::Point_;
 using cv::Mat_;
 using cv::Mat;
-using cv::vector;
+// using cv::vector;
 
 namespace caffe {
 

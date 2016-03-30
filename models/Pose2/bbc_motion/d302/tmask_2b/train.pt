@@ -737,29 +737,29 @@ layer {
   }
 }
 
-# layer {
-#   name: "viz_coordsr"
-#   type: "VisualizedPoseCoords"
-#   bottom: "pred_coordsr"
-#   bottom: "gt_coordsr"
-#   bottom: "aux_info"
-#   include {
-#     phase: TEST
-#   }
-#   visual_pose_coords_param {
-#     coords_path: "../asserts/models/Pose2/bbc_motion/d302/tmask_2b/poses/"
-#     skel_path: "../dataset/bbc_pose/labels/skel_path.txt"
-#     coords_files_name: "files/"
-#     coords_images_name: "images/"
-#     # if bottom.size() == 1, only one of them, either `train/test` or `train, test, fusion` 
-#     # if bottom.size() == 3, then phase_name_size must be 3
-#     # else phase_name_size must be 1
-#     phase_name: "pred/"
-#     phase_name: "gt/"
-#     phase_name: "fusion/"
-#     is_draw_text: true
-#   }
-# }
+layer {
+  name: "viz_coordsr"
+  type: "VisualizedPoseCoords"
+  bottom: "pred_coordsr"
+  bottom: "gt_coordsr"
+  bottom: "aux_info"
+  include {
+    phase: TEST
+  }
+  visual_pose_coords_param {
+    coords_path: "../asserts/models/Pose2/bbc_motion/d302/tmask_2b/poses/"
+    skel_path: "../dataset/bbc_pose/labels/skel_path.txt"
+    coords_files_name: "files/"
+    coords_images_name: "images/"
+    # if bottom.size() == 1, only one of them, either `train/test` or `train, test, fusion` 
+    # if bottom.size() == 3, then phase_name_size must be 3
+    # else phase_name_size must be 1
+    phase_name: "pred/"
+    phase_name: "gt/"
+    phase_name: "fusion/"
+    is_draw_text: true
+  }
+}
 
 layer {
   name: "accuracy"

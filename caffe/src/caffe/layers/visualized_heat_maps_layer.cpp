@@ -179,6 +179,8 @@ void VisualizedHeatMapsLayer<Dtype>::WriteImages(const vector<Blob<Dtype>*>& bot
       }
     }
     // save
+    const std::string dire = DireName(image_path);
+    CreateDir(dire.c_str(), 0);
     cv::imwrite(image_path, heat_map);
   }
 }

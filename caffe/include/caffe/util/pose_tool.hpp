@@ -4,6 +4,8 @@
 #include <vector>
 #include <string>
 #include "boost/scoped_ptr.hpp"
+#include "boost/algorithm/string.hpp"
+#include "boost/filesystem.hpp"
 
 #include "caffe/common.hpp"
 #include "caffe/proto/caffe.pb.h"
@@ -101,6 +103,8 @@ inline int CreateDir(const std::string sPathName, int beg) {
 	
 	return CreateDir(sPathName.c_str(), beg);
 }
+
+std::string DireName(const std::string& path);
 
 int CreateDir(const char *sPathName, int beg = 0);
 

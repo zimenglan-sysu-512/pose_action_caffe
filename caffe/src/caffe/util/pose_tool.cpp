@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 #include <set>
+#include "boost/algorithm/string.hpp"
+#include "boost/filesystem.hpp"
 
 #include "caffe/common.hpp"
 #include "caffe/util/pose_tool.hpp"
@@ -373,6 +375,14 @@ void MkdirTree(string sub, string dir){
   if (i+1 < sub.length()){
     MkdirTree(sub.substr(i+1), dir);
   }
+}
+
+std::string DireName(const std::string& path) {
+  // boost::filesystem::path p(path);
+  // return p.parent_path().string();
+
+  size_t found = path.find_last_of("/");
+  return path.substr(0, found);
 }
 
 bool IsDirectory(std::string dir) {

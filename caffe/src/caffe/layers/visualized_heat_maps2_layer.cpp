@@ -232,6 +232,8 @@ void VisualizedHeatMaps2Layer<Dtype>::WriteImages(const vector<Blob<Dtype>*>& bo
       // save
       const std::string image_path = this->phase_path_ + imgidx + "_" + 
           objidx + "_" + to_string(c) + this->img_ext_;
+      const std::string dire = DireName(image_path);
+      CreateDir(dire.c_str(), 0);
       cv::imwrite(image_path, img2);
     }
   }

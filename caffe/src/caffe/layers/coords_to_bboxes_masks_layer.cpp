@@ -300,11 +300,15 @@ void CoordsToBboxesMasksLayer<Dtype>::Forward_cpu(
       // 
       const std::string img_path = this->visual_path_ 
           + imgidxs[n] + "_" + objidxs[n] + this->img_ext_;
-      // cv::imwrite(img_path, img);
 
-      cv::imshow(img_path, img);
-      cv::waitKey(0);
-      cv::destroyAllWindows();
+      const std::string dire = DireName(img_path);
+      CreateDir(dire.c_str(), 0);
+      
+      cv::imwrite(img_path, img);
+
+      // cv::imshow(img_path, img);
+      // cv::waitKey(0);
+      // cv::destroyAllWindows();
     }
   }
 }

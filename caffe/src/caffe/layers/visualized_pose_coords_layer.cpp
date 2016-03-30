@@ -237,6 +237,8 @@ void VisualizedPoseCoordsLayer<Dtype>::WriteImages(
       visual_image_path = this->coords_images_path_ + 
           this->phase_name_[b_size - 1] + imgidx + "_" + objidx + this->img_ext_;
     }
+    const std::string dire = DireName(visual_image_path);
+    CreateDir(dire.c_str(), 0);
     cv::imwrite(visual_image_path, img);
   } // end item_id
 }

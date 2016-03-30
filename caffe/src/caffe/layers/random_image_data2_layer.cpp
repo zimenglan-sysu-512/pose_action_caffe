@@ -555,6 +555,8 @@ void RandomImageData2Layer<Dtype>::InternalThreadEntry() {
 
             const std::string img_path2 = visual_img_path + this->imgidxs_[item_id] + "_" + 
                 this->objidxs_[item_id] + "_" + to_string(ln / 2) + this->img_ext_;
+            const std::string dire2 = DireName(img_path2);
+            CreateDir(dire2.c_str(), 0);
             cv::imwrite(img_path2, img2);
           }
         }
@@ -565,6 +567,8 @@ void RandomImageData2Layer<Dtype>::InternalThreadEntry() {
             this->imgidxs_[item_id] + "_" + this->objidxs_[item_id] + this->img_ext_;
         LOG(INFO) << "saved img_path: " << img_path;
         LOG(INFO) << "rows: " << img.rows << ", cols: " << img.cols;
+        const std::string dire = DireName(img_path);
+        CreateDir(dire.c_str(), 0);
         cv::imwrite(img_path, img);
 
         LOG(INFO) << "item_id: " << item_id

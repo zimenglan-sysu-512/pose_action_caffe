@@ -247,6 +247,13 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
           }
         }  
       }
+      if(this->layer_param_.is_disp_info()) {
+        std::cout << imgidx << " " << objidx << " ";
+        for(int j2 = 0; j2 < labels.size(); j2++) {
+          std::cout << labels[j2] << " ";
+        }
+        std::cout << labels.size() << std::endl;
+      }
       // record (source_idx, (imgidx, (objidx, labels)))
       lines_.push_back(std::make_pair(s, std::make_pair(imgidx, 
                           std::make_pair(objidx, labels))));
@@ -732,6 +739,8 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
                                         + this->objidxs_[item_id] + "_ms_"
                                         + to_string(j2)
                                         + this->im_exts_[j2];
+            const std::string dire3 = DireName(img_path3);
+            CreateDir(dire3.c_str(), 0);
             LOG(INFO) << "img_path3: " << img_path3;                                        
             cv::imwrite(img_path3, img);                                       
             continue;
@@ -800,6 +809,9 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
                                           + this->objidxs_[item_id] + "_rf_" 
                                           + to_string(ln / 2) + 
                                           this->im_exts_[j2];
+              const std::string dire2 = DireName(img_path2);
+              CreateDir(dire2.c_str(), 0);
+
               cv::imwrite(img_path2, img2);
             }
           }
@@ -815,6 +827,8 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
 
           LOG(INFO) << "saved img_path: "   << img_path;
           LOG(INFO) << "rows: " << img.rows << ", cols: " << img.cols;
+          const std::string dire = DireName(img_path);
+          CreateDir(dire.c_str(), 0);
           cv::imwrite(img_path, img);
 
           LOG(INFO) << "item_id: "          << item_id

@@ -246,6 +246,8 @@ void TorsoMaskFromCoordsLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bo
       // 
       const std::string img_path = this->visual_path_ + imgidxs[n] + "_" 
           + objidxs[n] + this->img_ext_;
+      const std::string dire = DireName(img_path);
+      CreateDir(dire.c_str(), 0);
       cv::imwrite(img_path, img);
     }
   }

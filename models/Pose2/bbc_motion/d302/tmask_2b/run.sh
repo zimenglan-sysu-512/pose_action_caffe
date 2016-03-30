@@ -41,6 +41,8 @@ file_prefix="bbc_motion_"
 log_file=$(date -d "today" +"%Y-%m-%d-%H-%M-%S")
 log_file=$log_path$file_prefix$log_file".log"
 
+gpu=0
+
 # execute file
 caffe_bin="caffe"
 caffe_bin=$tools_dire$caffe_bin
@@ -60,7 +62,7 @@ sleep $sleep_time
 if [ ! -n "$1" ] ;then
 	re_iter=0
 	# run & log command
-	$caffe_bin train --solver=$solver_pt 2>&1 | tee -a $log_file
+	$caffe_bin train --gpu=$gpu --solver=$solver_pt 2>&1 | tee -a $log_file
 else
 	re_iter=$1
 	resume_model_file="bbc_motion_iter_"$re_iter".solverstate"
@@ -70,7 +72,7 @@ else
 	echo "snapshot path:" $resume_model_file
 	echo
 	# run & log command
-	$caffe_bin train --solver=$solver_pt --snapshot=$resume_model_file 2>&1 | tee -a $log_file
+	$caffe_bin train --gpu=$gpu --solver=$solver_pt --snapshot=$resume_model_file 2>&1 | tee -a $log_file
 fi
 
 echo "Done!"

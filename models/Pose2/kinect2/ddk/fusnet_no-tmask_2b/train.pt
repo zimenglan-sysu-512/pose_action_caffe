@@ -987,7 +987,7 @@ layer {
     images_num: 13707
     acc_name: "accuracy2.log"
     log_name: "log2.log"
-    acc_path: "../asserts/models/Pose2/kinect2/ddk/tmask_2b/accuracy/"
+    acc_path: "../asserts/models/Pose2/kinect2/ddk/fusnet_no-tmask_2b/accuracy/"
     zero_iter_test: true
   }
 }
@@ -1046,7 +1046,8 @@ layer {
     images_num: 13707
     acc_name: "accuracy.log"
     log_name: "log.log"
-    acc_path: "../asserts/models/Pose2/kinect2/ddk/fusnet_no-tmask_2b/accuracy2/"    # here use (rsho, lhip) -> 5: rsho, 16: lhip
+    acc_path: "../asserts/models/Pose2/kinect2/ddk/fusnet_no-tmask_2b/accuracy2/"    
+    # here use (rsho, lhip) -> 5: rsho, 16: lhip
     shoulder_id: 5
     hip_id: 16
     zero_iter_test: true

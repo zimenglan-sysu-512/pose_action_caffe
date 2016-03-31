@@ -1,5 +1,6 @@
 # net pt
 net: "models/Pose2/flic/final/refnet_fusnet_tmask_2b_2/train.pt"
+# net: "models/Pose2/flic/final/refnet_fusnet_tmask_2b_2/train2.pt"
 
 # snapshot
 snapshot: 1000

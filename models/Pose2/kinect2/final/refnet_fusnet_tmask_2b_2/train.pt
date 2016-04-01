@@ -98,7 +98,7 @@ layer {
 layer {
   name: "conv1_b1"
   type: "Convolution"
-  bottom: "data_b1"
+  bottom: "data"
   top: "conv1_b1"
   param {
     lr_mult: 0

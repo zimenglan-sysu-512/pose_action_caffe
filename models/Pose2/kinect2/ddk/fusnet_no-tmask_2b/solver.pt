@@ -7,8 +7,9 @@ snapshot: 1000
 # snapshot prefix
 snapshot_prefix: "../asserts/models/Pose2/kinect2/ddk/fusnet_no-tmask_2b/models/kinect2"
 
+# n_images (13707) = test_iter(3427) * batchsize(4)
 # n_images (13707) = test_iter(1714) * batchsize(8)
-test_iter: 1714
+test_iter: 3427
 
 # test when reaching the test_interval
 test_interval: 1000

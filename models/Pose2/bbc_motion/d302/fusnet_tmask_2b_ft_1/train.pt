@@ -18,6 +18,7 @@ layer {
     source: "../dataset/bbc_pose/labels/crop_train_plus_21w.label"
     root_folder: "../dataset/bbc_pose/crop.data/"
     root_folder: "../dataset/bbc_pose/crop.data.flo/"
+    root_folder: "../dataset/bbc_pose/torso_masks/"
     label_num: 18
     batch_size: 24
     always_max_size: true
@@ -27,8 +28,10 @@ layer {
     min_size: 240
     is_colors: true
     is_colors: true
+    is_colors: false
     im_exts: ".jpg"
     im_exts: ".png"
+    im_exts: ".jpg"
     parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path.txt"
     skel_points_path: "../dataset/bbc_pose/labels/skel_path.txt"
     # visual_path: "../dataset/bbc_pose/vision/train/"
@@ -54,6 +57,7 @@ layer {
     # source: "../dataset/bbc_pose/labels/test_plus.label"
     root_folder: "../dataset/bbc_pose/crop.data/"
     root_folder: "../dataset/bbc_pose/crop.data.flo/"
+    root_folder: "../dataset/bbc_pose/torso_masks/"
     label_num: 18
     batch_size: 2
     always_max_size: true
@@ -63,8 +67,10 @@ layer {
     min_size: 240
     is_colors: true
     is_colors: true
+    is_colors: false
     im_exts: ".jpg"
     im_exts: ".png"
+    im_exts: ".jpg"
     parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path.txt"
     skel_points_path: "../dataset/bbc_pose/labels/skel_path.txt"
     # visual_path: "../dataset/bbc_pose/vision/test/"
@@ -924,7 +930,7 @@ layer {
   visual_heat_maps_param {
     # 0: files; 1: images, 2: both
     visual_type: 1
-    heat_map_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/heat_maps/"
+    heat_map_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/heat_maps/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     # if bottom.size() is 1, then only one phase_name
@@ -947,7 +953,7 @@ layer {
     phase: TEST
   }
   visual_pose_coords_param {
-    coords_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/poses/"
+    coords_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/poses/"
     skel_path: "../dataset/bbc_pose/labels/skel_path.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
@@ -976,7 +982,7 @@ layer {
 #     images_num: 996
 #     acc_name: "accuracy.log"
 #     log_name: "log.log"
-#     acc_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/accuracy/"
+#     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy/"
 #     # here use (lsho, head)
 #     shoulder_id: 0
 #     hip_id: 1
@@ -999,7 +1005,7 @@ layer {
     images_num: 996
     acc_name: "accuracy2.log"
     log_name: "log2.log"
-    acc_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/accuracy/"
+    acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy/"
     zero_iter_test: true
   }
 }
@@ -1058,7 +1064,7 @@ layer {
 #     images_num: 996
 #     acc_name: "accuracy.log"
 #     log_name: "log.log"
-#     acc_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/accuracy2/"    # here use (rsho, lhip) -> 5: rsho, 16: lhip
+#     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy2/"    # here use (rsho, lhip) -> 5: rsho, 16: lhip
 #     # here use (lsho, head)
 #     shoulder_id: 0
 #     hip_id: 1
@@ -1081,7 +1087,7 @@ layer {
     images_num: 996
     acc_name: "accuracy2.log"
     log_name: "log2.log"
-    acc_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/accuracy2/"
+    acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy2/"
     zero_iter_test: true
   }
 }
@@ -1140,7 +1146,7 @@ layer {
 #     images_num: 996
 #     acc_name: "accuracy.log"
 #     log_name: "log.log"
-#     acc_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/accuracy3/"
+#     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy3/"
 #     # here use (lsho, head0
 #     shoulder_id: 0
 #     hip_id: 1
@@ -1163,7 +1169,7 @@ layer {
     images_num: 996
     acc_name: "accuracy2.log"
     log_name: "log2.log"
-    acc_path: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/accuracy3/"
+    acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy3/"
     zero_iter_test: true
   }
 }

@@ -8,17 +8,16 @@ snapshot: 1000
 snapshot_prefix: "../asserts/models/Pose2/bbc_motion/d302/tmask_2b/models/bbc_motion"
 
 # val: 996, test: 997
-# n_images (996) = test_iter(498) * batchsize(2)
 # n_images (996) = test_iter(249) * batchsize(4)
-test_iter: 498
+test_iter: 249
 
 # test when reaching the test_interval
 test_interval: 1000
 
 test_initialization: true
 
-# 0.00001 fast convergence
-base_lr: 0.00001 # 0.00000001
+# 0.0001 fast convergence
+base_lr: 0.0001 # 0.00000001
 
 # Learning rate
 lr_policy: "step"

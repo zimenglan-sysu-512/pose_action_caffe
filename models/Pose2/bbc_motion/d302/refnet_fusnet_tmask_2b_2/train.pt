@@ -19,12 +19,12 @@ layer {
     root_folder: "../dataset/bbc_pose/crop.data/"
     root_folder: "../dataset/bbc_pose/crop.data.flo/"
     label_num: 18
-    batch_size: 12
+    batch_size: 18
     always_max_size: true
     is_scale_image: true
     shuffle: true
-    max_size: 320
-    min_size: 256
+    max_size: 256
+    min_size: 240
     is_colors: true
     is_colors: true
     im_exts: ".jpg"
@@ -55,12 +55,12 @@ layer {
     root_folder: "../dataset/bbc_pose/crop.data/"
     root_folder: "../dataset/bbc_pose/crop.data.flo/"
     label_num: 18
-    batch_size: 4
+    batch_size: 2
     always_max_size: true
     is_scale_image: true
     shuffle: false
-    max_size: 320
-    min_size: 256
+    max_size: 256
+    min_size: 240
     is_colors: true
     is_colors: true
     im_exts: ".jpg"

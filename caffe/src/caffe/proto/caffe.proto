@@ -830,6 +830,7 @@ message VisualPoseCoordsParameter {
   optional bool is_draw_text = 9 [default = false];
   optional bool is_write_file = 10 [default = false];
   optional bool is_write_image = 11 [default = true];
+  optional string need_to_draw_inds_string = 12;
 }
 
 // message that stores parameters used by

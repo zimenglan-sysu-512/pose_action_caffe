@@ -1192,52 +1192,54 @@ layer {
     coords_files_name: "files/"
     coords_images_name: "images/"
     phase_name: "pred/"
-    is_draw_text: true
+    is_draw_text: false
+    is_draw_skel: true
+    need_to_draw_inds_string: "0,1,2,3,4,5,6,7,8"
+  }
+}
+
+layer {
+  name: "accuracy"
+  type: "PosePDJAccuracy"
+  bottom: "pred_coordsr"
+  bottom: "gt_coordsr"
+  top: "accuracy"
+  include {
+    phase: TEST
+  }
+  pose_pdj_accuracy_param {
+    acc_factor: 0.01
+    acc_factor_num: 50
+    images_num: 1016
+    acc_name: "accuracy.log"
+    log_name: "log.log"
+    acc_path: "../asserts/models/Pose2/flic/final/refnet_fusnet_tmask_2b_2/accuracy/"
+    # here use (rsho, lhip) -> 6: rsho, 10: lhip
+    shoulder_id: 6
+    hip_id: 10
+    zero_iter_test: true
   }
 }
 
 # layer {
-#   name: "accuracy"
-#   type: "PosePDJAccuracy"
+#   name: "accuracy_eudist"
+#   type: "PoseEuDistAccuracy"
 #   bottom: "pred_coordsr"
 #   bottom: "gt_coordsr"
-#   top: "accuracy"
+#   top: "accuracy_eudist"
 #   include {
 #     phase: TEST
 #   }
-#   pose_pdj_accuracy_param {
-#     acc_factor: 0.05
-#     acc_factor_num: 10
+#   pose_eudist_accuracy_param {
+#     acc_factor: 1
+#     acc_factor_num: 24
 #     images_num: 1016
-#     acc_name: "accuracy.log"
-#     log_name: "log.log"
+#     acc_name: "accuracy2.log"
+#     log_name: "log2.log"
 #     acc_path: "../asserts/models/Pose2/flic/final/refnet_fusnet_tmask_2b_2/accuracy/"
-#     # here use (rsho, lhip) -> 6: rsho, 10: lhip
-#     shoulder_id: 6
-#     hip_id: 10
 #     zero_iter_test: true
 #   }
 # }
-
-layer {
-  name: "accuracy_eudist"
-  type: "PoseEuDistAccuracy"
-  bottom: "pred_coordsr"
-  bottom: "gt_coordsr"
-  top: "accuracy_eudist"
-  include {
-    phase: TEST
-  }
-  pose_eudist_accuracy_param {
-    acc_factor: 1
-    acc_factor_num: 24
-    images_num: 1016
-    acc_name: "accuracy2.log"
-    log_name: "log2.log"
-    acc_path: "../asserts/models/Pose2/flic/final/refnet_fusnet_tmask_2b_2/accuracy/"
-    zero_iter_test: true
-  }
-}
 
 # # ########### predict coordinates && visulization && accuracy
 # layer {

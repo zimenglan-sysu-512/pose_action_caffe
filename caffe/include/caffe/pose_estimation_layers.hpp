@@ -1274,6 +1274,7 @@ class VisualizedPoseCoordsLayer : public Layer<Dtype>{
   std::vector<std::string> objidxs_;
   std::vector<std::string> imgidxs_;
   std::vector<std::string> images_paths_;
+  std::vector<int> draw_joints_inds_;
 };
 
 // pre-condition: need bottom[bottom.size() -1] blob to rescale the coordinates

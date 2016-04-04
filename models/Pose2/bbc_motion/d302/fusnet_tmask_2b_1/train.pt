@@ -34,7 +34,7 @@ layer {
     im_exts: ".jpg"
     parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path_n7.txt"
     skel_points_path: "../dataset/bbc_pose/labels/skel_path_n7.txt"
-    # visual_path: "../dataset/bbc_pose/vision/train/"
+    # visual_path: "../dataset/bbc_pose/vision.pt/train/"
   }
 }
 
@@ -73,7 +73,7 @@ layer {
     im_exts: ".jpg"
     parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path_n7.txt"
     skel_points_path: "../dataset/bbc_pose/labels/skel_path_n7.txt"
-    # visual_path: "../dataset/bbc_pose/vision/test/"
+    # visual_path: "../dataset/bbc_pose/vision.pt/test/"
   }
 }
 
@@ -99,7 +99,7 @@ layer {
     is_binary: true
     gau_mean: 0
     gau_stds: 1.5
-    radius_str: "5,8,8,5,8,8,5,6,6"
+    radius_str: "5,8,8,5,8,8,5"
   }
 }
 

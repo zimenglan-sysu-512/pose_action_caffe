@@ -1,0 +1,44 @@
+# net pt
+net: "models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/train.pt"
+
+# snapshot
+snapshot: 1000
+
+# snapshot prefix
+snapshot_prefix: "../asserts/models/Pose2/bbc_motion/ddk/fusnet_no-tmask_2b_1/models/bbc_motion"
+
+# val: 996, test: 997
+# n_images (996) = test_iter(249) * batchsize(4)
+test_iter: 249
+
+# test when reaching the test_interval
+test_interval: 1000
+
+test_initialization: true
+
+# 0.00001 fast convergence
+base_lr: 0.000001 # 0.00000001
+
+# Learning rate
+lr_policy: "step"
+
+# SGD
+gamma: 0.0001
+power: 0.75
+momentum: 0.9
+weight_decay: 0.0005
+
+# Change learning rate
+stepsize: 80000
+
+# Iterations
+max_iter: 80000
+
+# Display
+display: 200
+
+# CPU or GPU
+solver_mode: GPU
+
+# GPU ID
+device_id: 0

@@ -17,8 +17,8 @@ test_interval: 1000
 
 test_initialization: true
 
-# 0.00001 fast convergence
-base_lr: 0.00001 # 0.00000001
+# 0.0001 fast convergence
+base_lr: 0.0001 # 0.00000001
 
 # Learning rate
 lr_policy: "step"

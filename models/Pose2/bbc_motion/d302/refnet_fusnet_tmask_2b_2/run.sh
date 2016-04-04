@@ -51,8 +51,8 @@ echo "Usage: "
 echo "  sh run.sh [re_iter]"
 echo
 echo "######################################"
-
 echo
+
 # resume model file
 if [ ! -n "$1" ] ;then
 	re_iter=0

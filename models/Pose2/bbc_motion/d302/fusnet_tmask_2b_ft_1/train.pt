@@ -15,11 +15,11 @@ layer {
   }
   is_disp_info: false
   multi_sources_images_data_param {
-    source: "../dataset/bbc_pose/labels/crop_train_plus_21w.label"
+    source: "../dataset/bbc_pose/labels/crop_train_21w.label"
     root_folder: "../dataset/bbc_pose/crop.data/"
     root_folder: "../dataset/bbc_pose/crop.data.flo/"
-    root_folder: "../dataset/bbc_pose/torso_masks/"
-    label_num: 18
+    root_folder: "../dataset/bbc_pose/torso_masks/masks/"
+    label_num: 14
     batch_size: 24
     always_max_size: true
     is_scale_image: true
@@ -32,8 +32,8 @@ layer {
     im_exts: ".jpg"
     im_exts: ".png"
     im_exts: ".jpg"
-    parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path.txt"
-    skel_points_path: "../dataset/bbc_pose/labels/skel_path.txt"
+    parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path_n7.txt"
+    skel_points_path: "../dataset/bbc_pose/labels/skel_path_n7.txt"
     # visual_path: "../dataset/bbc_pose/vision/train/"
   }
 }
@@ -53,12 +53,12 @@ layer {
   is_disp_info: false
   multi_sources_images_data_param {
     # val: 996, test:997
-    source: "../dataset/bbc_pose/labels/crop_val_plus.label"
-    # source: "../dataset/bbc_pose/labels/test_plus.label"
+    source: "../dataset/bbc_pose/labels/crop_val.label"
+    # source: "../dataset/bbc_pose/labels/crop_test.label"
     root_folder: "../dataset/bbc_pose/crop.data/"
     root_folder: "../dataset/bbc_pose/crop.data.flo/"
-    root_folder: "../dataset/bbc_pose/torso_masks/"
-    label_num: 18
+    root_folder: "../dataset/bbc_pose/torso_masks/masks/"
+    label_num: 14
     batch_size: 2
     always_max_size: true
     is_scale_image: true
@@ -71,8 +71,8 @@ layer {
     im_exts: ".jpg"
     im_exts: ".png"
     im_exts: ".jpg"
-    parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path.txt"
-    skel_points_path: "../dataset/bbc_pose/labels/skel_path.txt"
+    parts_orders_path: "../dataset/bbc_pose/labels/parts_orders_path_n7.txt"
+    skel_points_path: "../dataset/bbc_pose/labels/skel_path_n7.txt"
     # visual_path: "../dataset/bbc_pose/vision/test/"
   }
 }
@@ -590,7 +590,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 9
+    num_output: 7
     kernel_size: 1
     weight_filler {
       type: "gaussian"
@@ -813,7 +813,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 9
+    num_output: 7
     kernel_size: 1
     weight_filler {
       type: "gaussian"
@@ -900,7 +900,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 40
+    top_k: 30
     heat_map_a: 1
     heat_map_b: 0
   }
@@ -933,9 +933,6 @@ layer {
     heat_map_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/heat_maps/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
-    # if bottom.size() is 1, then only one phase_name
-    # if bottom.size() is 3, then use three phase_name(s)
-    # ohters, errors
     # phase_name: "pred/"
     # phase_name: "gt/"
     phase_name: "fusion/"
@@ -947,22 +944,16 @@ layer {
   name: "viz_coordsr"
   type: "VisualizedPoseCoords"
   bottom: "pred_coordsr"
-  bottom: "gt_coordsr"
   bottom: "aux_info"
   include {
     phase: TEST
   }
   visual_pose_coords_param {
     coords_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/poses/"
-    skel_path: "../dataset/bbc_pose/labels/skel_path.txt"
+    skel_path: "../dataset/bbc_pose/labels/skel_path_n7.txt"
     coords_files_name: "files/"
     coords_images_name: "images/"
-    # if bottom.size() == 1, only one of them, either `train/test` or `train, test, fusion` 
-    # if bottom.size() == 3, then phase_name_size must be 3
-    # else phase_name_size must be 1
     phase_name: "pred/"
-    phase_name: "gt/"
-    phase_name: "fusion/"
     is_draw_text: true
   }
 }
@@ -1001,7 +992,7 @@ layer {
   }
   pose_eudist_accuracy_param {
     acc_factor: 1
-    acc_factor_num: 24
+    acc_factor_num: 20
     images_num: 996
     acc_name: "accuracy2.log"
     log_name: "log2.log"
@@ -1032,7 +1023,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 40
+    top_k: 30
     heat_map_a: 1
     heat_map_b: 0
   }
@@ -1083,7 +1074,7 @@ layer {
   }
   pose_eudist_accuracy_param {
     acc_factor: 1
-    acc_factor_num: 24
+    acc_factor_num: 20
     images_num: 996
     acc_name: "accuracy2.log"
     log_name: "log2.log"
@@ -1114,7 +1105,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 40
+    top_k: 30
     heat_map_a: 1
     heat_map_b: 0
   }
@@ -1165,7 +1156,7 @@ layer {
   }
   pose_eudist_accuracy_param {
     acc_factor: 1
-    acc_factor_num: 24
+    acc_factor_num: 20
     images_num: 996
     acc_name: "accuracy2.log"
     log_name: "log2.log"

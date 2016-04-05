@@ -11,3 +11,4 @@ data/Actions/
 *.avi
 demo/*.log
 ip
+results/accuracy.record.txt

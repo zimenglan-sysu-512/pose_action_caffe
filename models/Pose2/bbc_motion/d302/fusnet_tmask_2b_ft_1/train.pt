@@ -53,8 +53,8 @@ layer {
   is_disp_info: false
   multi_sources_images_data_param {
     # val: 996, test:997
-    source: "../dataset/bbc_pose/labels/crop_val.label"
-    # source: "../dataset/bbc_pose/labels/crop_test.label"
+    # source: "../dataset/bbc_pose/labels/crop_val.label"
+    source: "../dataset/bbc_pose/labels/crop_test.label"
     root_folder: "../dataset/bbc_pose/crop.data/"
     root_folder: "../dataset/bbc_pose/crop.data.flo/"
     root_folder: "../dataset/bbc_pose/torso_masks/masks/"
@@ -900,7 +900,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 30
+    top_k: 40
     heat_map_a: 1
     heat_map_b: 0
   }
@@ -970,7 +970,7 @@ layer {
 #   pose_pdj_accuracy_param {
 #     acc_factor: 0.05
 #     acc_factor_num: 10
-#     images_num: 996
+#     images_num: 997
 #     acc_name: "accuracy.log"
 #     log_name: "log.log"
 #     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy/"
@@ -993,7 +993,7 @@ layer {
   pose_eudist_accuracy_param {
     acc_factor: 1
     acc_factor_num: 20
-    images_num: 996
+    images_num: 997
     acc_name: "accuracy2.log"
     log_name: "log2.log"
     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy/"
@@ -1023,7 +1023,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 30
+    top_k: 40
     heat_map_a: 1
     heat_map_b: 0
   }
@@ -1052,7 +1052,7 @@ layer {
 #   pose_pdj_accuracy_param {
 #     acc_factor: 0.05
 #     acc_factor_num: 10
-#     images_num: 996
+#     images_num: 997
 #     acc_name: "accuracy.log"
 #     log_name: "log.log"
 #     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy2/"    # here use (rsho, lhip) -> 5: rsho, 16: lhip
@@ -1075,7 +1075,7 @@ layer {
   pose_eudist_accuracy_param {
     acc_factor: 1
     acc_factor_num: 20
-    images_num: 996
+    images_num: 997
     acc_name: "accuracy2.log"
     log_name: "log2.log"
     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy2/"
@@ -1105,7 +1105,7 @@ layer {
   }
   is_disp_info: true
   pose_coords_from_heat_maps_param {
-    top_k: 30
+    top_k: 40
     heat_map_a: 1
     heat_map_b: 0
   }
@@ -1134,7 +1134,7 @@ layer {
 #   pose_pdj_accuracy_param {
 #     acc_factor: 0.05
 #     acc_factor_num: 10
-#     images_num: 996
+#     images_num: 997
 #     acc_name: "accuracy.log"
 #     log_name: "log.log"
 #     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy3/"
@@ -1157,7 +1157,7 @@ layer {
   pose_eudist_accuracy_param {
     acc_factor: 1
     acc_factor_num: 20
-    images_num: 996
+    images_num: 997
     acc_name: "accuracy2.log"
     log_name: "log2.log"
     acc_path: "../asserts/models/Pose2/bbc_motion/d302/fusnet_tmask_2b_ft_1/accuracy3/"

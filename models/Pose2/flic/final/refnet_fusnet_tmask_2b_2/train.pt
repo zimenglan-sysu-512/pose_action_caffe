@@ -1174,7 +1174,7 @@ layer {
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
     phase_name: "pred/"
-    threshold: 0.273
+    threshold: 0.3
   }
 }
 

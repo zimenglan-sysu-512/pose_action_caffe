@@ -99,7 +99,7 @@ layer {
     is_binary: true
     gau_mean: 0
     gau_stds: 1.5
-    radius_str: "4,6,6,5,6,6,5"
+    radius_str: "4,6,6,4,6,6,4"
   }
 }
 
@@ -632,7 +632,7 @@ layer {
     bg_eof: 1
     ratio: 0.01
     prob_num: 11
-    heat_score_thres: 0.273
+    heat_score_thres: 0.243
     parts_err_num_thres: 3
     hard_negative_filepath: "NotImplemented."
   }

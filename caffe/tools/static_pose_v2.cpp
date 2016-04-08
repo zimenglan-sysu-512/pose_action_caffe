@@ -55,11 +55,13 @@ std::string _in_dire;
 std::string _pt_file;
 std::string _out_dire;
 std::string _skel_path;
+std::string _need_inds_string;
 std::string _data_layer_name;
 std::string _aux_info_layer_name;
 std::string _gt_coords_layer_name;
 std::vector<int> _s_skel_idxs;
 std::vector<int> _e_skel_idxs;
+std::vector<int> _need_inds;
 const float zero         = 0;
 const int _radius        = 2;
 const int _thickness     = 2;
@@ -97,6 +99,7 @@ DEFINE_int32(g_height, 100, "The height of frame/image (for initialization).");
 DEFINE_string(im_ext, ".jpg",  "image extesion.");
 DEFINE_string(in_dire, "",  "The input of the images.");
 DEFINE_string(skel_path, "",  "orders of parts to draw a stickmen.");
+DEFINE_string(need_inds_string, "",  "inds to draw joints.");
 DEFINE_string(pt_file, "",  "The input of label file specifying the input image and its corresponding label information, like torso/person bbox");
 DEFINE_string(out_dire, "", "The output of the results, like files or visualized images.");
 DEFINE_string(data_layer_name, "", "input data layer name.");
@@ -279,6 +282,7 @@ void _init() {
   _draw_text     = FLAGS_draw_text != 0;
   _disp_info     = FLAGS_disp_info != 0; 
   _skel_path     = FLAGS_skel_path;
+  _need_inds_string = FLAGS_need_inds_string;
 
   _data_layer_name      = FLAGS_data_layer_name;
   _aux_info_layer_name  = FLAGS_aux_info_layer_name;
@@ -292,6 +296,29 @@ void _init() {
   _draw_skel = !_s_skel_idxs.empty() && !_e_skel_idxs.empty();
   if(_draw_skel) {
     CHECK_EQ(_s_skel_idxs.size(), _e_skel_idxs.size());
+  }
+
+  if(!_need_inds.empty()) {
+    _need_inds.clear();
+  }
+  if(_need_inds_string.length()) {
+    vector<string> need_inds;
+    boost::split(need_inds, _need_inds_string, 
+                 boost::is_any_of(","));
+    LOG(INFO) << "need_inds_string: " << _need_inds_string;
+    for(int j = 0; j < need_inds.size(); j++) {
+      LOG(INFO) << "j: " << j << " ind: " << need_inds[j];
+      _need_inds.push_back(std::atoi(need_inds[j].c_str()));
+    }
+  } else {
+    for(int j = 0; j < _part_num; j++) {
+      _need_inds.push_back(j);
+    }
+  }
+  CHECK_LE(_need_inds.size(), _part_num);
+  for(int j = 0; j < _need_inds.size(); j++) {
+    CHECK_GE(_need_inds[j], 0);
+    CHECK_LT(_need_inds[j], _part_num);
   }
 
   caffe::GlobalVars::set_g_width( _g_width);
@@ -642,10 +669,38 @@ int _pose_estimate() {
         // bbox.t_x2 += int(tw * _ratio);
       }
 
+      // // draw joints
+      // for(int c = 0; c < channels; c += 2) {  
+      //   int x = int(coord[o + c + 0]);
+      //   int y = int(coord[o + c + 1]);
+      //   x += bbox.p_x1;
+      //   y += bbox.p_y1;
+
+      //   cv::Point p(x, y);
+      //   cv::circle(ims_vec[bchidx], p, _radius, _color6, 
+      //              _thickness);
+
+      //   if(_draw_text) {
+      //     const int idx = c / 2;
+      //     const std::string text = boost::to_string(idx);
+      //     if(idx % 2) {
+      //       const cv::Point text_point(x - 5, y - 5);
+      //       cv::putText(ims_vec[bchidx], text, text_point, 
+      //                   _fontFace, _fontScale, _color2);
+      //     } else {
+      //       const cv::Point text_point(x + 5, y + 5);
+      //       cv::putText(ims_vec[bchidx], text, text_point, 
+      //                   _fontFace, _fontScale, _color2);
+      //     }
+      //   } // end if
+      // } // end inner fori
+
       // draw joints
-      for(int c = 0; c < channels; c += 2) {  
-        int x = int(coord[o + c + 0]);
-        int y = int(coord[o + c + 1]);
+      for(int c = 0; c < _need_inds.size(); c++) {  
+        int j  = _need_inds[c];
+        int j2 = j * 2;
+        int x = int(coord[o + j2 + 0]);
+        int y = int(coord[o + j2 + 1]);
         x += bbox.p_x1;
         y += bbox.p_y1;
 
@@ -655,7 +710,7 @@ int _pose_estimate() {
 
         if(_draw_text) {
           const int idx = c / 2;
-          const std::string text = boost::to_string(idx);
+          const std::string text = boost::to_string(j);
           if(idx % 2) {
             const cv::Point text_point(x - 5, y - 5);
             cv::putText(ims_vec[bchidx], text, text_point, 
@@ -692,15 +747,15 @@ int _pose_estimate() {
       if(_disp_info) {
         LOG(INFO) << "p_x1: " << bbox.p_x1 << " p_y1: " << bbox.p_y1;                         
         LOG(INFO) << "p_x2: " << bbox.p_x2 << " p_y2: " << bbox.p_y2;                         
-        LOG(INFO) << "pw: " << pw << " ph: " << ph;                         
-        LOG(INFO) << "pw: " << ims_vec[bchidx].cols << " ph: " 
+        LOG(INFO) << "cropped person: pw: " << pw << " ph: " << ph;                         
+        LOG(INFO) << "origin image:   pw: " << ims_vec[bchidx].cols << " ph: " 
                   << ims_vec[bchidx].rows;                         
       }
       // top_left.x, top_left.y, width, height
       cv::Rect rect(bbox.p_x1, bbox.p_y1, pw, ph);
       cv::Mat im_crop = ims_vec[bchidx](rect);
       const std::string out_path2 = _out_dire 
-                                  + tp_infos[imgidx].im_name + " _"
+                                  + tp_infos[imgidx].im_name + "_"
                                   + boost::to_string(objidx) + _im_ext;
       if(_disp_info) {
         LOG(INFO) << "out_path2:" << out_path2;                          

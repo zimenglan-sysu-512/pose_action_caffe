@@ -931,8 +931,6 @@ layer {
     heat_map_path: "../asserts/models/Pose2/bbc_motion/final/fusnet_tmask_2b_ft_1/heat_maps/"
     heat_map_files_name: "files/"
     heat_map_images_name: "images/"
-    # phase_name: "pred/"
-    # phase_name: "gt/"
     phase_name: "fusion/"
     threshold: 0.3
   }
@@ -952,7 +950,9 @@ layer {
     coords_files_name: "files/"
     coords_images_name: "images/"
     phase_name: "pred/"
-    is_draw_text: true
+    is_draw_text: false
+    is_draw_skel: true
+    need_to_draw_inds_string: "0,1,2,3,4,5,6"
   }
 }
 

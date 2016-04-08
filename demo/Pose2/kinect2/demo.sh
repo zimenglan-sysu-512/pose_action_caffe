@@ -6,7 +6,7 @@
 # ########################################
 gpu=0					# set params
 p_dxy=10
-ratio=20
+ratio=24
 sho_id=9
 hip_id=13
 sho_id2=9
@@ -23,16 +23,20 @@ batch_size=1	# set params
 data_layer_name="data"
 aux_info_layer_name="aux_info"
 gt_coords_layer_name="gt_coords"
+need_inds_string="0,1,3,5,6,7,9,10,11,13,14,15,16,17,18"
 # ########################################
 
 caffe_dire="/home/ddk/dongdk/pose-caffe/"
 
-im_dire="/home/ddk/dongdk/dataset/demo/pose/mude.images1/"
+# im_dire="/home/ddk/dongdk/dataset/demo/pose/mude.images1/"
+# pt_file="${im_dire}tp.result/pt.bbox.txt"
 
-out_dire="${im_dire}pose.vision/"
+im_dire="/home/ddk/download/pose.test.nature.scene/"
+pt_file="${im_dire}pt_props.txt"
+
+out_dire="${im_dire}viz2/"
 mkdir -p $out_dire
 
-pt_file="${im_dire}tp.result/pt.bbox.txt"
 
 skel_path="${caffe_dire}demo/skel_paths/kinect2_19.txt"
 
@@ -73,6 +77,7 @@ $caffe_bin static_pose_v2 \
 		--batch_size=$batch_size \
 		--caffemodel=$caffemodel \
 		--data_layer_name $data_layer_name \
+		--need_inds_string $need_inds_string \
 		--aux_info_layer_name $aux_info_layer_name \
 		--gt_coords_layer_name $gt_coords_layer_name \
 		2>&1 | tee -a $log_path

@@ -8,7 +8,7 @@ snapshot: 1000
 snapshot_prefix: "../asserts/models/Pose2/bbc_motion/final/fusnet_tmask_2b_ft_1/models/bbc_motion"
 
 # val: 996, test: 1000
-# n_images (1000) = test_iter(500) * batchsize(4)
+# n_images (1000) = test_iter(500) * batchsize(2)
 test_iter: 500
 
 # test when reaching the test_interval

@@ -31,12 +31,15 @@ caffe_dire="/home/ddk/dongdk/pose-caffe/"
 # im_dire="/home/ddk/dongdk/dataset/demo/pose/mude.images1/"
 # pt_file="${im_dire}tp.result/pt.bbox.txt"
 
-im_dire="/home/ddk/download/pose.test.nature.scene/"
+# im_dire="/home/ddk/download/pose.test.nature.scene/"
+# pt_file="${im_dire}pt_props.txt"
+
+im_dire="/home/ddk/download/pt.pose/tianshui/"
+# im_dire="/home/ddk/download/pt.pose/huanglili/"
 pt_file="${im_dire}pt_props.txt"
 
 out_dire="${im_dire}viz2/"
 mkdir -p $out_dire
-
 
 skel_path="${caffe_dire}demo/skel_paths/kinect2_19.txt"
 

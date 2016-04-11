@@ -1,0 +1,17 @@
+
+Note:
+	1 hard negatives, use top k
+	2 2 banks,
+	3 thres: 0.273
+	4 prob_num: 11
+	5 no torso mask
+
+alias
+	fusnet: fusion net
+	2b:			2 banks
+	refnet: refined net
+	ft:			finetune
+
+cmds:
+	cd ../../../../../caffe/ && make -j8 && cd - && sh run.sh
+	cd ../../../../../caffe/ && make -j8 && cd - && sh test.sh

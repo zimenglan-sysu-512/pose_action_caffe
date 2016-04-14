@@ -106,6 +106,11 @@ inline int CreateDir(const std::string sPathName, int beg) {
 
 std::string DireName(const std::string& path);
 
+std::string FileName(const std::string& path);
+
+std::string FileNameNoExt(const std::string& filename);
+std::string FileNameNoExt2(const std::string& filepath);
+
 int CreateDir(const char *sPathName, int beg = 0);
 
 bool CreateDir(const std::string sPathName);

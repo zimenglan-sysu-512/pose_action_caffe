@@ -385,6 +385,23 @@ std::string DireName(const std::string& path) {
   return path.substr(0, found);
 }
 
+std::string FileName(const std::string& path) {
+  size_t found = path.find_last_of("/");
+  return path.substr(found + 1);
+}
+
+std::string FileNameNoExt(const std::string& filename) {
+  size_t found = filename.find_last_of(".");
+  return filename.substr(0, found);
+}
+
+std::string FileNameNoExt2(const std::string& filepath) {
+  size_t found    = filepath.find_last_of("");
+  string filename = filepath.substr(found + 1);
+  size_t found2   = filename.find_last_of(".");
+  return filename.substr(0, found2);
+}
+
 bool IsDirectory(std::string dir) {
   struct stat st;
   if(stat(dir.c_str(), &st) == 0){

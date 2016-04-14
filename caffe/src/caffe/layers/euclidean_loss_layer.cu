@@ -2,6 +2,7 @@
 
 #include "caffe/layer.hpp"
 #include "caffe/util/io.hpp"
+#include "caffe/global_variables.hpp"
 #include "caffe/util/math_functions.hpp"
 #include "caffe/vision_layers.hpp"
 
@@ -20,6 +21,13 @@ void EuclideanLossLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
   caffe_gpu_dot(count, diff_.gpu_data(), diff_.gpu_data(), &dot);
   Dtype loss = dot / bottom[0]->num() / Dtype(2);
   top[0]->mutable_cpu_data()[0] = loss;
+
+  /// print loss info
+  LOG(INFO);
+  LOG(INFO) << "layer name: " << this->layer_param_.name();
+  LOG(INFO) << "iteration: "  << GlobalVars::caffe_iter();
+  LOG(INFO) << "learn Rate: " << GlobalVars::learn_lr();
+  LOG(INFO) << "loss: "       << loss;
 }
 
 template <typename Dtype>
@@ -30,11 +38,11 @@ void EuclideanLossLayer<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
       const Dtype sign = (i == 0) ? 1 : -1;
       const Dtype alpha = sign * top[0]->cpu_diff()[0] / bottom[i]->num();
       caffe_gpu_axpby(
-          bottom[i]->count(),              // count
+          bottom[i]->count(),                 // count
           alpha,                              // alpha
           diff_.gpu_data(),                   // a
           Dtype(0),                           // beta
-          bottom[i]->mutable_gpu_diff());  // b
+          bottom[i]->mutable_gpu_diff());     // b
     }
   }
 }

@@ -1,0 +1,415 @@
+name: "ZhouYan"
+
+# ########### data
+layer {
+  name: "data"
+  type: "LoadDataFromFile"
+  top: "data"
+  top: "labels"
+  include {
+    phase: TRAIN
+  }
+  is_disp_info: false
+  load_data_from_file_param {
+    ow: 442
+    oh: 442
+    scale: 100
+    rand_skip: 0
+    shuffle: true
+    batch_size: 8
+    root_folder: "../dataset/zhouyan/data/train/"
+    # abs path, so root_folder dose not use here
+    source: "../dataset/zhouyan/labels/train_reshape.label"
+    # visual_path: "../dataset/zhouyan/vision/d.train/"
+  }
+}
+
+layer {
+  name: "data"
+  type: "LoadDataFromFile"
+  top: "data"
+  # top: "labels"
+  include {
+    phase: TEST
+  }
+  is_disp_info: false
+  load_data_from_file_param {
+    ow: 442
+    oh: 442
+    scale: 100
+    rand_skip: 0
+    shuffle: false
+    batch_size: 4
+    root_folder: "../dataset/zhouyan/data/test/"
+    # abs path, so root_folder dose not use here
+    source: "../dataset/zhouyan/labels/test_reshape.label"
+    # visual_path: "../dataset/zhouyan/vision/d.test/"
+  }
+}
+
+# layer {
+#   name: "data2"
+#   type: "Resize"
+#   bottom: "data"
+#   top: "data2"
+#   resize_param {
+#     height_fac: 0.707
+#     width_fac: 0.707
+#   }
+# }
+
+# ########### conv1
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "data"
+  top: "conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv2
+layer {
+  name: "conv2"
+  type: "Convolution"
+  bottom: "pool1"
+  top: "conv2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu2"
+  type: "ReLU"
+  bottom: "conv2"
+  top: "conv2"
+}
+
+layer {
+  name: "pool2"
+  type: "Pooling"
+  bottom: "conv2"
+  top: "pool2"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+
+# ########### conv3
+layer {
+  name: "conv3"
+  type: "Convolution"
+  bottom: "pool2"
+  top: "conv3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 128
+    pad: 2
+    kernel_size: 5
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu3"
+  type: "ReLU"
+  bottom: "conv3"
+  top: "conv3"
+}
+
+# ########### conv4
+layer {
+  name: "conv4"
+  type: "Convolution"
+  bottom: "conv3"
+  top: "conv4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 384
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu4"
+  type: "ReLU"
+  bottom: "conv4"
+  top: "conv4"
+}
+
+# ########### conv5
+layer {
+  name: "conv5"
+  type: "Convolution"
+  bottom: "conv4"
+  top: "conv5"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 384
+    pad: 4
+    kernel_size: 9
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu5"
+  type: "ReLU"
+  bottom: "conv5"
+  top: "conv5"
+}
+
+# ########### conv6
+layer {
+  name: "conv6"
+  type: "Convolution"
+  bottom: "conv5"
+  top: "conv6"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu6"
+  type: "ReLU"
+  bottom: "conv6"
+  top: "conv6"
+}
+
+# ########### conv7
+layer {
+  name: "conv7"
+  type: "Convolution"
+  bottom: "conv6"
+  top: "conv7"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 256
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu7"
+  type: "ReLU"
+  bottom: "conv7"
+  top: "conv7"
+}
+
+# ########### conv8
+layer {
+  name: "conv8"
+  type: "Convolution"
+  bottom: "conv7"
+  top: "conv8"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  convolution_param {
+    num_output: 1
+    kernel_size: 1
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+# ########### loss
+layer {
+  name: "gt_conv8"
+  type: "Resize"
+  bottom: "labels"
+  bottom: "conv8"
+  top: "gt_conv8"
+  include {
+    phase: TRAIN
+  }
+}
+
+layer {
+  name: "euclidean_loss"
+  type: "EuclideanLoss"
+  bottom: "conv8"
+  bottom: "gt_conv8"
+  include {
+    phase: TRAIN
+  }
+}
+
+########### 
+layer {
+  name: "relu8"
+  type: "ReLU"
+  bottom: "conv8"
+  top: "conv8"
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "gt_conv8"
+  type: "Resize"
+  bottom: "conv8"
+  bottom: "data"
+  top: "pred_conv8"
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "silence_pred_conv8"
+  type: "Silence"
+  bottom: "pred_conv8"
+  include {
+    phase: TEST
+  }
+}
+

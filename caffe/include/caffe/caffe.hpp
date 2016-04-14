@@ -40,4 +40,8 @@
 #include "caffe/person_torso_layers.hpp"
 #include "caffe/wanglan_face_shoulders_layers.hpp"
 
+//
+// zhouyan
+#include "caffe/layers/zhouyan_ann_layers.hpp"
+
 #endif  // CAFFE_CAFFE_HPP_

@@ -1,0 +1,6 @@
+method:
+	like image to image learning
+	use 2 pooling layers
+	use euclidean loss layer to optimise 
+
+batch size: 2

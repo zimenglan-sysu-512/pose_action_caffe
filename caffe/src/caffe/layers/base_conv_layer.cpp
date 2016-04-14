@@ -11,6 +11,8 @@ namespace caffe {
 template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top) {
+  LOG(INFO) << "layer name: " << this->layer_param_.name();
+  
   CHECK_EQ(4, bottom[0]->num_axes()) << "Input must have 4 axes, "
       << "corresponding to (num, channels, height, width)";
   // Configure the kernel size, padding, stride, and inputs.

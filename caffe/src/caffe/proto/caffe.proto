@@ -391,6 +391,8 @@ message LayerParameter {
   optional ArgMaxCParameter arg_max_c_param = 410;
   optional MultiSourcesImagesDataParameter multi_sources_images_data_param = 411;
   optional PoseEuDistAccuracyParameter pose_eudist_accuracy_param = 412;
+
+  optional LoadDataFromFileParameter load_data_from_file_param = 413;
 }
 
 // #################################################################################
@@ -867,6 +869,19 @@ message PoseEuDistAccuracyParameter {
   optional string acc_name = 5 [default = "accuracy.log"];
   optional string log_name = 6 [default = "log.log"];
   optional bool zero_iter_test = 7 [default = false];
+}
+
+// message that stores parameters used by
+message LoadDataFromFileParameter {
+  optional string source      = 1;
+  optional string root_folder = 2;
+  optional bool shuffle       = 3 [default = false];
+  optional uint32 batch_size  = 4;
+  optional uint32 rand_skip   = 5 [default = 0];
+  optional string visual_path = 6;
+  optional uint32 ow          = 7 [default = 442];
+  optional uint32 oh          = 8 [default = 442];
+  optional float scale        = 9 [default = 1.0];
 }
 
 // Message that stores parameters used by AccuracyLayer

@@ -7,12 +7,13 @@ snapshot: 500
 # snapshot prefix
 snapshot_prefix: "../asserts/pts/zhouyan/expe_2p/models/expe_2p"
 
-test_iter: 1
-test_interval: 1000000
-test_initialization: false
+# 504 = 126 * 4
+test_iter: 126
+test_interval: 1000
+test_initialization: true
 
-# 0.0001 fast convergence
-base_lr: 0.0001 
+# 0.00001 fast convergence
+base_lr: 0.00001 
 
 # Learning rate
 lr_policy: "step"
@@ -24,10 +25,10 @@ momentum: 0.9
 weight_decay: 0.0005
 
 # Change learning rate
-stepsize: 8000
+stepsize: 16000
 
 # Iterations
-max_iter: 8000
+max_iter: 16000
 
 # Display
 display: 20

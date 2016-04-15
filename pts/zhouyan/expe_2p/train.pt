@@ -16,7 +16,7 @@ layer {
     scale: 100
     rand_skip: 0
     shuffle: true
-    batch_size: 8
+    batch_size: 4
     root_folder: "../dataset/zhouyan/data/train/"
     # abs path, so root_folder dose not use here
     source: "../dataset/zhouyan/labels/train_reshape.label"
@@ -405,9 +405,25 @@ layer {
 }
 
 layer {
-  name: "silence_pred_conv8"
-  type: "Silence"
+  name: "re_pred_conv8"
+  type: "WriteDataIntoFile"
   bottom: "pred_conv8"
+  top: "re_pred_conv8"
+  write_data_into_file_param {
+    file_ext: ".txt"
+    visual_dire: "../dataset/zhouyan/results/test/"
+    n_images: 504 
+    scale: 0.01
+  }
+  include {
+    phase: TEST
+  }
+}
+
+layer {
+  name: "silence_re_pred_conv8"
+  type: "Silence"
+  bottom: "re_pred_conv8"
   include {
     phase: TEST
   }

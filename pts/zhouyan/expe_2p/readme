@@ -4,3 +4,7 @@ method:
 	use euclidean loss layer to optimise 
 
 batch size: 2
+
+
+train & test:
+	cd ../../../caffe/ && make -j8 && cd - && sh run.sh 7000

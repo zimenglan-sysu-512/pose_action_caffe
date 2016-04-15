@@ -77,6 +77,38 @@ class LoadDataFromFileLayer : public BasePrefetchingDataLayer<Dtype>
   shared_ptr<Caffe::RNG> prefetch_rng_;
 };
 
+template <typename Dtype>
+class WriteDataIntoFileLayer : public Layer<Dtype>  {
+ public:
+  explicit WriteDataIntoFileLayer(const LayerParameter& param)
+      : Layer<Dtype>(param) {}
+  virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+  virtual inline const char* type() const { return "WriteDataIntoFile"; }
+  virtual inline int MinBottomBlobs() const { return 1; }
+  virtual inline int ExactNumTopBlobs() const { return 1; }
+
+ protected:
+  virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+  virtual void Backward_cpu(const vector<Blob<Dtype>*>& top,
+      const vector<bool>& propagate_down, 
+      const vector<Blob<Dtype>*>& bottom);
+
+  virtual void WriteResults(const vector<Blob<Dtype>*>& bottom,
+      const vector<Blob<Dtype>*>& top);
+
+ private:
+  int im_c_;
+  int n_images_;
+  Dtype scale_;
+  std::string file_ext_;
+  std::string visual_dire_;
+};
+
 }  // namespace caffe
 
 #endif  // CAFFE_ZHOUYAN_ANN_LAYERS_HPP_

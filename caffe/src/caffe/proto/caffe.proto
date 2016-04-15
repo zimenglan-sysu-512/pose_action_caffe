@@ -393,6 +393,7 @@ message LayerParameter {
   optional PoseEuDistAccuracyParameter pose_eudist_accuracy_param = 412;
 
   optional LoadDataFromFileParameter load_data_from_file_param = 413;
+  optional WriteDataIntoFileParameter write_data_into_file_param = 414;
 }
 
 // #################################################################################
@@ -882,6 +883,14 @@ message LoadDataFromFileParameter {
   optional uint32 ow          = 7 [default = 442];
   optional uint32 oh          = 8 [default = 442];
   optional float scale        = 9 [default = 1.0];
+}
+
+// message that stores parameters used by
+message WriteDataIntoFileParameter {
+  optional float scale        = 1 [default = 1.0];
+  optional string visual_dire = 2 [default =  ""];
+  optional int32 n_images     = 3 [default =   0];
+  optional string file_ext    = 4 [default = ".txt"];
 }
 
 // Message that stores parameters used by AccuracyLayer

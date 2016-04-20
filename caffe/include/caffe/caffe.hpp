@@ -44,4 +44,9 @@
 // zhouyan
 #include "caffe/layers/zhouyan_ann_layers.hpp"
 
+//
+// Tomas Pfister
+#include "caffe/layers/pose_flownet.hpp"
+
+
 #endif  // CAFFE_CAFFE_HPP_

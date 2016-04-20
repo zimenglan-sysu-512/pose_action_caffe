@@ -19,7 +19,7 @@ layer {
     root_folder: "../dataset/FLIC/crop.images2/train/"
     root_folder: "../dataset/FLIC/torso_masks/train/masks/"
     label_num: 28
-    batch_size: 12
+    batch_size: 8
     always_max_size: true
     is_scale_image: true
     shuffle: true
@@ -733,7 +733,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 64
+    num_output: 128
     kernel_size: 21
     pad: 10
     weight_filler {

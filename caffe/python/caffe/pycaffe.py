@@ -66,7 +66,9 @@ def _Net_forward(self, blobs=None, start=None, end=None, **kwargs):
     """
     if blobs is None:
         blobs = []
-
+    # print "\n\n", "layer names:", list(self._layer_names), "\n\n"
+    # print "\n\n", "input layer names:", list(self._inputs), "\n\n"
+    # print "\n\n", "output layer names:", list(self._outputs), "\n\n"
     if start is not None:
         start_ind = list(self._layer_names).index(start)
     else:
@@ -81,6 +83,7 @@ def _Net_forward(self, blobs=None, start=None, end=None, **kwargs):
 
     # set the bottom blobs and top blobs of datalayer
     if kwargs:
+        # print "kwargs.keys:", kwargs.keys()
         if set(kwargs.keys()) != set(self.inputs):
             raise Exception('Input blob arguments do not match net inputs.')
         # Set input according to defined shapes and make arrays single and

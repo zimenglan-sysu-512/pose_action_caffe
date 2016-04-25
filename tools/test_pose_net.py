@@ -1,0 +1,136 @@
+#!/usr/bin/env python
+
+# --------------------------------------------------------
+# Pose Estimation Demo
+# Copyright (c) 2016 SYSU
+# Written by Dengke Dong
+# --------------------------------------------------------
+
+"""Test a pose estimation network on images ."""
+
+import _init_paths
+import caffe
+from fast_rcnn.config_pose import pose_cfg, cfg_from_file
+from fast_rcnn.test_pose   import pose_estimation
+import cv2
+import time
+import pprint
+import os, sys
+import argparse
+
+
+def _parse_args():
+  """Parse input arguments"""
+  parser = argparse.ArgumentParser(description='Test a Fast R-CNN network')
+  # gpu
+  parser.add_argument('--gpu_id', dest='gpu_id', help='gpu id',
+                      default=0, type=int)
+  # def
+  parser.add_argument('--deploy_pt', dest='deploy_pt', help='pt file defining the network',
+                      default="", type=str)
+  # net
+  parser.add_argument('--caffemodel', dest='caffemodel', help='trained model to test',
+                      default="", type=str)
+  # cfg
+  parser.add_argument('--cfg_file', dest='cfg_file', help='optional config file',
+                      default="", type=str)
+  # pt_file
+  parser.add_argument('--pt_file', dest='pt_file', help='person and torso detection results',
+                      default="", type=str)
+  if len(sys.argv) == 1:
+    parser.print_help()
+    sys.exit(1)
+  args = parser.parse_args()
+  return args
+
+def _pt_bboxes(pt_file, l_pt_box=9):
+  pt_infos = []
+  fh       = open(pt_file)
+  
+  for line in fh.readlines():
+    line = line.strip()
+    info = line.split()
+    assert len(info) >= 1
+    im_path, info = info[0], info[1:]
+
+    n_info = len(info)
+    assert n_info >= l_pt_box
+    assert n_info % l_pt_box == 0
+
+    info     = [i.strip() for i in info]
+    info     = [int(i)    for i in info]
+    
+    pt_boxes = []
+    for j in xrange(n_info / l_pt_box):
+      pt_box = []
+      j2     = j * l_pt_box
+      # ignore objidx
+      j2     = j2 + 1
+      pt_box.append(info[j2: j2+4])
+      j2     = j2 + 4
+      pt_box.append(info[j2: j2+4])
+      pt_boxes.append(pt_box)
+
+    pt_infos.append((im_path, pt_boxes))
+
+  fh.close()
+  assert len(pt_infos) >= 1
+
+  return pt_infos
+
+def test_pose_net():
+  ''''''
+  args = _parse_args()
+  print "\n\n", args, "\n\n"
+
+  cfg_file = args.cfg_file.strip()
+  if not os.path.exists(cfg_file) or not os.path.isfile(cfg_file):
+    raise IOError(('{:s} not found.\n').format(cfg_file))
+  cfg_from_file(args.cfg_file)
+  
+  print('Using config:')
+  pprint.pprint(pose_cfg)
+  print "\n\n"
+  
+  time.sleep(pose_cfg.SLEEP_TIME)
+
+  caffe.set_mode_gpu()
+  caffe.set_device(args.gpu_id)
+
+  deploy_pt  = args.deploy_pt.strip()
+  if not os.path.exists(deploy_pt) or not os.path.isfile(deploy_pt):
+    raise IOError(('{:s} not found.\n').format(deploy_pt))
+
+  caffemodel = args.caffemodel.strip()
+  if not os.path.exists(caffemodel) or not os.path.isfile(caffemodel):
+    raise IOError(('{:s} not found.\n').format(caffemodel))
+
+  pt_file = args.pt_file.strip()
+  if not os.path.exists(pt_file) or not os.path.isfile(pt_file):
+    raise IOError(('{:s} not found.\n').format(pt_file))
+
+  pt_infos = _pt_bboxes(pt_file)
+
+  net = caffe.Net(deploy_pt, caffemodel, caffe.TEST)
+
+  # #################################################################
+  print "\n\nStarting pose estimation\n\n"
+
+  im_c = 1
+  for pt_info in pt_infos:
+    if pose_cfg.DISP_NUM > 0 and im_c > pose_cfg.DISP_NUM:
+      break
+    
+    im_path, pt_boxes = pt_info
+    print "\n\n", "im_c:", im_c, "im_path:", im_path
+    
+    pose_estimation(net, im_path, pt_boxes)
+
+    im_c = im_c + 1
+    
+
+  print "\n\nEnd pose estimation\n\n"
+
+if __name__ == '__main__':
+  ''''''
+  test_pose_net()

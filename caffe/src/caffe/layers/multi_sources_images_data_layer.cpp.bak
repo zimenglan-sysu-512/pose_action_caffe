@@ -97,35 +97,6 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
     CHECK(this->receptive_field_size_ > 0);
   }
 
-  // scale and angle
-  if(!this->scales_.empty()) {
-    this->scales_.clear();
-  }
-  if(msidp.has_scale_string()) {
-    std::string scale_string = msidp.scale_string();
-    boost::trim(scale_string);
-    std::vector<std::string> scale_info;
-    boost::split(scale_info, scale_string, boost::is_any_of(","));
-    for(int j = 0; j < scale_info.size(); j++) {
-      this->scales_.push_back(std::atof(scale_info[j].c_str()));
-    }
-  } else {
-    this->scales_.push_back(1.0);
-  }
-  CHECK_GE(this->scales_.size(), 1);
-  for(int j = 0; j < this->scales_.size(); j++) {
-    LOG(INFO) << "ind: " << j << " -- scales: " << this->scales_[j];
-  }
-
-  this->has_angle_   = false;
-  if(msidp.has_angle_max()) {
-    this->has_angle_ = true;
-    this->angle_max_ = msidp.angle_max();
-    CHECK_GT(this->angle_max_, 0);
-    LOG(INFO) << "angle_max: " << this->angle_max_;
-  }
-
-  // 
   if(this->is_scale_image_) {
     CHECK(msidp.has_max_size());
     CHECK(msidp.min_size_size() > 0);
@@ -254,7 +225,8 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
       std::vector<std::string> label_info;
       // imgidx x1 y1 x2 y2 ... xn yn
       boost::trim(line_info);
-      boost::split(label_info, line_info, boost::is_any_of(" "));
+      boost::split(label_info, line_info, 
+                      boost::is_any_of(" "));
 
       CHECK_GE(label_info.size(), 2);
       if(label_info.size() == 2) {
@@ -397,15 +369,6 @@ template <typename Dtype>
 void MultiSourcesImagesDataLayer<Dtype>::PerturbedCoordsBias() {
 }
 
-template <typename Dtype>
-float MultiSourcesImagesDataLayer<Dtype>::Uniform(
-    const float min, const float max) 
-{
-  float diff = max - min;
-  int random = this->data_transformer_->Rand(int(diff * 10) + 1);
-  float r    = random * 0.1;
-  return min + r;
-}
 
 template <typename Dtype>
 void MultiSourcesImagesDataLayer<Dtype>::ShuffleImages() {
@@ -521,33 +484,23 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
   // image scale
   timer.Start();
   if(this->is_scale_image_) {
-    const int n_scales   = this->scales_.size();
-    const int scale_ind  = this->data_transformer_->Rand(n_scales);
-    const float scale    = this->scales_[scale_ind];
-    float max_size       = float(this->max_size_) * scale;
-    
     for (int item_id = 0; item_id < this->batch_size_; ++item_id) {
-      float im_min_size = std::min(widths[item_id], heights[item_id]);
-      float im_max_size = std::max(widths[item_id], heights[item_id]);
+      float img_min_size = std::min(widths[item_id], heights[item_id]);
+      float img_max_size = std::max(widths[item_id], heights[item_id]);
 
       float im_scale;
       if(this->always_max_size_) {
-        im_scale = float(max_size) / float(im_max_size + 0.0);
+        im_scale = float(this->max_size_) / float(img_max_size + 0.0);
       } else {
-        const int s   = this->min_sizes_.size();
-        const int ind = this->data_transformer_->Rand(s);
-        const int min_size = this->min_sizes_[ind];
-        
-        max_size = std::max(max_size,float(min_size));
-
-        im_scale = float(std::max(min_size, int(im_min_size))) 
-                 / float(std::min(min_size, int(im_min_size)) + 0.);
-        if(im_scale * im_max_size > max_size) {
-          im_scale = float(max_size) / float(im_max_size + 0.0);
+        const int rand_min_size_idx = 
+            this->data_transformer_->Rand(this->min_sizes_.size());
+        const int min_size = this->min_sizes_[rand_min_size_idx];
+        im_scale = float(std::max(min_size, int(img_min_size))) 
+                 / float(std::min(min_size, int(img_min_size)) + 0.);
+        if(im_scale * img_max_size > this->max_size_) {
+          im_scale = float(this->max_size_) / float(img_max_size + 0.0);
         }
       }
-
-      // scale factor
       im_scales.push_back(im_scale);
     }
   } else {
@@ -561,8 +514,8 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
   int max_height = -1;
   int max_width  = -1;
   for (int item_id = 0; item_id < this->batch_size_; ++item_id) {
-    max_width  = std::max(max_width,  int(widths[item_id] * 
-                                          im_scales[item_id]));
+    max_width = std::max(max_width, int(widths[item_id] * 
+                                        im_scales[item_id]));
     max_height = std::max(max_height, int(heights[item_id] * 
                                           im_scales[item_id]));
   }
@@ -596,18 +549,19 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
 
   // images & labels (rescale)
   for (int item_id = 0; item_id < this->batch_size_; ++item_id) {
-    if(this->layer_param_.is_disp_info()) {
-      LOG(INFO) << "Start fetching images & labels -- " << item_id << "...";
-    }
-    
     timer.Start();
-    // mirror -- horizontal
-    const bool do_mirror = transform_param.mirror() && 
-                           this->data_transformer_->Rand(2);
-    // rotate
-    std::vector<cv::Mat> Ms;
-    const bool do_rotate = this->data_transformer_->Rand(3) == 0;
-    
+    // const int width              = widths[item_id]  * 
+    //                                im_scales[item_id];
+    // const int height             = heights[item_id] * 
+    //                                im_scales[item_id];
+    const bool do_mirror         = transform_param.mirror() && 
+                                   this->data_transformer_->Rand(2);
+
+    if(this->layer_param_.is_disp_info()) {
+      LOG(INFO) << "Start fetching images & labels -- " 
+                << item_id << "...";
+    }
+
     // images from multi-sources                               
     for(int j2 = 0; j2 < this->n_sources_; j2++) {
       const std::string image_path = this->root_folders_[j2] +
@@ -639,23 +593,6 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
         const int flipCode = 1;
         cv::flip(im, im, flipCode);
       }
-
-      if(do_rotate) {
-        cv::Mat M(2, 3, CV_32FC1);
-
-        double scale     = 1;
-        cv::Point center = cv::Point(im.cols / 2, im.rows / 2);
-        float angle      = Uniform(-this->angle_max_, this->angle_max_);
-
-        // Get the rotation matrix with the specifications above
-        M = cv::getRotationMatrix2D(center, angle, scale);
-
-        // Rotate the warped image
-        cv::warpAffine(im, im, M, im.size());
-
-        Ms.push_back(M);
-      }
-
       // 把图片拷贝到放在blob的右上角
       int sc = this->channels_inds_[j2];
       if(this->has_mean_values_) {
@@ -676,8 +613,7 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
         }
       }
     }                           
-    CHECK_GE(Ms.size(), 1);
-
+    
     if(this->layer_param_.is_disp_info()) {
       LOG(INFO) << "Start fetching images -- mid...";
     }
@@ -706,20 +642,6 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
         // y -- height
         float y = label[idx + 1];
         y       = y * im_scales[item_id];
-
-        // rotate
-        if(do_rotate) {
-          const cv::Mat& M = Ms[0];
-          const float x2 = M.at<double>(0, 0) * x +
-                           M.at<double>(0, 1) * y + 
-                           M.at<double>(0, 2);
-          const float y2 = M.at<double>(1, 0) * x + 
-                           M.at<double>(1, 1) * y + 
-                           M.at<double>(1, 2);
-          x = x2;
-          y = y2;
-        }
-        
         // set
         const int ln = kpn * 2;
         prefetch_label[label_offset + ln + 0] = Dtype(x);

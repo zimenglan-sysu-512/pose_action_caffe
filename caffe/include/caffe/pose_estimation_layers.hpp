@@ -1355,6 +1355,10 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual inline int ExactNumBottomBlobs() const { return 0; }
   virtual inline int MinTopBlobs() const { return 1; }
   virtual inline int MaxTopBlobs() const { return 3; }
+  // Random number generator
+  inline float Uniform(const float min, const float max);
+  // Rotate image for augmentation
+  inline cv::Mat RotateImage(cv::Mat src, float rotation_angle);
 
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
@@ -1368,6 +1372,7 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
   virtual void InternalThreadEntry();
 
   bool shuffle_;
+  bool has_angle_;
   bool is_scale_image_;
   bool always_max_size_;
   bool has_mean_values_;
@@ -1384,13 +1389,14 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
   
   float min_plb_;
   float max_plb_;
+  float angle_max_;
   
   vector<bool> is_colors_;
   std::vector<int> min_sizes_;
   std::vector<int> origin_parts_orders_;
   std::vector<int> flippable_parts_orders_;
 
-
+  std::string scale_string_;
   std::string parts_orders_path_;
 
   std::vector<string> im_exts_;
@@ -1404,6 +1410,7 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
 
   std::vector<int> inds_;
   std::vector<int> channels_inds_;
+  std::vector<float> scales_;
   vector<Dtype> mean_values_;
   // <imgidx, <objidx, coords>>
   vector<std::pair<int, std::pair<std::string, std::pair<std::string, 

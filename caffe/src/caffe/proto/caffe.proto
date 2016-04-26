@@ -627,6 +627,9 @@ message MultiSourcesImagesDataParameter {
   optional int32 receptive_field_size  = 21;
   // record the order of joints/parts
   optional string parts_orders_path    = 22;
+  // multi-scale
+  optional string scale_string         = 23; // [default = "1"];
+  optional float angle_max             = 24; // [default = 0];
 }
 
 

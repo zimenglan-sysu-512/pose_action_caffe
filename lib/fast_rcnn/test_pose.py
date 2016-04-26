@@ -315,8 +315,9 @@ def pose_estimation(net, im_path, pt_boxes):
   pred_coords = blobs_out[target_name]    # has been rescaled
   # print "pred_coords.shape", pred_coords.shape # (1, 28, 1, 1)
 
-  _viz_pose(im_path, pred_coords, pt_boxes)
-
+  out_path = _viz_pose(im_path, pred_coords, pt_boxes)
+  return out_path
+  
 
 if __name__ == '__main__':
   ''''''

@@ -94,6 +94,12 @@ __C.VIZ_COLORS   = [
     (245,  21,  18),
 ]
 
+__C.SOCKET = edict()
+__C.SOCKET.BUFFER_SIZE = 2048
+__C.SOCKET.SERVER_PORT = 8192
+__C.SOCKET.SERVER_ADDR = "127.0.0.1"
+
+
 def _merge_a_into_b(a, b):
   """Merge config dictionary a into config dictionary b, clobbering the
   options in b whenever they are also specified in a.

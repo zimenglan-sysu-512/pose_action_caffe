@@ -230,5 +230,8 @@ def server_pose_net():
 
 if __name__ == '__main__':
   ''''''
+  # # from pt file
   # test_pose_net()
+
+  # # from client
   server_pose_net()

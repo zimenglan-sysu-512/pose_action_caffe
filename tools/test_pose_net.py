@@ -206,24 +206,28 @@ def server_pose_net():
     print 'Connected by', client_addr
     BUF_SIZE = pose_cfg.SOCKET.BUFFER_SIZE
     while True:
-      # recieve data from client
-      data = client.recv(BUF_SIZE)
-      data = data.strip()
-      print data
+      try: 
+        # recieve data from client
+        data = client.recv(BUF_SIZE)
+        data = data.strip()
+        print "\ndata recieve:", data, "\n"
 
-      # pose estimation
-      starttime = time.time()
+        # pose estimation
+        starttime = time.time()
 
-      im_path, pt_boxes = _per_pt_info(data)
+        im_path, pt_boxes = _per_pt_info(data)
 
-      out_path = pose_estimation(net, im_path, pt_boxes)
+        out_path = pose_estimation(net, im_path, pt_boxes)
 
-      endtime = time.time()
+        endtime = time.time()
 
-      # send data to client
-      data = out_path + " " + '%.3f' % (endtime - starttime)
-      print "\ndata:", data, "\n"
-      client.sendall(data)
+        # send data to client
+        data = out_path + " " + '%.3f' % (endtime - starttime)
+        print "data send:", data
+        print "\n*********************************************\n\n"
+        client.sendall(data)
+      except Exception as err:
+        print "cant not get person & torso detection results"
 
   # close
   server.close()

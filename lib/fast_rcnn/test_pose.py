@@ -269,7 +269,7 @@ def _viz_pose(im_path, pred_coords, pt_boxes):
       x  = coords[j2 + 0]
       y  = coords[j2 + 1]
       p2 = (x , y)
-      cv2.line(im, p1, p2, colors[n_colors], l_thickness)
+      cv2.line(im, p1, p2, colors[n_colors + 3], l_thickness)
 
     # person and torso bounding box
     p1 = (p_x1, p_y1)

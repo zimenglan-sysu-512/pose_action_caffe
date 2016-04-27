@@ -630,6 +630,11 @@ message MultiSourcesImagesDataParameter {
   // multi-scale
   optional string scale_string         = 23; // [default = "1"];
   optional float angle_max             = 24; // [default = 0];
+  repeated bool need_rotates           = 25;
+  optional int32 translate_num         = 26 [default = 10];
+  repeated bool need_translates        = 27;
+  optional int32 rotate_prob_num       = 28 [default =  4];
+  optional int32 translate_prob_num    = 29 [default =  4];
 }
 
 

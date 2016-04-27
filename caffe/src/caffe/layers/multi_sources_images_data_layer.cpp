@@ -122,10 +122,99 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
     this->has_angle_ = true;
     this->angle_max_ = msidp.angle_max();
     CHECK_GT(this->angle_max_, 0);
+  }
+  LOG(INFO) << "has angle: " << this->has_angle_;
+  if(this->has_angle_) {
     LOG(INFO) << "angle_max: " << this->angle_max_;
   }
 
-  // 
+  // need rotate
+  if(!this->need_rotate_ims_.empty()) {
+    this->need_rotate_ims_.clear();
+  }
+  if(msidp.need_rotates_size() > 0) {
+    CHECK(msidp.need_rotates_size() == 1 || 
+          msidp.need_rotates_size() == this->n_sources_);
+    for(int j = 0; j < msidp.need_rotates_size(); j++) {
+      const bool flag = msidp.need_rotates(j);
+      this->need_rotate_ims_.push_back(flag);
+    }
+    if(msidp.need_rotates_size() == 1) {
+      const bool flag = this->need_rotate_ims_[0];
+      for(int j = 1; j < this->n_sources_ ; j++) {
+        this->need_rotate_ims_.push_back(flag);
+      }
+    }
+    
+  } else {
+    for(int j = 0; j < this->n_sources_ ; j++) {
+      this->need_rotate_ims_.push_back(true); // default: depend on has_angle_
+    }
+  }
+  CHECK_EQ(this->need_rotate_ims_.size(), this->n_sources_);
+  for(int j = 0; j < this->need_rotate_ims_.size(); j++) {
+    LOG(INFO) << "ind: " << j << " need rotate im: " 
+              << this->need_rotate_ims_[j];
+  }
+
+  this->rotate_prob_num_ = 0;
+  if(this->has_angle_) {
+    CHECK(msidp.has_rotate_prob_num());
+    this->rotate_prob_num_ = msidp.rotate_prob_num();
+    CHECK_GT(this->rotate_prob_num_, 1);
+  }
+  LOG(INFO) << "rotate_prob_num: " << this->rotate_prob_num_;
+
+
+  // need translate
+  bool need_translate_flag = false;
+  if(!this->need_translate_ims_.empty()) {
+    this->need_translate_ims_.clear();
+  }
+  if(msidp.need_translates_size() > 0) {
+    CHECK(msidp.need_translates_size() == 1 || 
+          msidp.need_translates_size() == this->n_sources_);
+    for(int j = 0; j < msidp.need_translates_size(); j++) {
+      const bool flag = msidp.need_translates(j);
+      this->need_translate_ims_.push_back(flag);
+      if(flag) {
+        need_translate_flag = true;
+      }
+    }
+    if(msidp.need_translates_size() == 1) {
+      const bool flag = this->need_translate_ims_[0];
+      for(int j = 1; j < this->n_sources_ ; j++) {
+        this->need_translate_ims_.push_back(flag);
+      }
+    }
+    
+  } else {
+    for(int j = 0; j < this->n_sources_ ; j++) {
+      this->need_translate_ims_.push_back(false);
+    }
+  }
+  CHECK_EQ(this->need_translate_ims_.size(), this->n_sources_);
+  for(int j = 0; j < this->need_translate_ims_.size(); j++) {
+    LOG(INFO) << "ind: " << j << " translate step: " 
+              << this->need_translate_ims_[j];
+  }
+
+  this->translate_num_ = 0;
+  this->translate_prob_num_ = 0;
+
+  if(need_translate_flag) {
+    CHECK(msidp.has_translate_num());
+    this->translate_num_ = msidp.translate_num();
+    CHECK_GT(this->translate_num_, 1);
+
+    CHECK(msidp.has_translate_prob_num());
+    this->translate_prob_num_ = msidp.translate_prob_num();
+    CHECK_GT(this->translate_prob_num_, 1);
+  }
+  LOG(INFO) << "translate_num: "      << this->translate_num_;
+  LOG(INFO) << "translate_prob_num: " << this->translate_prob_num_;
+
+  // scale image
   if(this->is_scale_image_) {
     CHECK(msidp.has_max_size());
     CHECK(msidp.min_size_size() > 0);
@@ -141,6 +230,8 @@ void MultiSourcesImagesDataLayer<Dtype>::DataLayerSetUp(
       CHECK_GT(min_size, 0);
       this->min_sizes_.push_back(min_size);
     }
+
+    CHECK_GE(this->min_sizes_.size(), 1);
   }
   CHECK_EQ(this->label_num_ % 2, 0);
 
@@ -401,9 +492,13 @@ template <typename Dtype>
 float MultiSourcesImagesDataLayer<Dtype>::Uniform(
     const float min, const float max) 
 {
-  float diff = max - min;
-  int random = this->data_transformer_->Rand(int(diff * 10) + 1);
+  int diff = int(max - min);
+  if(diff < 0) diff = 0 - diff;
+  CHECK_GT(diff, 0);
+  // LOG(INFO) << "uniform 0 -- diff: " << diff;
+  int random = this->data_transformer_->Rand(diff * 10 + 1);
   float r    = random * 0.1;
+  // LOG(INFO) << "uniform 1 -- random: " << random << " r: " << r;
   return min + r;
 }
 
@@ -522,9 +617,14 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
   timer.Start();
   if(this->is_scale_image_) {
     const int n_scales   = this->scales_.size();
-    const int scale_ind  = this->data_transformer_->Rand(n_scales);
+    int scale_ind = 0;
+    if(n_scales > 1) {
+      scale_ind  = this->data_transformer_->Rand(n_scales);
+    }
     const float scale    = this->scales_[scale_ind];
     float max_size       = float(this->max_size_) * scale;
+    // LOG(INFO) << "scale_ind: " << scale_ind << " "
+    //           << "scale: " << scale << " max_size: " << max_size;
     
     for (int item_id = 0; item_id < this->batch_size_; ++item_id) {
       float im_min_size = std::min(widths[item_id], heights[item_id]);
@@ -535,7 +635,11 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
         im_scale = float(max_size) / float(im_max_size + 0.0);
       } else {
         const int s   = this->min_sizes_.size();
-        const int ind = this->data_transformer_->Rand(s);
+        int ind = 0;
+        if(s > 1) {
+          ind = this->data_transformer_->Rand(s);
+        }
+        // LOG(INFO) << "min_size ind: " << ind;
         const int min_size = this->min_sizes_[ind];
         
         max_size = std::max(max_size,float(min_size));
@@ -602,13 +706,34 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
     
     timer.Start();
     // mirror -- horizontal
+    // LOG(INFO) << "item_id: " << item_id;
     const bool do_mirror = transform_param.mirror() && 
                            this->data_transformer_->Rand(2);
-    // rotate
-    std::vector<cv::Mat> Ms;
-    const bool do_rotate = this->data_transformer_->Rand(3) == 0;
+    // LOG(INFO) << "mirror: " << do_mirror;
     
-    // images from multi-sources                               
+    // rotate and translate
+    // LOG(INFO) << "rotate 0 -- has_angle: " << this->has_angle_;
+    cv::Mat M( 2, 3, CV_32FC1);
+    cv::Mat M2(2, 3, CV_64FC1);
+
+    const int translate_prob_num = this->translate_prob_num_ <= 1 ? 1 : 
+                                   this->data_transformer_->Rand(this->translate_prob_num_);
+    const bool do_translate = translate_prob_num == 0;
+
+    const int rotate_prob_num = this->rotate_prob_num_ <= 1 ? 1 : 
+                           this->data_transformer_->Rand(this->rotate_prob_num_);
+    const bool do_rotate = this->has_angle_ && (rotate_prob_num == 0);
+
+
+    // LOG(INFO) << "translate 1 -- do_translate: " << do_translate  << " "
+    //           << "translate_prob_num: " << translate_prob_num;
+    // LOG(INFO) << "rotate 1 -- do_rotate: "       << do_rotate     << " "
+    //           << "rotate_prob_num: " << rotate_prob_num;
+    
+    bool first_rotate    = true;
+    bool first_translate = true;
+    
+    // images from multi-sources
     for(int j2 = 0; j2 < this->n_sources_; j2++) {
       const std::string image_path = this->root_folders_[j2] +
                                      this->imgidxs_[item_id] + 
@@ -627,6 +752,41 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
         continue;
       }
 
+      if(do_translate && first_translate) {
+        const int tl1 = this->translate_num_;
+        const int tl2 = tl1 * 2 + 1;
+        int tl_dx     = this->data_transformer_->Rand(tl2);
+        int tl_dy     = this->data_transformer_->Rand(tl2);
+        tl_dx        -= tl1;
+        tl_dy        -= tl1;
+        // LOG(INFO) << "ind: " << j2 << " translate -- dx: " 
+        //           << tl_dx << " dy: " << tl_dy;
+
+        M2.at<double>(0, 0) = double(1);
+        M2.at<double>(0, 1) = double(0);
+        M2.at<double>(0, 2) = double(tl_dx);
+        M2.at<double>(1, 0) = double(0);
+        M2.at<double>(1, 1) = double(1);
+        M2.at<double>(1, 2) = double(tl_dy);
+
+        first_translate = false;
+      }
+      if(do_translate) {
+        CHECK_EQ(first_translate, false);
+      }
+
+      if(do_rotate && first_rotate) {
+        double s    = 1;
+        cv::Point c = cv::Point(im.cols / 2, im.rows / 2);
+        float angle = this->Uniform(-this->angle_max_, this->angle_max_);
+        // Get the rotation matrix with the specifications above
+        M = cv::getRotationMatrix2D(c, angle, s);
+        first_rotate = false;
+      }
+      if(do_rotate) {
+        CHECK_EQ(first_rotate, false);
+      }
+  
       // ####################################################### 
       // need to check <width, height> for all sources???
       // here do not check!!!
@@ -634,26 +794,23 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
       // #######################################################    
       CHECK(im.data) << "Could not load " << image_path;
 
+      // translate -- allow different source image to translate different (dx, dy)
+      if(do_translate && this->need_translate_ims_[j2]) {
+        // Translate 
+        // LOG(INFO) << "ind2: " << j2 << " translate";
+        cv::warpAffine(im, im, M2, im.size());
+      }
+
       if(do_mirror) {
         // >0: horizontal; <0: horizontal&vertical; =0: vertical
         const int flipCode = 1;
         cv::flip(im, im, flipCode);
       }
 
-      if(do_rotate) {
-        cv::Mat M(2, 3, CV_32FC1);
-
-        double scale     = 1;
-        cv::Point center = cv::Point(im.cols / 2, im.rows / 2);
-        float angle      = Uniform(-this->angle_max_, this->angle_max_);
-
-        // Get the rotation matrix with the specifications above
-        M = cv::getRotationMatrix2D(center, angle, scale);
-
+      // rotate-- different source image has the same rotation
+      if(do_rotate && this->need_rotate_ims_[j2]) {
         // Rotate the warped image
         cv::warpAffine(im, im, M, im.size());
-
-        Ms.push_back(M);
       }
 
       // 把图片拷贝到放在blob的右上角
@@ -675,8 +832,7 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
                               sc, im);
         }
       }
-    }                           
-    CHECK_GE(Ms.size(), 1);
+    }                  
 
     if(this->layer_param_.is_disp_info()) {
       LOG(INFO) << "Start fetching images -- mid...";
@@ -700,16 +856,32 @@ void MultiSourcesImagesDataLayer<Dtype>::InternalThreadEntry() {
                                  : this->origin_parts_orders_[kpn];
         const int idx = id * 2;
         // x -- width
-        float x       = label[idx];
-        x             = (do_mirror ? widths[item_id] - x - 1 : x) 
-                      * im_scales[item_id];
+        float x =  label[idx + 0];
+        float w = widths[item_id];
         // y -- height
-        float y = label[idx + 1];
-        y       = y * im_scales[item_id];
+        float y =  label[idx + 1];
 
-        // rotate
-        if(do_rotate) {
-          const cv::Mat& M = Ms[0];
+        x = x * im_scales[item_id];
+        w = w * im_scales[item_id];
+        y = y * im_scales[item_id];
+        
+        // translate 
+        if(do_translate && this->need_translate_ims_[0]) {
+          const float x2 = M2.at<double>(0, 0) * x +
+                           M2.at<double>(0, 1) * y + 
+                           M2.at<double>(0, 2);
+          const float y2 = M2.at<double>(1, 0) * x + 
+                           M2.at<double>(1, 1) * y + 
+                           M2.at<double>(1, 2);
+          x = x2;
+          y = y2;
+        }
+
+        // flip
+        x = (do_mirror ? w - x - 1 : x);
+
+        // rotate label
+        if(do_rotate && this->need_rotate_ims_[0]) {
           const float x2 = M.at<double>(0, 0) * x +
                            M.at<double>(0, 1) * y + 
                            M.at<double>(0, 2);

@@ -1384,14 +1384,19 @@ class MultiSourcesImagesDataLayer : public BasePrefetchingDataLayer<Dtype> {
   int crop_size_;
   int n_sources_;
   int batch_size_;
+  int translate_num_;
   int key_points_num_;
+  int rotate_prob_num_;
+  int translate_prob_num_;
   int receptive_field_size_;
-  
   float min_plb_;
   float max_plb_;
   float angle_max_;
   
-  vector<bool> is_colors_;
+  std::vector<bool> is_colors_;
+  std::vector<bool> need_rotate_ims_;
+  std::vector<bool> need_translate_ims_;
+
   std::vector<int> min_sizes_;
   std::vector<int> origin_parts_orders_;
   std::vector<int> flippable_parts_orders_;

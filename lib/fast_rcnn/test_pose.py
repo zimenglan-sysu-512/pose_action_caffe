@@ -102,9 +102,16 @@ def _get_blobs(im_path, pt_boxes):
   aux_infos   = []
   n_pt_box    = len(pt_boxes)
 
+  # p_bbox: produce by t_bbox
+  # p_bbox: produce by person detector
+  # t_bbox: produce by toros  detector
   for pt_box in pt_boxes:
-    assert len(pt_box) == 2
-    p_box, t_box = pt_box
+    assert (len(pt_box) == 2 or len(pt_box) == 3)
+    if   len(pt_box) == 2:
+      p_box, t_box    = pt_box
+    elif len(pt_box) == 3:
+      p_box, _, t_box = pt_box
+
     assert len(p_box) == 4
     assert len(t_box) == 4
     p_x1, p_y1, p_x2, p_y2 = p_box
@@ -237,8 +244,13 @@ def _viz_pose(im_path, pred_coords, pt_boxes):
     coords = pred_coords[n, :, 0, 0]
     assert len(coords) == parts_num * 2
 
+    op_box = None
     pt_box = pt_boxes[n]
-    p_box, t_box = pt_box
+    assert (len(pt_box) == 2 or len(pt_box) == 3)
+    if   len(pt_box) == 2:
+      p_box, t_box         = pt_box
+    elif len(pt_box) == 3:
+      p_box, op_box, t_box = pt_box
     p_x1, p_y1, p_x2, p_y2 = p_box
     t_x1, t_y1, t_x2, t_y2 = t_box
     
@@ -247,6 +259,9 @@ def _viz_pose(im_path, pred_coords, pt_boxes):
       j2 = j * 2
       coords[j2 + 0] += p_x1
       coords[j2 + 1] += p_y1
+
+    p_box                  = op_box
+    p_x1, p_y1, p_x2, p_y2 = p_box
 
     # joint
     for c in xrange(len(parts_inds)):

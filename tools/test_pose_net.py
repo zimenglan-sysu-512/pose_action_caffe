@@ -195,6 +195,38 @@ def _per_pt_info(line, l_pt_box=9):
   assert len(pt_boxes) >= 1
   return im_path, pt_boxes
 
+def _per_pt_info2(line, l_pt_box=13):
+  # p_bbox: produce by t_bbox
+  # p_bbox: produce by person detector
+  # t_bbox: produce by toros  detector
+  line = line.strip()
+  info = line.split()
+  assert len(info) >= 1
+  im_path, info = info[0], info[1:]
+
+  n_info = len(info)
+  assert n_info >= l_pt_box
+  assert n_info % l_pt_box == 0
+
+  info     = [i.strip() for i in info]
+  info     = [int(i)    for i in info]
+  
+  pt_boxes = []
+  for j in xrange(n_info / l_pt_box):
+    pt_box = []
+    j2     = j * l_pt_box
+    # ignore objidx
+    j2     = j2 + 1
+    pt_box.append(info[j2: j2+4])
+    j2     = j2 + 4
+    pt_box.append(info[j2: j2+4])
+    j2     = j2 + 4
+    pt_box.append(info[j2: j2+4])
+    pt_boxes.append(pt_box)
+
+  assert len(pt_boxes) >= 1
+  return im_path, pt_boxes
+
 def server_pose_net():
   net, args = _init_net()
 
@@ -215,7 +247,8 @@ def server_pose_net():
         # pose estimation
         starttime = time.time()
 
-        im_path, pt_boxes = _per_pt_info(data)
+        # im_path, pt_boxes = _per_pt_info(data)
+        im_path, pt_boxes = _per_pt_info2(data)
 
         out_path = pose_estimation(net, im_path, pt_boxes)
 

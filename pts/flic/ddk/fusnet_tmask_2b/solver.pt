@@ -9,7 +9,7 @@ snapshot_prefix: "../asserts/pts/flic/ddk/fusnet_tmask_2b/models/flic"
 
 # 1016 = 127( test_iter) * 8(batchsize)
 # 1016 = 1016(test_iter) * 1(batchsize)
-test_iter: 127
+test_iter: 1016
 
 # test when reaching the test_interval
 test_interval: 1000

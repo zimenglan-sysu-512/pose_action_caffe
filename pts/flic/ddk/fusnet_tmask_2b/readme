@@ -7,12 +7,17 @@ Note:
 	5 torso mask
 	6 fusion_net (only train fusion net)
 
-alias
+alias:
 	fusnet: fusion net
 	2b:			2 banks
 	refnet: refined net
 	ft:			finetune
 
+data argument:
+	flip
+	translate
+	rotate
+
 cmds:
-	cd ../../../../caffe/ && make -j8 && cd - && sh train.sh
+	cd ../../../../caffe/ && make -j8 && cd - && sh run.sh
 	cd ../../../../caffe/ && make -j8 && cd - && sh test.sh

@@ -25,15 +25,24 @@ layer {
     shuffle: true
     max_size: 256
     min_size: 240
-    # angle_max: 15
-    rotate_prob_num: 0
-    translate_prob_num: 0
     is_colors: true
     is_colors: false
+    angle_max: 7
+    # only rotate input image (color)
+    need_rotates: true
+    need_rotates: false
+    rotate_prob_num: 4 # 1 / prob_num
+    # only translate torso mask (perturb)
+    need_translates: false
+    need_translates: true
+    translate_num: 5
+    translate_prob_num: 4 # 1 / prob_num
+    scale_string: "0.96,1.0,1.0,1.0,1.0,1.04"
+    # scale_string: "0.95,0.98,1.0,1.0,1.0,1.0,1.02,1.05"
     im_exts: ".jpg"
     im_exts: ".jpg"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
-    visual_path: "../dataset/FLIC/viz.train/"
+    # visual_path: "../dataset/FLIC/viz.train/"
   }
 }
 
@@ -47,34 +56,25 @@ layer {
     phase: TEST
   }
   transform_param { # opencv: B, G, R
-    mirror: true
+    mirror: false
   }
   multi_sources_images_data_param {
     source: "../dataset/FLIC/labels/crop_test_labels2.txt"
     root_folder: "../dataset/FLIC/crop.images2/test/"
     root_folder: "../dataset/FLIC/torso_masks/test/masks/"
     label_num: 28
-    batch_size: 8
+    batch_size: 1
     always_max_size: true
     is_scale_image: true
     shuffle: false
     max_size: 256
     min_size: 240
-    scale_string: "0.9,0.95,1.0,1.05,1.1"
     is_colors: true
     is_colors: false
-    angle_max: 10
-    need_rotates: true
-    need_rotates: true
-    rotate_prob_num: 4
-    need_translates: true
-    need_translates: true
-    translate_num: 10
-    translate_prob_num: 4
     im_exts: ".jpg"
     im_exts: ".jpg"
     parts_orders_path: "../dataset/FLIC/labels/parts_orders_path.txt"
-    visual_path: "../dataset/FLIC/viz.test2/"
+    # visual_path: "../dataset/FLIC/viz.test2/"
   }
 }
 

@@ -1,0 +1,47 @@
+
+plot:
+	eblow, wrist
+
+flic: (image) (PCK or PDJ)
+	9 joints 
+	without torso mask
+		SpatialNet + FusionNet
+
+	with torso mask
+		SpatialNet
+		FusionNet
+		IndepentNet
+
+		SpatialNet + FusionNet + IndepentNet (final)
+
+	compare with Jonathan Tompson "Efficient Object Localization Using Convlutional Networks" (PDJ@0.05)
+
+kinect2 (still images | video) (PCK or PDJ)
+	19 joints
+	without torso mask
+		SpatialNet + FusionNet
+
+	with torso mask or both torso mask and motion
+		SpatialNet
+		FusionNet
+		IndepentNet
+
+		SpatialNet + FusionNet + IndepentNet (final)
+
+	no need to compare with other (PDJ@0.1/0.05)
+
+bbc pose (video) (PCKf)
+	7 joints 
+	without torso mask
+		SpatialNet + FusionNet
+
+	with torso mask
+		SpatialNet
+		FusionNet
+		IndepentNet
+
+		SpatialNet + FusionNet + IndepentNet (final)
+
+	compare with Tomas Pfister "Flowing ConvNets for Human Pose Estimation in Videos" (only for bbc pose not bbc pose extension) (r=6 | r=10)
+
+plot the hard parts, like eblow, wrist

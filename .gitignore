@@ -11,6 +11,3 @@ data/Actions/
 *.avi
 demo/*.log
 ip
-results/*.py
-results/*.pyc
-results/accuracy.record.txt

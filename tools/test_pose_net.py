@@ -261,6 +261,10 @@ def server_pose_net():
         client.sendall(data)
       except Exception as err:
         print "cant not get person & torso detection results"
+        break
+    print "\n\n**********************************************"
+    print "               New Connection"
+    print "**********************************************\n\n"
 
   # close
   server.close()

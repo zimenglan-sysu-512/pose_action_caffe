@@ -262,9 +262,9 @@ def server_pose_net():
       except Exception as err:
         print "cant not get person & torso detection results"
         break
-    print "\n\n**********************************************"
-    print "               New Connection"
-    print "**********************************************\n\n"
+    print "\n\n*****************************************************"
+    print "               Wait for New Connection"
+    print "*****************************************************\n\n"
 
   # close
   server.close()
